@@ -11,7 +11,6 @@ public class Player_Controller : MonoBehaviour
 
    
     public Animator playerAnimation;
-    public int moveSpeed;
 
     private Vector2 _moveDirection;
 
@@ -26,7 +25,6 @@ public class Player_Controller : MonoBehaviour
        rb = GetComponent<Rigidbody>();
        player_Class = GetComponent<Player_Class>();
        playerAnimation = GetComponent<Animator>();
-       moveSpeed = player_Class.speed;
 
        move.action.Enable();
        attack.action.Enable();
@@ -37,10 +35,16 @@ public class Player_Controller : MonoBehaviour
     void Update()
     {
         _moveDirection = move.action.ReadValue<Vector2>();
-        rb.linearVelocity = new Vector3(_moveDirection.x * moveSpeed,0,_moveDirection.y * moveSpeed);
+
+        
+        rb.linearVelocity = new Vector3(_moveDirection.x * player_Class.speed, rb.linearVelocity.y ,_moveDirection.y * player_Class.speed);
         if (attack.action.IsPressed() && isAttacking == false)
         {
             playerAnimation.SetTrigger("isAttacking");
         }
+
+        
+
     }
+    
 }

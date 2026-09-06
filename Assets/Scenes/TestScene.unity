@@ -338,7 +338,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!136 &306682522
 CapsuleCollider:
@@ -482,7 +482,6 @@ MonoBehaviour:
   rb: {fileID: 0}
   player_Class: {fileID: 0}
   playerAnimation: {fileID: 0}
-  moveSpeed: 0
   isAttacking: 0
   weapon: {fileID: 0}
   move: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}

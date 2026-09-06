@@ -11,8 +11,7 @@ public class Player_Class : MonoBehaviour
     public int speed;
 
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         //Warrior Stats
         health = 100;
