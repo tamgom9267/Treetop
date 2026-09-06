@@ -9,7 +9,6 @@ public class Player_Controller : MonoBehaviour
     [SerializeField]
     public Player_Class player_Class;
 
-   
     public Animator playerAnimation;
 
     private Vector2 _moveDirection;

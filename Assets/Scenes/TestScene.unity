@@ -498,6 +498,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4262636d57ad2b84a94d7d4acf0bf089, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player_Class
+  classStats: {fileID: 11400000, guid: 4c856cbb514d0704cac4a42fc011a5bf, type: 2}
   health: 0
   MP: 0
   defense: 0
@@ -1115,6 +1116,7 @@ GameObject:
   - component: {fileID: 1402917846}
   - component: {fileID: 1402917845}
   - component: {fileID: 1402917844}
+  - component: {fileID: 1402917848}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1206,6 +1208,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1402917848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1402917843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01f4fa90d47309c4ca11a523f9dab59b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthBar
+  player_Class: {fileID: 306682528}
+  HP: {fileID: 0}
+  MP: {fileID: 0}
 --- !u!1 &1595151946
 GameObject:
   m_ObjectHideFlags: 0
