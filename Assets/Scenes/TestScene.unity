@@ -544,7 +544,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 8b78809653fdcb44f82e26be01c1bd56, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2016,7 +2016,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 100
+  m_Text: 
 --- !u!222 &1331520576
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2221,8 +2221,8 @@ MonoBehaviour:
   playerClass: {fileID: 306682530}
   HP: {fileID: 10077839}
   MP: {fileID: 1076903185}
-  NumbHP: {fileID: 0}
-  NumbMP: {fileID: 0}
+  NumbHP: {fileID: 1331520575}
+  NumbMP: {fileID: 1852812969}
 --- !u!1 &1595151946
 GameObject:
   m_ObjectHideFlags: 0
@@ -2553,7 +2553,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 100
+  m_Text: 
 --- !u!222 &1852812970
 CanvasRenderer:
   m_ObjectHideFlags: 0
