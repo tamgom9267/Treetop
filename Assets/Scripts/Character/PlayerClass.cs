@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Player_Class : MonoBehaviour
+public class PlayerClass : MonoBehaviour
 {
 
     public  ClassStats classStats;
