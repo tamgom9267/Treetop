@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +8,9 @@ public class HealthBar : MonoBehaviour
 
     public Slider HP;
     public Slider MP;
+
+    public Text NumbHP;
+    public Text NumbMP;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -27,5 +29,8 @@ public class HealthBar : MonoBehaviour
     {
         HP.value = playerClass.health;
         MP.value = playerClass.MP;
+
+        NumbHP.text = playerClass.health.ToString();
+        NumbMP.text = playerClass.MP.ToString();
     }
 }

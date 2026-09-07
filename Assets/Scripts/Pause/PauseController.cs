@@ -5,11 +5,14 @@ public class PauseController : MonoBehaviour
 {
     [SerializeField] private GameObject CanvasHealthBar;
     [SerializeField] private GameObject CanvasPause;
+    private InputAction PauseAction;
     private bool isPaused = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        PauseAction = InputSystem.actions.FindAction("Player/Pause");
+
         // Al iniciar el juego, el tiempo es normal
         Time.timeScale = 1f;
 
@@ -19,6 +22,15 @@ public class PauseController : MonoBehaviour
         // Ocultamos el canvas de pausa
         CanvasPause.SetActive(false);
 
+    }
+
+    void Update()
+    {
+        if (PauseAction.WasPressedThisFrame())
+        {
+            Debug.Log("ESC PRESIONADO");
+            TogglePause();
+        }
     }
 
     public void OnPause(InputValue value)
