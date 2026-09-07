@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player_Controller : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     public Rigidbody rb;
     [SerializeField]
-    public Player_Class player_Class;
+    public PlayerClass playerClass;
     public Animator playerAnimation;
     private Vector2 _moveDirection;
     public bool isAttacking = false;
@@ -16,7 +16,7 @@ public class Player_Controller : MonoBehaviour
     void Start()
     {
        rb = GetComponent<Rigidbody>();
-       player_Class = GetComponent<Player_Class>();
+       playerClass = GetComponent<PlayerClass>();
        playerAnimation = GetComponent<Animator>();
 
        move.action.Enable();
@@ -33,7 +33,7 @@ public class Player_Controller : MonoBehaviour
             RotatePlayer(_moveDirection);    
         }
         
-        rb.linearVelocity = new Vector3(_moveDirection.x * player_Class.speed, rb.linearVelocity.y ,_moveDirection.y * player_Class.speed);
+        rb.linearVelocity = new Vector3(_moveDirection.x * playerClass.speed, rb.linearVelocity.y ,_moveDirection.y * playerClass.speed);
         
         if (attack.action.WasPressedThisFrame() && !isAttacking)
         {
