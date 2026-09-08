@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f749c4cabd25b124f8a2f4f51fa2c29e, type: 3}
   m_Name: Sword
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
+  name: Sword
   model: {fileID: 919132149155446097, guid: 1d6fc22a56dd01647a38decd2d77118b, type: 3}
-  sprite: {fileID: 0}
+  UIsprite: {fileID: 2800000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
+  weight: {x: 1, y: 1}
   animator: {fileID: 0}
