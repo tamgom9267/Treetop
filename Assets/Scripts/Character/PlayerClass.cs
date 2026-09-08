@@ -5,11 +5,26 @@ public class PlayerClass : MonoBehaviour
 
     public  ClassStats classStats;
 
+    public PlayerInventory Inventory;
+
+    public InventoryObject Weapon;
+    public InventoryObject Slot1;
+    public InventoryObject Slot2;
+    public InventoryObject Slot3;
+
+    public int maxhHealth;
     public int health;
     public int MP;
     public int defense;
+    
+    //Daño físico(Attack Damage)
     public int AD;
+
+    //Daño de proyectil(Ability Points)
     public int AP;
+
+    //Poder de curación(Healing Bonus)
+    public int HB;
     public int speed;
 
 
@@ -31,7 +46,8 @@ public class PlayerClass : MonoBehaviour
     {
          if (classStats)
         {
-            health = classStats.health;
+            maxhHealth = classStats.health;
+            health = maxhHealth;
             MP = classStats.MP;
             defense = classStats.defense;
             AD = classStats.AD;
