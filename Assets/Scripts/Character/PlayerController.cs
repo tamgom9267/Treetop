@@ -7,12 +7,16 @@ public class PlayerController : MonoBehaviour
     public Rigidbody rb;
     [SerializeField]
     public PlayerClass playerClass;
+    public PlayerInventory Inventory;
     public Animator playerAnimation;
     private Vector2 _moveDirection;
     public bool isAttacking = false;
     public GameObject weapon;
     public InputActionReference move;
     public InputActionReference attack;
+    public InputActionReference interact;
+
+
 
     void Start()
     {
@@ -22,6 +26,7 @@ public class PlayerController : MonoBehaviour
 
        move.action.Enable();
        attack.action.Enable();
+       interact.action.Enable();
 
        Transform equipedWeapon = transform.Find("Hand");
        Instantiate(weapon,equipedWeapon);
@@ -57,6 +62,7 @@ public class PlayerController : MonoBehaviour
 
             playerAnimation.SetTrigger("isAttacking");
         }
+
     }
     
     void RotatePlayer(Vector2 direction)
@@ -89,5 +95,5 @@ public class PlayerController : MonoBehaviour
     {
         isAttacking = false;
     }
-    
+
 }

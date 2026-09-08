@@ -5,8 +5,6 @@ public class PlayerClass : MonoBehaviour
 
     public  ClassStats classStats;
 
-    public PlayerInventory Inventory;
-
     public InventoryObject Weapon;
     public InventoryObject Slot1;
     public InventoryObject Slot2;
