@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -22,9 +21,6 @@ public class PlayerController : MonoBehaviour
 
        move.action.Enable();
        attack.action.Enable();
-
-       Transform equipedWeapon = transform.Find("Hand");
-       Instantiate(weapon,equipedWeapon);
        
     }
 
