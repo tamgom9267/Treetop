@@ -17,4 +17,5 @@ MonoBehaviour:
   defense: 10
   AD: 5
   AP: 1
+  HB: 0
   speed: 5
