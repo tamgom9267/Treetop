@@ -12,6 +12,11 @@ public class PlayerController : MonoBehaviour
     private Vector2 _moveDirection;
     public bool isAttacking = false;
     public GameObject weapon;
+
+    public InventoryObject Slot1;
+    public InventoryObject Slot2;
+    public InventoryObject Slot3;
+    
     public InputActionReference move;
     public InputActionReference attack;
     public InputActionReference interact;
@@ -22,11 +27,13 @@ public class PlayerController : MonoBehaviour
     {
        rb = GetComponent<Rigidbody>();
        playerClass = GetComponent<PlayerClass>();
+       Inventory = GetComponent<PlayerInventory>();
+
        playerAnimation = GetComponent<Animator>();
 
        move.action.Enable();
        attack.action.Enable();
-       interact.action.Enable();
+       
 
        Transform equipedWeapon = transform.Find("Hand");
        Instantiate(weapon,equipedWeapon);
