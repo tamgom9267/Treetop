@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f749c4cabd25b124f8a2f4f51fa2c29e, type: 3}
-  m_Name: Sword
+  m_Name: Staff
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
-  name: Sword
-  model: {fileID: 919132149155446097, guid: f62c64d74932ff140a5ada35c201a0ae, type: 3}
-  prefab: {fileID: 919132149155446097, guid: 1d6fc22a56dd01647a38decd2d77118b, type: 3}
-  UIsprite: {fileID: 2800000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
+  name: Staff
+  model: {fileID: 919132149155446097, guid: aca471f1ce5754e478e46eff3085a450, type: 3}
+  prefab: {fileID: 6284623827792501393, guid: 8a5a201cab37be740bd0696aa6cc0461, type: 3}
+  UIsprite: {fileID: 2800000, guid: 6ffe63d9c7f421c47ab808cca3bc0802, type: 3}
   weight: {x: 1, y: 1}
   animator: {fileID: 0}

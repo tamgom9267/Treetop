@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public Animator playerAnimation;
     private Vector2 _moveDirection;
     public bool isAttacking = false;
-    public GameObject weapon;
+    public Weapon weapon;
 
     public InventoryObject Slot1;
     public InventoryObject Slot2;
@@ -36,7 +36,7 @@ public class PlayerController : MonoBehaviour
        
 
        Transform equipedWeapon = transform.Find("Hand");
-       Instantiate(weapon,equipedWeapon);
+       Instantiate(weapon.model,equipedWeapon);
        
     }
 

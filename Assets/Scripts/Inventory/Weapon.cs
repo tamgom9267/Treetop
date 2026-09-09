@@ -5,7 +5,9 @@ using UnityEngine.UI;
 public class Weapon : ScriptableObject
 {
     public string name;
+
     public GameObject model;
+    public GameObject prefab;
     public Texture2D UIsprite;
 
     public Vector2Int weight = Vector2Int.one;
