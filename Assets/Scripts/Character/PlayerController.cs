@@ -127,25 +127,20 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerExit()
     {
-        Debug.Log("s");
+        nearestWeapon.isSelected = false;
     }
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("aaaaa");
         if(other.CompareTag("Weapon"))
         {
             Debug.Log("a");
             WeaponObject weaponObj = other.gameObject.GetComponent<WeaponObject>();
+            nearestWeapon = weaponObj;
             if(weaponObj == nearestWeapon)
             {
                 nearestWeapon.isSelected = true;
             }
-            else
-            {
-                nearestWeapon = weaponObj;
-                Debug.Log("b");
-                
-            }
+            
             
         }
 

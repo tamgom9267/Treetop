@@ -59,6 +59,11 @@ public class WeaponObject : InventoryObject
            
 
         }
+        else
+        {
+            GameObject InteractCanva = transform.GetChild(4).gameObject;
+            InteractCanva.SetActive(false);
+        }
         
 
     }
