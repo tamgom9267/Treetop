@@ -13,7 +13,7 @@ public class InventoryObject : MonoBehaviour
     //Cuanto espacio ocupa
     public int weight;
 
-    public float4x4 requieredCells;
+    public List<List<int>> requieredCells;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

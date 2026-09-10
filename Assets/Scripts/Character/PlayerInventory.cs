@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class PlayerInventory : MonoBehaviour
 {
     public List<InventoryObject> Inventory = new List<InventoryObject>();
+    public List<int> AvailableIDs = new List<int>();
 
     //Cuanto cabe en el inventario(basicamente grid**2)
     public int MaxWeight = 16;
@@ -16,8 +18,8 @@ public class PlayerInventory : MonoBehaviour
     public int row = 4;
     public int column = 4;
 
-    //Para generar el grid
-    public int grid;
+    //El espacio del inventario con los espacios integrados
+    public List<List<int>> grid;
 
     //Para cuando Recogas un objeto
     public InventoryObject SelectedObject;
@@ -69,16 +71,25 @@ public class PlayerInventory : MonoBehaviour
         
     }
 
-    void UpdateSpace()
-    {
-        grid = row*column;
-        MaxWeight = grid;
-    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        UpdateSpace();
+        //Crear el inventario inicial
+        MaxWeight = row*column;
+        List<int> row_array = new List<int>();
+
+        for(int i = 0; i<row; i++)
+        {
+            row_array.Append(0);
+        }
+
+        for (int i = 0; i < column; i++)
+        {
+            grid.Append(row_array);
+        }
+
+
     }
 
     // Update is called once per frame

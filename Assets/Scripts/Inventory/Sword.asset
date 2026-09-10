@@ -14,7 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
   name: Sword
   model: {fileID: 919132149155446097, guid: f62c64d74932ff140a5ada35c201a0ae, type: 3}
-  prefab: {fileID: 919132149155446097, guid: 1d6fc22a56dd01647a38decd2d77118b, type: 3}
+  prefab: {fileID: 585997809360705486, guid: 22f96321d07eb0941a4dd5229d301e16, type: 3}
   UIsprite: {fileID: 2800000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
-  weight: {x: 1, y: 1}
-  animator: {fileID: 0}
+  weight: 0
+  health: 0
+  MP: 0
+  defense: 0
+  AD: 5
+  AP: 0
+  HB: 0
+  speed: 0
