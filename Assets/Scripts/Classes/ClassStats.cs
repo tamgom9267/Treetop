@@ -8,5 +8,7 @@ public class ClassStats : ScriptableObject
     public int defense;
     public int AD;
     public int AP;
+    
+    public int HB;
     public int speed;
 }

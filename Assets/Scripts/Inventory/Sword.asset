@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f749c4cabd25b124f8a2f4f51fa2c29e, type: 3}
+  m_Name: Sword
+  m_EditorClassIdentifier: Assembly-CSharp::Weapon
+  name: Sword
+  model: {fileID: 919132149155446097, guid: f62c64d74932ff140a5ada35c201a0ae, type: 3}
+  prefab: {fileID: 585997809360705486, guid: 22f96321d07eb0941a4dd5229d301e16, type: 3}
+  UIsprite: {fileID: 2800000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
+  weight: 0
+  health: 0
+  MP: 0
+  defense: 0
+  AD: 5
+  AP: 0
+  HB: 0
+  speed: 0

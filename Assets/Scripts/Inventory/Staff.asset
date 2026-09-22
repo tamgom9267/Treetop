@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f749c4cabd25b124f8a2f4f51fa2c29e, type: 3}
+  m_Name: Staff
+  m_EditorClassIdentifier: Assembly-CSharp::Weapon
+  name: Staff
+  model: {fileID: 919132149155446097, guid: aca471f1ce5754e478e46eff3085a450, type: 3}
+  prefab: {fileID: 6284623827792501393, guid: 8a5a201cab37be740bd0696aa6cc0461, type: 3}
+  UIsprite: {fileID: 2800000, guid: 6ffe63d9c7f421c47ab808cca3bc0802, type: 3}
+  weight: {x: 1, y: 1}
+  animator: {fileID: 0}

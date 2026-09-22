@@ -1,3 +1,5 @@
+using Microsoft.Unity.VisualStudio.Editor;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,21 +8,51 @@ public class PlayerController : MonoBehaviour
     public Rigidbody rb;
     [SerializeField]
     public PlayerClass playerClass;
+    public PlayerInventory Inventory;
     public Animator playerAnimation;
     private Vector2 _moveDirection;
     public bool isAttacking = false;
-    public GameObject weapon;
+    public WeaponData weapon;
+
+    public InventoryObject Slot1;
+    public InventoryObject Slot2;
+    public InventoryObject Slot3;
+    
     public InputActionReference move;
     public InputActionReference attack;
+    public InputActionReference interact;
+
+    public InputActionReference inventory;
+
+    Transform handObj;
+
+    
+
+
+    WeaponObject nearestWeapon;
+
+
+    [SerializeField]
+    GameObject InventoryUI; 
 
     void Start()
     {
        rb = GetComponent<Rigidbody>();
        playerClass = GetComponent<PlayerClass>();
+       Inventory = GetComponent<PlayerInventory>();
+
        playerAnimation = GetComponent<Animator>();
 
        move.action.Enable();
        attack.action.Enable();
+       interact.action.Enable();
+       inventory.action.Enable();
+
+       handObj = transform.Find("Hand");
+       GameObject equipedWeapon = Instantiate(weapon.prefab,handObj);
+       equipedWeapon.GetComponent<WeaponObject>().player = this;
+       equipedWeapon.GetComponent<SphereCollider>().enabled = false;
+       equipedWeapon.GetComponent<Rigidbody>().isKinematic = true;
        
     }
 
@@ -53,6 +85,12 @@ public class PlayerController : MonoBehaviour
 
             playerAnimation.SetTrigger("isAttacking");
         }
+
+        if (inventory.action.WasPressedThisFrame())
+        {
+            InventoryUI.SetActive(!InventoryUI.activeSelf);
+        }
+
     }
     
     void RotatePlayer(Vector2 direction)
@@ -85,5 +123,28 @@ public class PlayerController : MonoBehaviour
     {
         isAttacking = false;
     }
-    
+
+
+    private void OnTriggerExit()
+    {
+        nearestWeapon.isSelected = false;
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("Weapon"))
+        {
+            Debug.Log("a");
+            WeaponObject weaponObj = other.gameObject.GetComponent<WeaponObject>();
+            nearestWeapon = weaponObj;
+            if(weaponObj == nearestWeapon)
+            {
+                nearestWeapon.isSelected = true;
+            }
+            
+            
+        }
+
+        
+    }
+
 }
