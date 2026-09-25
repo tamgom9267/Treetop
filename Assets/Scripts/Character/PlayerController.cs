@@ -125,10 +125,14 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    private void OnTriggerExit()
-    {
-        nearestWeapon.isSelected = false;
+    private void OnTriggerExit(Collider other)
+    {   
+        if(other.CompareTag("Weapon"))
+        {
+            nearestWeapon.isSelected = false;
+        }
     }
+
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Weapon"))
