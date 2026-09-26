@@ -7,7 +7,7 @@ public class PlayerClass : MonoBehaviour
 
     
 
-    public int maxhHealth;
+    public int maxHealth;
     public int health;
     public int MP;
     public int defense;
@@ -41,8 +41,8 @@ public class PlayerClass : MonoBehaviour
     {
          if (classStats)
         {
-            maxhHealth = classStats.health;
-            health = maxhHealth;
+            maxHealth = classStats.health;
+            health = maxHealth;
             MP = classStats.MP;
             defense = classStats.defense;
             AD = classStats.AD;
