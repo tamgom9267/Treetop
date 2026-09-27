@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviour
        GameObject equipedWeapon = Instantiate(weapon.prefab,handObj);
        equipedWeapon.GetComponent<WeaponObject>().player = this;
        equipedWeapon.GetComponent<SphereCollider>().enabled = false;
+       equipedWeapon.GetComponent<BoxCollider>().enabled = false;
        equipedWeapon.GetComponent<Rigidbody>().isKinematic = true;
        
     }

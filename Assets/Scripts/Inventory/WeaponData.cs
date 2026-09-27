@@ -5,7 +5,7 @@ using UnityEngine.UI;
 [CreateAssetMenu(fileName = "WeaponData", menuName = "Scriptable Objects/Weapon")]
 public class WeaponData : ScriptableObject
 {
-    public string name;
+    public string Name;
 
     public GameObject model;
     public GameObject prefab;
