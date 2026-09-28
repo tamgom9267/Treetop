@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,11 +11,11 @@ public class WeaponData : ScriptableObject
 
     public GameObject model;
     public GameObject prefab;
-    public Texture2D UIsprite;
+    public Sprite UIsprite;
 
     public int weight;
 
-    public List<List<int>> requiredCells;
+   public List<int> requiredCells = new List<int>();
 
     //Stats que va a modificar
     public int health;

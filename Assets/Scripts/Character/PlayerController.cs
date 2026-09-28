@@ -2,6 +2,7 @@ using Microsoft.Unity.VisualStudio.Editor;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
@@ -29,11 +30,10 @@ public class PlayerController : MonoBehaviour
     
 
 
-    WeaponObject nearestWeapon;
+    public WeaponObject nearestWeapon;
 
 
-    [SerializeField]
-    GameObject InventoryUI; 
+    [SerializeField] GameObject InventoryUI; 
 
     void Start()
     {
@@ -92,6 +92,13 @@ public class PlayerController : MonoBehaviour
             InventoryUI.SetActive(!InventoryUI.activeSelf);
         }
 
+        if(interact.action.WasPressedThisFrame() && InventoryUI.activeSelf == false && nearestWeapon != null)
+        {
+            InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);
+            InventoryUI.SetActive(true);
+
+        }
+
     }
     
     void RotatePlayer(Vector2 direction)
@@ -126,9 +133,14 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    private void OnTriggerExit()
+    private void OnTriggerExit(Collider other)
     {
-        nearestWeapon.isSelected = false;
+         if(other.CompareTag("Weapon"))
+        {
+            nearestWeapon.isSelected = false;
+        }
+
+
     }
     private void OnTriggerEnter(Collider other)
     {

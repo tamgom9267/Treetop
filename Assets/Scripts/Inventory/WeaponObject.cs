@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -9,7 +11,7 @@ public class WeaponObject : InventoryObject
     public PlayerController player;
 
     [SerializeField]
-    private WeaponData weaponData;
+    public WeaponData weaponData;
 
 
     public int health;
@@ -36,9 +38,17 @@ public class WeaponObject : InventoryObject
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    
+    void getRealList(List<int> cells)
+    {
+        for(int i = 0; i < cells.Count; i+=2)
+        {
+            requieredCells.Add(new List<int> {cells[i],cells[i+1]});
+        }
+    }
     void Awake()
     {
-        name = weaponData.name;
+        Name = weaponData.Name;
         health = weaponData.health;
         MP = weaponData.MP;
         defense = weaponData.defense;
@@ -46,6 +56,7 @@ public class WeaponObject : InventoryObject
         AP = weaponData.AP;
         HB = weaponData.HB;
         speed = weaponData.speed;
+        getRealList(weaponData.requiredCells);        
 
     }
 

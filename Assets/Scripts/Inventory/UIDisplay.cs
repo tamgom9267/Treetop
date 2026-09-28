@@ -15,8 +15,8 @@ public class UIDisplay : MonoBehaviour
         GameObject WeaponSprite = new GameObject("WeaponSprite");
         
         WeaponSprite.transform.SetParent(weaponSlotObj, false);
-        RawImage Image = WeaponSprite.AddComponent<RawImage>();
-        Image.texture = player.weapon.UIsprite;
+        Image Image = WeaponSprite.AddComponent<Image>();
+        Image.sprite = player.weapon.UIsprite;
     
     }
 
@@ -29,8 +29,8 @@ public class UIDisplay : MonoBehaviour
             GameObject WeaponSprite = new GameObject("WeaponSprite");
             
             WeaponSprite.transform.SetParent(weaponSlotObj, false);
-            RawImage Image = WeaponSprite.AddComponent<RawImage>();
-            Image.texture = player.weapon.UIsprite;
+            Image Image = WeaponSprite.AddComponent<Image>();
+            Image.sprite = player.weapon.UIsprite;
         }
         else
         {
