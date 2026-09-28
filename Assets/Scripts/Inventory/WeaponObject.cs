@@ -16,9 +16,9 @@ public class WeaponObject : InventoryObject
     public int MP;
     public int defense;
     
-    public int AD;
+    public int WD;
 
-    public int AP;
+    public int PD;
 
     public int HB;
     public int speed;
@@ -42,8 +42,8 @@ public class WeaponObject : InventoryObject
         health = weaponData.health;
         MP = weaponData.MP;
         defense = weaponData.defense;
-        AD = weaponData.AD;
-        AP = weaponData.AP;
+        WD = weaponData.WD;
+        PD = weaponData.PD;
         HB = weaponData.HB;
         speed = weaponData.speed;
 

@@ -54,6 +54,21 @@ public class Area3 : MonoBehaviour
         // Activamos el cuarto
         isActive = true;
 
+        // Activa la IA y animaciones de todos los slimes del cuarto.
+        foreach (GameObject enemy in enemies)
+        {
+            // Evita errores si un enemigo ya no existe.
+            if (enemy == null)
+                continue;
+
+            // Obtiene el script SlimeEnemy.cs de cada slime
+            SlimeEnemy slimeEnemy = enemy.GetComponent<SlimeEnemy>();
+
+            // Solo activa los objetos que tienen el script SlimeEnemy.
+            if (slimeEnemy != null)
+                slimeEnemy.ActivateSlime();
+        }
+
         // Mientras se cimpleta el objetivo, las puertas se mantienen cerradas
         CloseDoor(entranceDoor);
         CloseDoor(exitDoor);

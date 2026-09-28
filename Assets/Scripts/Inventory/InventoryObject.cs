@@ -5,7 +5,7 @@ using UnityEngine;
 public class InventoryObject : MonoBehaviour
 {
 
-    public string name;
+    public string Objectname;
 
     //En caso de tener dos objetos con el mismo nombres
     public string ID;

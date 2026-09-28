@@ -55,7 +55,7 @@ public class Area4 : MonoBehaviour
         CloseDoor(entranceDoor);
         CloseDoor(exitDoor);
 
-        // Calculamos cuánta vida le falta al Player.
+        // Calculamos cuanta vida le falta al Player.
         int missingHealth = playerClass.maxHealth - playerClass.health;
 
         // Si le faltan menos de 19 puntos de vida, le quitamos 20.

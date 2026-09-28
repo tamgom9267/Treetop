@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 3299177}
   m_Layer: 0
   m_Name: Pared Isquierda
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -245,7 +245,7 @@ GameObject:
   - component: {fileID: 5038147}
   m_Layer: 0
   m_Name: Bloque 4
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -490,6 +490,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cofre
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 047774e1a2141eb4c94f40d5bc99082b, type: 3}
+      propertyPath: m_TagString
+      value: Obstacle
+      objectReference: {fileID: 0}
     - target: {fileID: 7202271454713460447, guid: 047774e1a2141eb4c94f40d5bc99082b, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -646,7 +650,7 @@ GameObject:
   - component: {fileID: 30789140}
   m_Layer: 0
   m_Name: Bloque 3
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -758,7 +762,7 @@ GameObject:
   - component: {fileID: 33202678}
   m_Layer: 0
   m_Name: Pared Arriba
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -949,7 +953,7 @@ GameObject:
   - component: {fileID: 35238191}
   m_Layer: 0
   m_Name: Pared Derecha
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1061,7 +1065,7 @@ GameObject:
   - component: {fileID: 58846591}
   m_Layer: 0
   m_Name: Bloque 5
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1296,7 +1300,7 @@ GameObject:
   - component: {fileID: 101448833}
   m_Layer: 0
   m_Name: Pared Abajo
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1408,7 +1412,7 @@ GameObject:
   - component: {fileID: 122260070}
   m_Layer: 0
   m_Name: Pared Derecha
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1520,7 +1524,7 @@ GameObject:
   - component: {fileID: 125772226}
   m_Layer: 0
   m_Name: Bloque 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1632,7 +1636,7 @@ GameObject:
   - component: {fileID: 127994684}
   m_Layer: 0
   m_Name: Bloque 4
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1744,7 +1748,7 @@ GameObject:
   - component: {fileID: 144950236}
   m_Layer: 0
   m_Name: Objeto 6
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1856,7 +1860,7 @@ GameObject:
   - component: {fileID: 170966507}
   m_Layer: 0
   m_Name: Bloque 3
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2176,63 +2180,6 @@ Transform:
   - {fileID: 1506065123}
   m_Father: {fileID: 61621298}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &207254886
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 137415524845617739, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
-      propertyPath: m_Name
-      value: sword
-      objectReference: {fileID: 0}
-    - target: {fileID: 766704977975204081, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 766704977975204081, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 766704977975204081, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 766704977975204081, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 766704977975204081, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 766704977975204081, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 766704977975204081, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 766704977975204081, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 766704977975204081, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 766704977975204081, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
 --- !u!1 &209705071
 GameObject:
   m_ObjectHideFlags: 0
@@ -2384,7 +2331,7 @@ GameObject:
   - component: {fileID: 215203359}
   m_Layer: 0
   m_Name: Pared Arriba
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2646,7 +2593,7 @@ GameObject:
   - component: {fileID: 240384712}
   m_Layer: 0
   m_Name: Pared Arriba
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2833,7 +2780,7 @@ GameObject:
   - component: {fileID: 257716272}
   m_Layer: 0
   m_Name: Puerta
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2870,7 +2817,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -3020,7 +2967,7 @@ GameObject:
   - component: {fileID: 270078292}
   m_Layer: 0
   m_Name: Pared Arriba
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3166,7 +3113,7 @@ GameObject:
   - component: {fileID: 307449630}
   m_Layer: 0
   m_Name: Pared Derecha
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3278,7 +3225,7 @@ GameObject:
   - component: {fileID: 323195841}
   m_Layer: 0
   m_Name: Pared Isquierda
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3527,7 +3474,7 @@ GameObject:
   - component: {fileID: 374274061}
   m_Layer: 0
   m_Name: Pared Superior
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3639,7 +3586,7 @@ GameObject:
   - component: {fileID: 376153687}
   m_Layer: 0
   m_Name: Bloque 5
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3751,7 +3698,7 @@ GameObject:
   - component: {fileID: 376290522}
   m_Layer: 0
   m_Name: Bloque 5
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3863,7 +3810,7 @@ GameObject:
   - component: {fileID: 378093762}
   m_Layer: 0
   m_Name: Pared Abajo
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4196,7 +4143,7 @@ GameObject:
   - component: {fileID: 389687802}
   m_Layer: 0
   m_Name: Bloque central
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4308,7 +4255,7 @@ GameObject:
   - component: {fileID: 396279124}
   m_Layer: 0
   m_Name: Objeto 4
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4422,7 +4369,7 @@ GameObject:
   - component: {fileID: 408111469}
   m_Layer: 0
   m_Name: Area 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4700,7 +4647,7 @@ GameObject:
   - component: {fileID: 420077347}
   m_Layer: 0
   m_Name: Bloque 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4812,7 +4759,7 @@ GameObject:
   - component: {fileID: 423953606}
   m_Layer: 0
   m_Name: Bloque 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4924,7 +4871,7 @@ GameObject:
   - component: {fileID: 425856201}
   m_Layer: 0
   m_Name: Bloque 4
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5036,7 +4983,7 @@ GameObject:
   - component: {fileID: 432109726}
   m_Layer: 0
   m_Name: Bloque 3
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5148,7 +5095,7 @@ GameObject:
   - component: {fileID: 433163796}
   m_Layer: 0
   m_Name: Pared Isquierda
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5262,7 +5209,7 @@ GameObject:
   - component: {fileID: 450610948}
   m_Layer: 0
   m_Name: Area 4
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5647,7 +5594,7 @@ GameObject:
   - component: {fileID: 483803907}
   m_Layer: 0
   m_Name: Bloque 3
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5908,7 +5855,7 @@ GameObject:
   - component: {fileID: 505156163}
   m_Layer: 0
   m_Name: Bloque 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6095,7 +6042,7 @@ GameObject:
   - component: {fileID: 515876030}
   m_Layer: 0
   m_Name: Pared Abajo
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6358,7 +6305,7 @@ GameObject:
   - component: {fileID: 544434089}
   m_Layer: 0
   m_Name: Bloque derecho 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6470,7 +6417,7 @@ GameObject:
   - component: {fileID: 547355697}
   m_Layer: 0
   m_Name: Pared Inferior
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6703,7 +6650,7 @@ GameObject:
   - component: {fileID: 591631125}
   m_Layer: 0
   m_Name: Bloque central
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6815,7 +6762,7 @@ GameObject:
   - component: {fileID: 607034117}
   m_Layer: 0
   m_Name: Pared Isquierda
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7102,6 +7049,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Yunque
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a8ffc5bf05a254249ac62c4015f744a2, type: 3}
+      propertyPath: m_TagString
+      value: Obstacle
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 65702495048144492, guid: a8ffc5bf05a254249ac62c4015f744a2, type: 3}
@@ -7161,7 +7112,7 @@ GameObject:
   - component: {fileID: 630567127}
   m_Layer: 0
   m_Name: Pared Inferior
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7372,7 +7323,7 @@ GameObject:
   - component: {fileID: 645280487}
   m_Layer: 0
   m_Name: Bloque derecho 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7484,7 +7435,7 @@ GameObject:
   - component: {fileID: 665561801}
   m_Layer: 0
   m_Name: Pared Isquierda
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7596,7 +7547,7 @@ GameObject:
   - component: {fileID: 677088716}
   m_Layer: 0
   m_Name: Bloque 3
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7833,10 +7784,12 @@ MonoBehaviour:
   health: 0
   MP: 0
   defense: 0
-  AD: 0
-  AP: 0
+  WD: 0
+  PD: 0
   HB: 0
   speed: 0
+  enemyKnockbackForce: 8
+  enemyKnockbackUpForce: 3
 --- !u!114 &707366305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7854,6 +7807,7 @@ MonoBehaviour:
   Inventory: {fileID: 0}
   playerAnimation: {fileID: 707366302}
   isAttacking: 0
+  turnSpeed: 720
   weapon: {fileID: 11400000, guid: a2415408a2bb30d43b0301c3bc2a7f70, type: 2}
   Slot1: {fileID: 0}
   Slot2: {fileID: 0}
@@ -7927,7 +7881,7 @@ GameObject:
   - component: {fileID: 730322744}
   m_Layer: 0
   m_Name: Pared Derecha
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8072,7 +8026,7 @@ GameObject:
   - component: {fileID: 773546155}
   m_Layer: 0
   m_Name: Pared Derecha
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8322,7 +8276,7 @@ GameObject:
   - component: {fileID: 797326296}
   m_Layer: 0
   m_Name: Bloque 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8620,7 +8574,7 @@ GameObject:
   - component: {fileID: 819948014}
   m_Layer: 0
   m_Name: Bloque derecho 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8734,7 +8688,7 @@ GameObject:
   - component: {fileID: 822574270}
   m_Layer: 0
   m_Name: Area 5
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8886,7 +8840,7 @@ GameObject:
   - component: {fileID: 826493884}
   m_Layer: 0
   m_Name: Pared Superior
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9047,7 +9001,7 @@ GameObject:
   - component: {fileID: 833769955}
   m_Layer: 0
   m_Name: Objeto 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9159,7 +9113,7 @@ GameObject:
   - component: {fileID: 834609144}
   m_Layer: 0
   m_Name: Bloque 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9271,7 +9225,7 @@ GameObject:
   - component: {fileID: 848706321}
   m_Layer: 0
   m_Name: Bloque 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9383,7 +9337,7 @@ GameObject:
   - component: {fileID: 854018354}
   m_Layer: 0
   m_Name: Bloque isquierdo 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10094,7 +10048,7 @@ GameObject:
   - component: {fileID: 932510398}
   m_Layer: 0
   m_Name: Bloque 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10281,7 +10235,7 @@ GameObject:
   - component: {fileID: 967402425}
   m_Layer: 0
   m_Name: Bloque 6
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10646,6 +10600,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: SMILE 2
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      propertyPath: m_TagString
+      value: PhysicalEnemy
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 9119259220617699050, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
@@ -10664,7 +10626,19 @@ PrefabInstance:
       addedObject: {fileID: 1700227623}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1700227625}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1700227626}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1700227627}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1700227624}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1700227628}
   m_SourcePrefab: {fileID: 100100000, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
 --- !u!4 &1057711361 stripped
 Transform:
@@ -10685,7 +10659,7 @@ GameObject:
   - component: {fileID: 1058245521}
   m_Layer: 0
   m_Name: Pared Derecha
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11008,7 +10982,7 @@ GameObject:
   - component: {fileID: 1092559446}
   m_Layer: 0
   m_Name: Bloque derecho 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11122,7 +11096,7 @@ GameObject:
   - component: {fileID: 1100802648}
   m_Layer: 0
   m_Name: Area 3
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11139,7 +11113,8 @@ Transform:
   m_LocalPosition: {x: -28.5, y: 0, z: 20.5}
   m_LocalScale: {x: 4.2, y: 1, z: 2.6}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1599574195}
   m_Father: {fileID: 59399820}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!64 &1100802644
@@ -11276,7 +11251,7 @@ GameObject:
   - component: {fileID: 1109031278}
   m_Layer: 0
   m_Name: Puerta
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11388,7 +11363,7 @@ GameObject:
   - component: {fileID: 1134872938}
   m_Layer: 0
   m_Name: Bloque 4
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11500,7 +11475,7 @@ GameObject:
   - component: {fileID: 1140418791}
   m_Layer: 0
   m_Name: Bloque 3
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11632,107 +11607,6 @@ Transform:
   - {fileID: 307449629}
   m_Father: {fileID: 1881189487}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1153938667
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 700273250}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8551818586688069340, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.591786
-      objectReference: {fileID: 0}
-    - target: {fileID: -8551818586688069340, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -5477749408508380018, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.893569
-      objectReference: {fileID: 0}
-    - target: {fileID: -5477749408508380018, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -1144500085531921300, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.187205
-      objectReference: {fileID: 0}
-    - target: {fileID: -1144500085531921300, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 533193074659131909, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 533193074659131909, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_Name
-      value: sword
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      propertyPath: m_TagString
-      value: Weapon
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b9e37d635c266f740a4019014a709042, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2033930184}
-  m_SourcePrefab: {fileID: 100100000, guid: b9e37d635c266f740a4019014a709042, type: 3}
---- !u!4 &1153938668 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b9e37d635c266f740a4019014a709042, type: 3}
-  m_PrefabInstance: {fileID: 1153938667}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1156667074
 GameObject:
   m_ObjectHideFlags: 0
@@ -11918,7 +11792,7 @@ GameObject:
   - component: {fileID: 1165289866}
   m_Layer: 0
   m_Name: Puerta
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11955,7 +11829,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -12062,7 +11936,7 @@ GameObject:
   - component: {fileID: 1188479005}
   m_Layer: 0
   m_Name: Pared Abajo
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12224,6 +12098,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Fogata
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 31de0d29c51b5f24186c493dd2bdfbbb, type: 3}
+      propertyPath: m_TagString
+      value: Obstacle
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 65702495048144492, guid: 31de0d29c51b5f24186c493dd2bdfbbb, type: 3}
@@ -12330,7 +12208,7 @@ GameObject:
   - component: {fileID: 1241461459}
   m_Layer: 0
   m_Name: Pared Arriba
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12502,7 +12380,7 @@ GameObject:
   - component: {fileID: 1257382359}
   m_Layer: 0
   m_Name: Puerta
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12539,7 +12417,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -12614,7 +12492,7 @@ GameObject:
   - component: {fileID: 1262861198}
   m_Layer: 0
   m_Name: Bloque 5
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12726,7 +12604,7 @@ GameObject:
   - component: {fileID: 1274326314}
   m_Layer: 0
   m_Name: Puente 3-4
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12839,7 +12717,7 @@ GameObject:
   - component: {fileID: 1275525514}
   m_Layer: 0
   m_Name: Pared Arriba
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12951,7 +12829,7 @@ GameObject:
   - component: {fileID: 1289254750}
   m_Layer: 0
   m_Name: Bloque 3
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13096,7 +12974,7 @@ GameObject:
   - component: {fileID: 1305116242}
   m_Layer: 0
   m_Name: Puerta
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13133,7 +13011,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -13254,7 +13132,7 @@ GameObject:
   - component: {fileID: 1308602590}
   m_Layer: 0
   m_Name: Objeto 3
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13557,7 +13435,7 @@ GameObject:
   - component: {fileID: 1311442366}
   m_Layer: 0
   m_Name: Pared Abajo
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13669,7 +13547,7 @@ GameObject:
   - component: {fileID: 1314455438}
   m_Layer: 0
   m_Name: Bloque 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13781,7 +13659,7 @@ GameObject:
   - component: {fileID: 1314487599}
   m_Layer: 0
   m_Name: Bloque isquierdo 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13972,7 +13850,7 @@ GameObject:
   - component: {fileID: 1337792761}
   m_Layer: 0
   m_Name: Objeto 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14084,7 +13962,7 @@ GameObject:
   - component: {fileID: 1345646228}
   m_Layer: 0
   m_Name: Pared Isquierda
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14196,7 +14074,7 @@ GameObject:
   - component: {fileID: 1348446932}
   m_Layer: 0
   m_Name: Pared Inferior
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14344,7 +14222,7 @@ GameObject:
   - component: {fileID: 1355317337}
   m_Layer: 0
   m_Name: Area 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14568,7 +14446,7 @@ GameObject:
   - component: {fileID: 1362034562}
   m_Layer: 0
   m_Name: Objeto 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14680,7 +14558,7 @@ GameObject:
   - component: {fileID: 1366026807}
   m_Layer: 0
   m_Name: Pared Arriba
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14937,7 +14815,7 @@ GameObject:
   - component: {fileID: 1394756807}
   m_Layer: 0
   m_Name: Pared Abajo
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15384,7 +15262,7 @@ GameObject:
   - component: {fileID: 1461821623}
   m_Layer: 0
   m_Name: Puerta
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15421,7 +15299,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -15496,7 +15374,7 @@ GameObject:
   - component: {fileID: 1463835544}
   m_Layer: 0
   m_Name: Bloque 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15756,7 +15634,7 @@ GameObject:
   - component: {fileID: 1475286832}
   m_Layer: 0
   m_Name: Pared Superior
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15901,7 +15779,7 @@ GameObject:
   - component: {fileID: 1483742833}
   m_Layer: 0
   m_Name: Pared Derecha
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16048,7 +15926,7 @@ GameObject:
   - component: {fileID: 1496877139}
   m_Layer: 0
   m_Name: Puente 4-5
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16161,7 +16039,7 @@ GameObject:
   - component: {fileID: 1506065124}
   m_Layer: 0
   m_Name: Bloque 6
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16382,7 +16260,7 @@ GameObject:
   - component: {fileID: 1529575205}
   m_Layer: 0
   m_Name: Bloque 4
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16563,7 +16441,7 @@ GameObject:
   - component: {fileID: 1559992370}
   m_Layer: 0
   m_Name: Puente 2-3
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16726,6 +16604,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: SMILE 3
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      propertyPath: m_TagString
+      value: PhysicalEnemy
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 9119259220617699050, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
@@ -16744,7 +16630,19 @@ PrefabInstance:
       addedObject: {fileID: 1575690402}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1575690404}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1575690405}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1575690406}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1575690403}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1575690407}
   m_SourcePrefab: {fileID: 100100000, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
 --- !u!4 &1575690401 stripped
 Transform:
@@ -16781,9 +16679,103 @@ MonoBehaviour:
   m_GameObject: {fileID: 458765349}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9e123fc40123be4997ede7141697bcb, type: 3}
+  m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
+  vidaSlime: 10
+  contactDamage: 5
+  knockbackForce: 5
+  knockbackUpForce: 2
+  inAir: 0
+  isActive: 0
+--- !u!65 &1575690404
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 458765349}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 7, y: 7, z: 8}
+  m_Center: {x: 0.6, y: 3, z: 0.8}
+--- !u!54 &1575690405
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 458765349}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 32
+  m_CollisionDetection: 0
+--- !u!95 &1575690406
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 458765349}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6f6daff78c7ac694d9a5672f423b5bf5, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1575690407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 458765349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af4c2334f4b8e464284d3a60abb188a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemyMovement
+  minJumpCooldown: 0.8
+  maxJumpCooldown: 1.3
+  horizontalJumpForce: 5
+  verticalJumpForce: 3
+  turnSpeed: 360
+  navMeshCheckDistance: 10
 --- !u!1 &1577692641
 GameObject:
   m_ObjectHideFlags: 0
@@ -16798,7 +16790,7 @@ GameObject:
   - component: {fileID: 1577692643}
   m_Layer: 0
   m_Name: Bloque 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16976,6 +16968,70 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1595151946}
   m_CullTransparentMesh: 1
+--- !u!1 &1599574194
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1599574195}
+  - component: {fileID: 1599574196}
+  m_Layer: 0
+  m_Name: Area3NavMesh
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1599574195
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599574194}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1100802643}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1599574196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599574194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 1
+  m_Size: {x: 40, y: 1, z: 24}
+  m_Center: {x: 0, y: 0, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 1
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 1.3333334
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 053a37623e37df24289b3f67037bcd70, type: 2}
+  m_BuildHeightMesh: 1
 --- !u!1 &1603454066
 GameObject:
   m_ObjectHideFlags: 0
@@ -16990,7 +17046,7 @@ GameObject:
   - component: {fileID: 1603454068}
   m_Layer: 0
   m_Name: Pared Isquierda
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -17102,7 +17158,7 @@ GameObject:
   - component: {fileID: 1608796287}
   m_Layer: 0
   m_Name: Bloque 6
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -17214,7 +17270,7 @@ GameObject:
   - component: {fileID: 1612026719}
   m_Layer: 0
   m_Name: Pared Isquierda
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -17326,7 +17382,7 @@ GameObject:
   - component: {fileID: 1613650672}
   m_Layer: 0
   m_Name: Bloque 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -17438,7 +17494,7 @@ GameObject:
   - component: {fileID: 1614412245}
   m_Layer: 0
   m_Name: Bloque 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -17659,7 +17715,7 @@ GameObject:
   - component: {fileID: 1651485925}
   m_Layer: 0
   m_Name: Objeto 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -17932,7 +17988,7 @@ GameObject:
   - component: {fileID: 1680430893}
   m_Layer: 0
   m_Name: Puerta
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -17969,7 +18025,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -18140,9 +18196,103 @@ MonoBehaviour:
   m_GameObject: {fileID: 1700227622}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9e123fc40123be4997ede7141697bcb, type: 3}
+  m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
+  vidaSlime: 10
+  contactDamage: 5
+  knockbackForce: 5
+  knockbackUpForce: 2
+  inAir: 0
+  isActive: 0
+--- !u!65 &1700227625
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700227622}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 7, y: 7, z: 8}
+  m_Center: {x: 0.6, y: 3, z: 0.8}
+--- !u!54 &1700227626
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700227622}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 80
+  m_CollisionDetection: 0
+--- !u!95 &1700227627
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700227622}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6f6daff78c7ac694d9a5672f423b5bf5, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1700227628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700227622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af4c2334f4b8e464284d3a60abb188a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemyMovement
+  minJumpCooldown: 0.8
+  maxJumpCooldown: 1.3
+  horizontalJumpForce: 5
+  verticalJumpForce: 3
+  turnSpeed: 360
+  navMeshCheckDistance: 10
 --- !u!1 &1711226479
 GameObject:
   m_ObjectHideFlags: 0
@@ -18232,7 +18382,7 @@ GameObject:
   - component: {fileID: 1723737418}
   m_Layer: 0
   m_Name: Objeto 3
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -18377,7 +18527,7 @@ GameObject:
   - component: {fileID: 1739641352}
   m_Layer: 0
   m_Name: Pared Isquierda
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -18489,7 +18639,7 @@ GameObject:
   - component: {fileID: 1780470073}
   m_Layer: 0
   m_Name: Pared Derecha
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -18751,7 +18901,7 @@ GameObject:
   - component: {fileID: 1799522970}
   m_Layer: 0
   m_Name: Objeto 3
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -18973,7 +19123,7 @@ GameObject:
   - component: {fileID: 1804323913}
   m_Layer: 0
   m_Name: Bloque 6
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -19160,7 +19310,7 @@ GameObject:
   - component: {fileID: 1826556590}
   m_Layer: 0
   m_Name: Bloque 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -19603,7 +19753,7 @@ GameObject:
   - component: {fileID: 1895740515}
   m_Layer: 0
   m_Name: Puerta
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -19640,7 +19790,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -19715,7 +19865,7 @@ GameObject:
   - component: {fileID: 1897554924}
   m_Layer: 0
   m_Name: Bloque 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -19902,7 +20052,7 @@ GameObject:
   - component: {fileID: 1921468443}
   m_Layer: 0
   m_Name: Pared Abajo
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -20543,6 +20693,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: SMILE 1
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      propertyPath: m_TagString
+      value: PhysicalEnemy
+      objectReference: {fileID: 0}
     - target: {fileID: 1066235068171334618, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.09
@@ -20817,7 +20975,19 @@ PrefabInstance:
       addedObject: {fileID: 1934640763}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1934640765}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1934640766}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1934640767}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1934640764}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1934640768}
   m_SourcePrefab: {fileID: 100100000, guid: 0135375a952c609448178aa985a1f4ea, type: 3}
 --- !u!4 &1934640762 stripped
 Transform:
@@ -20854,9 +21024,103 @@ MonoBehaviour:
   m_GameObject: {fileID: 1582267613}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9e123fc40123be4997ede7141697bcb, type: 3}
+  m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
+  vidaSlime: 10
+  contactDamage: 5
+  knockbackForce: 5
+  knockbackUpForce: 2
+  inAir: 0
+  isActive: 0
+--- !u!65 &1934640765
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1582267613}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 7, y: 7, z: 8}
+  m_Center: {x: 0.6, y: 3, z: 0.8}
+--- !u!54 &1934640766
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1582267613}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 32
+  m_CollisionDetection: 0
+--- !u!95 &1934640767
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1582267613}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6f6daff78c7ac694d9a5672f423b5bf5, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1934640768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1582267613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af4c2334f4b8e464284d3a60abb188a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemyMovement
+  minJumpCooldown: 0.8
+  maxJumpCooldown: 1.3
+  horizontalJumpForce: 5
+  verticalJumpForce: 3
+  turnSpeed: 360
+  navMeshCheckDistance: 10
 --- !u!1 &1974235744
 GameObject:
   m_ObjectHideFlags: 0
@@ -20871,7 +21135,7 @@ GameObject:
   - component: {fileID: 1974235746}
   m_Layer: 0
   m_Name: Bloque isquierdo 1
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -21019,7 +21283,7 @@ GameObject:
   - component: {fileID: 1990212266}
   m_Layer: 0
   m_Name: Puente 1-2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -21316,7 +21580,7 @@ GameObject:
   - component: {fileID: 2027780939}
   m_Layer: 0
   m_Name: Puerta
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -21353,7 +21617,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -21428,7 +21692,7 @@ GameObject:
   - component: {fileID: 2030334838}
   m_Layer: 0
   m_Name: Bloque 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -21526,32 +21790,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2030334836}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &2033930183 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b9e37d635c266f740a4019014a709042, type: 3}
-  m_PrefabInstance: {fileID: 1153938667}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &2033930184
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2033930183}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.2849387, y: 1.9768896, z: 0.29245472}
-  m_Center: {x: 0, y: 0.8, z: 0}
 --- !u!1 &2034026121
 GameObject:
   m_ObjectHideFlags: 0
@@ -21566,7 +21804,7 @@ GameObject:
   - component: {fileID: 2034026123}
   m_Layer: 0
   m_Name: Bloque isquierdo 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -21728,6 +21966,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Alquimista
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1d3adae60827a7940b1491ce1c83d044, type: 3}
+      propertyPath: m_TagString
+      value: Obstacle
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 65702495048144492, guid: 1d3adae60827a7940b1491ce1c83d044, type: 3}
@@ -21754,7 +21996,7 @@ GameObject:
   - component: {fileID: 2065257005}
   m_Layer: 0
   m_Name: Bloque 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22020,7 +22262,7 @@ GameObject:
   - component: {fileID: 2089798135}
   m_Layer: 0
   m_Name: Bloque 2
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22132,7 +22374,7 @@ GameObject:
   - component: {fileID: 2109940500}
   m_Layer: 0
   m_Name: Bloque 4
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22248,4 +22490,3 @@ SceneRoots:
   - {fileID: 1472254379}
   - {fileID: 1532695840}
   - {fileID: 1309465090}
-  - {fileID: 207254886}
