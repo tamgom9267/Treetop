@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 
@@ -15,6 +16,11 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] GameObject InventorySlot;
     [SerializeField] GameObject ChestLoot;
     [SerializeField] GameObject ChestLootImages;
+    [SerializeField] GameObject cursorPrefab;
+
+    public GameObject cursor;
+    public int cursorZone = 0;
+
 
     [Header("Loot")]
     public InventoryObject LootObject;
@@ -129,6 +135,19 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
+    public void MovingCursor(InputActionReference direction)
+    {
+        if(direction)
+        {
+            
+        }
+    }
+
+    public void isMovingObject()
+    {
+        
+    }
+
     #endregion
 
 
@@ -173,6 +192,9 @@ public class PlayerInventory : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        cursor = Instantiate(cursorPrefab, this.transform);
+        RectTransform cursorRect = cursor.GetComponent<RectTransform>();
+        
 
         //Hacer que cada panel de inventorySlot tenga su propia coordenada(Esto es unicamente para el Chestloot)
         int row_counter = 0;
@@ -210,11 +232,13 @@ public class PlayerInventory : MonoBehaviour
         }
 
         gameObject.SetActive(false);
+
+        cursorRect.anchoredPosition = ChestLoot.transform.GetChild(0).position;
     }
 
     // Update is called once per frame
     void Update()
     {
-    
+        
     }
 }

@@ -24,13 +24,16 @@ public class PlayerController : MonoBehaviour
     public InputActionReference interact;
 
     public InputActionReference inventory;
+    public InputActionReference select;
 
     Transform handObj;
 
-    
+    public InventoryObject nearestWeapon;
+    public InventoryObject SelectedItem;
+    public bool isSelected = false;
 
 
-    public WeaponObject nearestWeapon;
+
 
 
     [SerializeField] GameObject InventoryUI; 
@@ -47,6 +50,7 @@ public class PlayerController : MonoBehaviour
        attack.action.Enable();
        interact.action.Enable();
        inventory.action.Enable();
+       select.action.Enable();
 
        handObj = transform.Find("Hand");
        GameObject equipedWeapon = Instantiate(weapon.prefab,handObj);
@@ -104,6 +108,15 @@ public class PlayerController : MonoBehaviour
 
         }
 
+        if(InventoryUI.activeSelf == true)
+        {
+            //Es para selecionar un objeto en el inventario
+            if (select.action.WasPressedThisFrame())
+            {
+                //En processo
+            }
+        }
+
     }
     
     void RotatePlayer(Vector2 direction)
@@ -142,7 +155,7 @@ public class PlayerController : MonoBehaviour
     {
          if(other.CompareTag("Weapon"))
         {
-            nearestWeapon.isSelected = false;
+            nearestWeapon.GetComponent<WeaponObject>().isSelected = false;
             nearestWeapon = null;
         }
 
@@ -157,7 +170,7 @@ public class PlayerController : MonoBehaviour
             nearestWeapon = weaponObj;
             if(weaponObj == nearestWeapon)
             {
-                nearestWeapon.isSelected = true;
+                nearestWeapon.GetComponent<WeaponObject>().isSelected = true;
             }
             
             
