@@ -6,8 +6,8 @@ public class ClassStats : ScriptableObject
     public int health;
     public int MP;
     public int defense;
-    public int AD;
-    public int AP;
+    public int WD;
+    public int PD;
     
     public int HB;
     public int speed;
