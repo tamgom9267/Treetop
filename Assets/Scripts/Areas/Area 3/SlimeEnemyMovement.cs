@@ -71,14 +71,11 @@ public class SlimeEnemyMovement : MonoBehaviour
         // El slime no calcula rutas ni salta antes de que el Area 3 se active.
         if (!slimeEnemy.isActive)
             return;
-        // Mientras esta en el piso e idle, mira hacia su siguiente salto.
-        if (!slimeEnemy.inAir && !jumpCycleActive)
-        {
-            UpdateJumpDirection();
-        }
+        
+        UpdateJumpDirection();
 
         // Si el slime esta en el aire, en la animacion, o aun no termina el tiempo de salto, no inicia otro salto
-        if (slimeEnemy.inAir || jumpCycleActive || Time.time < nextJumpTime)
+        if (jumpCycleActive || Time.time < nextJumpTime)
             return;
 
         StartJump();
@@ -153,9 +150,6 @@ public class SlimeEnemyMovement : MonoBehaviour
             verticalJumpForce,
             jumpDirection.z * horizontalJumpForce
         );
-
-        // El slime esta en el aire y SlimeEnemy bloquea su movimiento para evitar problemas.
-        slimeEnemy.inAir = true;
 
         rb.AddForce(jumpForce, ForceMode.Impulse);
 

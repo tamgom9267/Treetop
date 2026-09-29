@@ -18,9 +18,6 @@ public class SlimeEnemy : MonoBehaviour
     // Fuerza vertical que eleva un poco al slime.
     [SerializeField] private float knockbackUpForce = 2f;
 
-    // Define si el slime esta en el aire
-    public bool inAir = false;
-
     [Header("Estado")]
     public bool isActive = false;
 
@@ -111,10 +108,6 @@ public class SlimeEnemy : MonoBehaviour
     // Knockback al slime
     private void ApplyKnockback(GameObject attacker, float knockbackMultiplier)
     {
-        // Evita aplicar otro knockback mientras el slime sigue en el aire.
-        if (inAir)
-            return;
-        
         // Direccion desde el atacante hacia el slime.
         Vector3 knockbackDirection = transform.position - attacker.transform.position;
 
@@ -136,9 +129,6 @@ public class SlimeEnemy : MonoBehaviour
             knockbackUpForce * knockbackMultiplier,
             knockbackDirection.z * knockbackForce * knockbackMultiplier
         );
-
-        // Mientras recibe knockback, su movimiento automatico queda bloqueado.
-        inAir = true;
         
         // Aplica las furzas definidas en el vector como un golpe seco.
         rb.AddForce(knockback, ForceMode.Impulse);
@@ -169,13 +159,6 @@ public class SlimeEnemy : MonoBehaviour
         // Un slime inactivo no puede dañar ni empujar al jugador.
         if (!isActive)
             return;
-            
-        // Si toca una superficie solida, ya no esta en el aire.
-        if (inAir && collision.gameObject.CompareTag("Obstacle") )
-        {
-            inAir = false;
-        }
-
 
         // Si colisiona con el es un Player
         if (!collision.gameObject.CompareTag("Player"))
