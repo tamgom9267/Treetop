@@ -89,6 +89,11 @@ public class PlayerController : MonoBehaviour
 
         if (inventory.action.WasPressedThisFrame())
         {
+            if(InventoryUI.activeSelf == true && nearestWeapon != null)
+            {
+                InventoryUI.GetComponent<PlayerInventory>().ResetChestLootGrid();
+                nearestWeapon.gameObject.SetActive(true);
+            }
             InventoryUI.SetActive(!InventoryUI.activeSelf);
         }
 
@@ -138,6 +143,7 @@ public class PlayerController : MonoBehaviour
          if(other.CompareTag("Weapon"))
         {
             nearestWeapon.isSelected = false;
+            nearestWeapon = null;
         }
 
 

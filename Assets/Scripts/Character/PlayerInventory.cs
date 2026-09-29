@@ -30,6 +30,7 @@ public class PlayerInventory : MonoBehaviour
     public int lootWeight = 8;
     public List<List<int>> lootgrid = new List<List<int>>();
 
+    #region LootWeapon
     public void InspectLoot(InventoryObject worldObject)
     {
         LootObject = worldObject;
@@ -106,11 +107,29 @@ public class PlayerInventory : MonoBehaviour
         {
             InvObj.GetComponent<Image>().sprite = weapon.weaponData.UIsprite;    
             RectTransform rect = InvObj.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(rect.sizeDelta.x *(scalewidth+1), rect.sizeDelta.y * (scaleheight+1));
+            rect.sizeDelta = new Vector2(rect.sizeDelta.x *(scalewidth+1-ObjImagePosition[0].x), rect.sizeDelta.y * (scaleheight+1 - -ObjImagePosition[0].y));
         }
         
         
     }
+
+    public void ResetChestLootGrid()
+    {
+        //Poner la matriz de Chestloot en 0s
+        lootgrid = new List<List<int>>();
+        for(int i = 0; i < 4; i++)
+        {
+            lootgrid.Add(new List<int> {0,0});
+        }
+
+        //Quitar la imagen de ChestLootImage
+        foreach(Transform child in ChestLootImages.transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
+    #endregion
 
 
     public void AddObject(InventoryObject NewObject)
