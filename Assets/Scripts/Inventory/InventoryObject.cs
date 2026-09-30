@@ -8,7 +8,7 @@ public class InventoryObject : MonoBehaviour
     public string Name;
 
     //En caso de tener dos objetos con el mismo nombres
-    public string ID;
+    public int ID;
 
     //Cuanto espacio ocupa
     public int weight;

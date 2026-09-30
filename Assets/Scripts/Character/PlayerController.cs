@@ -24,11 +24,11 @@ public class PlayerController : MonoBehaviour
     public InputActionReference interact;
 
     public InputActionReference inventory;
-    public InputActionReference select;
 
     Transform handObj;
 
-    public InventoryObject nearestWeapon;
+    public GameObject nearestWeapon;
+    public InventoryObject nearestWeaponObj;
     public InventoryObject SelectedItem;
     public bool isSelected = false;
 
@@ -50,7 +50,6 @@ public class PlayerController : MonoBehaviour
        attack.action.Enable();
        interact.action.Enable();
        inventory.action.Enable();
-       select.action.Enable();
 
        handObj = transform.Find("Hand");
        GameObject equipedWeapon = Instantiate(weapon.prefab,handObj);
@@ -64,13 +63,27 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         _moveDirection = move.action.ReadValue<Vector2>();
-        if (!isAttacking)
+        if(InventoryUI.activeSelf == true)
         {
-            RotatePlayer(_moveDirection);    
+            if (move.action.WasPressedThisFrame())
+            {
+                InventoryUI.GetComponent<PlayerInventory>().MovingCursor(new Vector2(_moveDirection.x, _moveDirection.y));
+            }
+        }
+        else
+        {
+            if (!isAttacking)
+            {
+                RotatePlayer(_moveDirection);    
+            }
+            rb.linearVelocity = new Vector3(_moveDirection.x * playerClass.speed, rb.linearVelocity.y ,_moveDirection.y * playerClass.speed);
         }
         
-        rb.linearVelocity = new Vector3(_moveDirection.x * playerClass.speed, rb.linearVelocity.y ,_moveDirection.y * playerClass.speed);
+        
+    
+
         
         if (attack.action.WasPressedThisFrame() && !isAttacking)
         {
@@ -93,28 +106,19 @@ public class PlayerController : MonoBehaviour
 
         if (inventory.action.WasPressedThisFrame())
         {
-            if(InventoryUI.activeSelf == true && nearestWeapon != null)
+            if(InventoryUI.activeSelf == true && nearestWeaponObj != null)
             {
                 InventoryUI.GetComponent<PlayerInventory>().ResetChestLootGrid();
-                nearestWeapon.gameObject.SetActive(true);
+                nearestWeapon.SetActive(true);
             }
             InventoryUI.SetActive(!InventoryUI.activeSelf);
         }
 
-        if(interact.action.WasPressedThisFrame() && InventoryUI.activeSelf == false && nearestWeapon != null)
+        if(interact.action.WasPressedThisFrame() && InventoryUI.activeSelf == false && nearestWeaponObj != null)
         {
-            InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);
+            InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);            
             InventoryUI.SetActive(true);
 
-        }
-
-        if(InventoryUI.activeSelf == true)
-        {
-            //Es para selecionar un objeto en el inventario
-            if (select.action.WasPressedThisFrame())
-            {
-                //En processo
-            }
         }
 
     }
@@ -155,7 +159,8 @@ public class PlayerController : MonoBehaviour
     {
          if(other.CompareTag("Weapon"))
         {
-            nearestWeapon.GetComponent<WeaponObject>().isSelected = false;
+            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
+            nearestWeaponObj =null;
             nearestWeapon = null;
         }
 
@@ -167,10 +172,11 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log("a");
             WeaponObject weaponObj = other.gameObject.GetComponent<WeaponObject>();
-            nearestWeapon = weaponObj;
-            if(weaponObj == nearestWeapon)
-            {
-                nearestWeapon.GetComponent<WeaponObject>().isSelected = true;
+            nearestWeaponObj =weaponObj;
+            nearestWeapon = other.gameObject;
+            if(weaponObj == nearestWeaponObj)
+           {
+                nearestWeaponObj.GetComponent<WeaponObject>().isSelected = true;
             }
             
             

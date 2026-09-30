@@ -12969,16 +12969,17 @@ MonoBehaviour:
   MaxWeight: 16
   CurrentWeight: 0
   InventorySlot: {fileID: 6878622352990616443, guid: 8a209cf110daafe42aabb21693810e3c, type: 3}
+  ObjectImagePanel: {fileID: 6878622352990616443, guid: 7313839786c209e4f8d4eea3cfd5dd93, type: 3}
   ChestLoot: {fileID: 1398783794}
   ChestLootImages: {fileID: 972660936}
   cursorPrefab: {fileID: 5817527357031244793, guid: e559595ea5164324c8da5064d65932ab, type: 3}
   cursor: {fileID: 0}
-  cursorZone: 0
   LootObject: {fileID: 0}
   row: 4
   column: 4
   SelectedObject: {fileID: 0}
   lootWeight: 8
+  Loot: []
 --- !u!1 &1311191834
 GameObject:
   m_ObjectHideFlags: 0
