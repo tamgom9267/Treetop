@@ -11,6 +11,11 @@ public class WeaponObject : InventoryObject
     [SerializeField]
     private WeaponData weaponData;
 
+    [Header("Trail/Smear de Arma")]
+    [SerializeField]
+    private TrailRenderer weaponTrail;
+
+
 
     public int health;
     public int MP;
@@ -66,5 +71,15 @@ public class WeaponObject : InventoryObject
         }
         
 
+    }
+
+    public void EnableTrail()
+    {
+        weaponTrail.emitting = true;
+    }
+
+    public void DisableTrail()
+    {
+        weaponTrail.emitting = false;
     }
 }

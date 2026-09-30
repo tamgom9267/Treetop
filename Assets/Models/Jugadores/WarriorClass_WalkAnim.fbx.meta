@@ -1,0 +1,255 @@
+fileFormatVersion: 2
+guid: 08040ae42403ef728b327ba8ae85de79
+ModelImporter:
+  serializedVersion: 24300
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.001
+    second: {fileID: 2100000, guid: c22eddc45c1f3f8a2be997040dfcd2ee, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.003
+    second: {fileID: 2100000, guid: bbb8f946a935db4f5ad9741f82b55ca1, type: 2}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+    searchTexturesGlobally: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Walk
+      takeName: Scene
+      internalID: -623603649343465320
+      firstFrame: 1
+      lastFrame: 24
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0.96
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton:
+    - name: WarriorClass_WalkAnim(Clone)
+      parentName: 
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Armature
+      parentName: WarriorClass_WalkAnim(Clone)
+      position: {x: -0.006299317, y: 0.60967267, z: 0}
+      rotation: {x: -0.5000001, y: -0.49999994, z: -0.5, w: 0.5}
+      scale: {x: 74.96139, y: 74.96139, z: 74.96139}
+    - name: Estomago
+      parentName: Armature
+      position: {x: -0, y: 0, z: -0.00078544416}
+      rotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+      scale: {x: 1, y: 0.9999998, z: 0.9999998}
+    - name: Pierna_I
+      parentName: Estomago
+      position: {x: 8.4351824e-11, y: 0.0006520579, z: -0.00207173}
+      rotation: {x: 0.99982, y: 0.00000002974905, z: -5.644764e-10, w: -0.018971322}
+      scale: {x: 1.0000001, y: 1.0000013, z: 1.0000014}
+    - name: Pie_I
+      parentName: Pierna_I
+      position: {x: -1.4901161e-10, y: 0.0035004744, z: 5.3297953e-11}
+      rotation: {x: -0.0050216336, y: -0.000004390911, z: -0.0008995136, w: 0.999987}
+      scale: {x: 0.99999994, y: 1.0000012, z: 1.0000014}
+    - name: Pie_I_Base
+      parentName: Pie_I
+      position: {x: -4.2840836e-10, y: 0.0035198098, z: -1.0710209e-10}
+      rotation: {x: -0.082322404, y: 0.02128887, z: 0.69720614, w: 0.71181}
+      scale: {x: 0.99999994, y: 0.9999995, z: 1.0000001}
+    - name: Pierna_D
+      parentName: Estomago
+      position: {x: -1.3676806e-10, y: 0.0006860346, z: 0.0019036618}
+      rotation: {x: -0.0000005504744, y: 0.016699672, z: 0.99986064, w: -0.000000006822262}
+      scale: {x: 1.0000005, y: 1.0000014, z: 0.99999964}
+    - name: Pie_D
+      parentName: Pierna_D
+      position: {x: -1.2107193e-10, y: 0.0035719278, z: 3.5666685e-11}
+      rotation: {x: -0.014925519, y: 0.000008522798, z: 0.0005821819, w: 0.99988854}
+      scale: {x: 1.0000029, y: 1.0000036, z: 1.0000008}
+    - name: Pie_D_Base
+      parentName: Pie_D
+      position: {x: -7.916242e-11, y: 0.0036026144, z: -1.4901161e-10}
+      rotation: {x: -0.096675076, y: -0.11315564, z: -0.6903053, w: 0.7080455}
+      scale: {x: 1.0000024, y: 1.0000035, z: 0.9999998}
+    - name: Torso
+      parentName: Estomago
+      position: {x: -0, y: 0.004336381, z: 0}
+      rotation: {x: 0.0081959665, y: 5.1531e-11, z: 0.00000000628721, w: 0.9999665}
+      scale: {x: 0.9999998, y: 0.9999995, z: 0.99999934}
+    - name: Cabeza
+      parentName: Torso
+      position: {x: 1.0302756e-10, y: 0.0034669307, z: 0}
+      rotation: {x: 0.0024860704, y: 0.00000009632611, z: 4.925016e-10, w: 0.9999969}
+      scale: {x: 0.99999934, y: 1, z: 1.0000002}
+    - name: Hombro_D
+      parentName: Torso
+      position: {x: -2.7939677e-11, y: 0.0032688463, z: 0.003105393}
+      rotation: {x: 0.00000041240924, y: 0.5938451, z: 0.8045794, w: 0.00000027189608}
+      scale: {x: 1.0000024, y: 1.0000021, z: 1.0000005}
+    - name: Brazo_D
+      parentName: Hombro_D
+      position: {x: 2.9802322e-10, y: 0.0046770093, z: -2.2351741e-10}
+      rotation: {x: -0.027607083, y: 0.000000037820968, z: 0.000000013787087, w: 0.9996189}
+      scale: {x: 1.0000021, y: 1.0000017, z: 1.0000005}
+    - name: Hombro_I
+      parentName: Torso
+      position: {x: 1.4901161e-10, y: 0.003063676, z: -0.003059401}
+      rotation: {x: 0.00000018695906, y: -0.5802385, z: 0.8144467, w: -0.00000011982154}
+      scale: {x: 1.0000023, y: 1.000002, z: 1.0000004}
+    - name: Brazo_I
+      parentName: Hombro_I
+      position: {x: -1.4901161e-10, y: 0.004786995, z: 0}
+      rotation: {x: 0.031826347, y: -0.00000004574609, z: -0.00000005589019, w: 0.9994934}
+      scale: {x: 1.0000013, y: 1.0000007, z: 1.0000011}
+    - name: Armguard
+      parentName: WarriorClass_WalkAnim(Clone)
+      position: {x: -0, y: 0.000000014901161, z: 0}
+      rotation: {x: -0.70710677, y: 0, z: -0, w: 0.7071068}
+      scale: {x: 20.820698, y: 20.820698, z: 20.820698}
+    - name: Body
+      parentName: WarriorClass_WalkAnim(Clone)
+      position: {x: -0, y: 0.044286054, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 14.120567, y: 14.120567, z: 14.120567}
+    - name: Head
+      parentName: WarriorClass_WalkAnim(Clone)
+      position: {x: -1.2004414e-16, y: 0.54063076, z: -0.0034655828}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 21.735619, y: 21.735619, z: 21.735619}
+    - name: Hood
+      parentName: WarriorClass_WalkAnim(Clone)
+      position: {x: -0, y: 0.580004, z: 0}
+      rotation: {x: -0.70710677, y: 0, z: -0, w: 0.7071068}
+      scale: {x: 25.292088, y: 25.292088, z: 25.292088}
+    - name: Legs
+      parentName: WarriorClass_WalkAnim(Clone)
+      position: {x: -0, y: -0.37112597, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 12.484715, y: 12.484715, z: 12.484715}
+    - name: Shoulder Pads
+      parentName: WarriorClass_WalkAnim(Clone)
+      position: {x: -0.021601012, y: 0.000000014901161, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 15.858468, y: 15.858468, z: 15.858468}
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 1
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

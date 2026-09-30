@@ -28,6 +28,8 @@ public class PlayerController : MonoBehaviour
 
     public WeaponData weapon;
 
+    private WeaponObject equippedWeapon;
+
     public InventoryObject Slot1;
     public InventoryObject Slot2;
     public InventoryObject Slot3;
@@ -67,8 +69,12 @@ public class PlayerController : MonoBehaviour
 
        handObj = transform.Find("Hand");
        GameObject equipedWeapon = Instantiate(weapon.prefab,handObj);
-       equipedWeapon.GetComponent<WeaponObject>().player = this;
-       equipedWeapon.GetComponent<SphereCollider>().enabled = false;
+
+       equippedWeapon = equipedWeapon.GetComponent<WeaponObject>();
+       equippedWeapon.player = this;
+
+       // equipedWeapon.GetComponent<WeaponObject>().player = this;
+       // equipedWeapon.GetComponent<SphereCollider>().enabled = false;
 
        // La espada no puede hacer damage si el jugador no esta atacando.
         equippedWeaponCollider = equipedWeapon.GetComponent<BoxCollider>();
@@ -176,6 +182,7 @@ public class PlayerController : MonoBehaviour
     public void EnableWeaponCollider()
     {
         equippedWeaponCollider.enabled = true;
+        equippedWeapon.EnableTrail();
     }
 
     // esta funcion llama por Animation Event al terminar la animacion de ataque.
@@ -183,6 +190,7 @@ public class PlayerController : MonoBehaviour
     {
         // Desactiva el collider al terminar el ataque.
         equippedWeaponCollider.enabled = false;
+        equippedWeapon.DisableTrail();
 
         isAttacking = false;
     }
