@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SlimeEnemy : MonoBehaviour
+public class SlimeBoss : MonoBehaviour
 {
     [Header("Estadisticas del slime")]
     [SerializeField] private int vidaSlime = 10;
