@@ -65,6 +65,26 @@ public class Area5 : MonoBehaviour
         // Mientras se cimpleta el objetivo, las puertas se mantienen cerradas
         CloseDoor(entranceDoor);
         CloseDoor(exitDoor);
+
+        // Activa la IA y animaciones de todos los slimes del cuarto.
+        foreach (GameObject enemy in enemies)
+        {
+            // Obtiene el script SlimeEnemy.cs de cada slime.
+            SlimeEnemy slimeEnemy = enemy.GetComponent<SlimeEnemy>();
+
+            // Activa a cada slime.
+            slimeEnemy.ActivateSlime();
+        }
+
+        // Activa el boss
+        if (boss != null)
+        {
+            // Obtiene el script SlimeBoss.cs.
+            SlimeBoss slimeBoss = boss.GetComponent<SlimeBoss>();
+
+            // Activa a el boss
+            slimeBoss.ActivateSlime();
+        }
     }
 
     private void Update()

@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 _moveDirection;
 
     // Guarda los slimes que ya fueron golpeados durante el ataque actual.
-    private HashSet<SlimeEnemy> slimesHitThisAttack = new HashSet<SlimeEnemy>();
+    private HashSet<GameObject> enemiesHitThisAttack = new HashSet<GameObject>();
     public bool isAttacking = false;
     private bool inAir = false;
 
@@ -116,7 +116,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Attaque: " + attackDirection);
 
             // Un nuevo ataque puede volver a golpear a los slimes.
-            slimesHitThisAttack.Clear();
+            enemiesHitThisAttack.Clear();
             
             isAttacking = true;
 
@@ -167,18 +167,18 @@ public class PlayerController : MonoBehaviour
     }
 
     // Devuelve true solo la primera vez que este ataque golpea al slime.
-    public bool RegisterSlimeHit(SlimeEnemy slime)
+    public bool RegisterEnemyHit(GameObject enemy)
     {
         // No permite golpes si el jugador no está atacando.
         if (!isAttacking)
             return false;
 
         // No permite golpear dos veces al mismo slime en el mismo ataque.
-        if (slimesHitThisAttack.Contains(slime))
+        if (enemiesHitThisAttack.Contains(enemy))
             return false;
 
         // Registra al slime como golpeado.
-        slimesHitThisAttack.Add(slime);
+        enemiesHitThisAttack.Add(enemy);
 
         return true;
     }
