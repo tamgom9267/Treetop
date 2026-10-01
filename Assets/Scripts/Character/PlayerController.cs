@@ -40,16 +40,13 @@ public class PlayerController : MonoBehaviour
 
     public InputActionReference inventory;
 
-    // Transform handObj;
+    Transform handObj;
 
     WeaponObject nearestWeapon;
 
 
     [SerializeField]
     GameObject InventoryUI;
-
-    [SerializeField]
-    Transform handObj;
 
     private void Awake()
     {
@@ -70,14 +67,14 @@ public class PlayerController : MonoBehaviour
        interact.action.Enable();
        inventory.action.Enable();
 
-    //    handObj = transform.Find("Hand");
+       handObj = transform.Find("Hand");
        GameObject equipedWeapon = Instantiate(weapon.prefab,handObj);
 
        equippedWeapon = equipedWeapon.GetComponent<WeaponObject>();
        equippedWeapon.player = this;
 
-       equipedWeapon.GetComponent<WeaponObject>().player = this;
-       equipedWeapon.GetComponent<SphereCollider>().enabled = false;
+       // equipedWeapon.GetComponent<WeaponObject>().player = this;
+       // equipedWeapon.GetComponent<SphereCollider>().enabled = false;
 
        // La espada no puede hacer damage si el jugador no esta atacando.
         equippedWeaponCollider = equipedWeapon.GetComponent<BoxCollider>();
@@ -88,8 +85,6 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         _moveDirection = move.action.ReadValue<Vector2>();
-
-        playerAnimation.SetFloat("Speed", _moveDirection.magnitude);
 
         if (!inAir)
         {
