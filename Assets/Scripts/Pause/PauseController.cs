@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PauseController : MonoBehaviour
 {
@@ -84,5 +85,10 @@ public class PauseController : MonoBehaviour
 
         // Escondemos el menu de pausa
         CanvasPause.SetActive(false);
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("StartMenuScene");
     }
 }

@@ -20,6 +20,10 @@ public class Area1 : MonoBehaviour
     private bool presedS;
     private bool presedD;
 
+    [Header("Hint")]
+
+    [SerializeField] private HintController hintController;
+
     private void Start()
     {
         // Inicializamos los estados del cuarto
@@ -53,6 +57,9 @@ public class Area1 : MonoBehaviour
 
         // Activamos el cuarto
         isActive = true;
+
+        // Mostramos el objetivo de el cuarto.
+        hintController.ActivateHint("Objetivo:\nUtiliza W, A, S y D para aprender a moverte y abrir el camino hacia el siguiente cuarto.");
 
         // Mientras se cimpleta el objetivo, las puertas se mantienen cerradas
         CloseDoor(exitDoor);

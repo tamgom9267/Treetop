@@ -208,7 +208,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FollowPlayerNoRotation
   cameraToFollow: {fileID: 1847954175}
   player: {fileID: 810070559}
-  offset: {x: 0, y: 7, z: -6}
+  offset: {x: 0, y: 10, z: -8}
+  cameraRotation: {x: 45, y: 0, z: 0}
 --- !u!4 &224549682
 Transform:
   m_ObjectHideFlags: 0

@@ -12,6 +12,10 @@ public class Area4 : MonoBehaviour
     [Header("Estados del cuarto")]
     public bool isActive;
     public bool isCompleted;
+
+    [Header("Hint")]
+
+    [SerializeField] private HintController hintController;
     
     private void Start()
     {
@@ -50,6 +54,9 @@ public class Area4 : MonoBehaviour
 
         // Activamos el cuarto
         isActive = true;
+
+        // Mostramos el objetivo de el cuarto.
+        hintController.ActivateHint("Objetivo:\nUtiliza la fogata para recuperar tu vida al 100% para poder avanzar al siguiente cuarto.");
 
         // Mientras se cimpleta el objetivo, las puertas se mantienen cerradas
         CloseDoor(entranceDoor);
