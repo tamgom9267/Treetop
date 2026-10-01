@@ -28,6 +28,8 @@ public class PlayerController : MonoBehaviour
 
     public WeaponData weapon;
 
+    private WeaponObject equippedWeapon;
+
     public InventoryObject Slot1;
     public InventoryObject Slot2;
     public InventoryObject Slot3;
@@ -38,13 +40,16 @@ public class PlayerController : MonoBehaviour
 
     public InputActionReference inventory;
 
-    Transform handObj;
+    // Transform handObj;
 
     WeaponObject nearestWeapon;
 
 
     [SerializeField]
     GameObject InventoryUI;
+
+    [SerializeField]
+    Transform handObj;
 
     private void Awake()
     {
@@ -65,8 +70,12 @@ public class PlayerController : MonoBehaviour
        interact.action.Enable();
        inventory.action.Enable();
 
-       handObj = transform.Find("Hand");
+    //    handObj = transform.Find("Hand");
        GameObject equipedWeapon = Instantiate(weapon.prefab,handObj);
+
+       equippedWeapon = equipedWeapon.GetComponent<WeaponObject>();
+       equippedWeapon.player = this;
+
        equipedWeapon.GetComponent<WeaponObject>().player = this;
        equipedWeapon.GetComponent<SphereCollider>().enabled = false;
 
@@ -79,6 +88,8 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         _moveDirection = move.action.ReadValue<Vector2>();
+
+        playerAnimation.SetFloat("Speed", _moveDirection.magnitude);
 
         if (!inAir)
         {
@@ -176,6 +187,7 @@ public class PlayerController : MonoBehaviour
     public void EnableWeaponCollider()
     {
         equippedWeaponCollider.enabled = true;
+        equippedWeapon.EnableTrail();
     }
 
     // esta funcion llama por Animation Event al terminar la animacion de ataque.
@@ -183,6 +195,7 @@ public class PlayerController : MonoBehaviour
     {
         // Desactiva el collider al terminar el ataque.
         equippedWeaponCollider.enabled = false;
+        equippedWeapon.DisableTrail();
 
         isAttacking = false;
     }
