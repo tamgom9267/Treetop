@@ -18,11 +18,16 @@ public class PlayerInventory : MonoBehaviour
     public int MaxWeight = 16;
     public int CurrentWeight = 0;
 
-    [SerializeField] GameObject InventorySlot;
     [SerializeField] GameObject ObjectImagePanel;
+    [SerializeField] GameObject cursorPrefab;
+    [SerializeField] GameObject InventorySlot;
+     //Gameobjects del canvas inventario
+    [SerializeField] GameObject InventoryLoot;
+
+    //Gameobjects del canvas chestloot inventario
     [SerializeField] GameObject ChestLoot;
     [SerializeField] GameObject ChestLootImages;
-    [SerializeField] GameObject cursorPrefab;
+    
 
 
     bool isMoving = false;
@@ -41,15 +46,13 @@ public class PlayerInventory : MonoBehaviour
     public List<List<int>> lootgrid = new List<List<int>>();
     public List<InventoryObject> Loot = new List<InventoryObject>();
 
-
-
-
     #region LootWeapon
     public void InspectLoot(GameObject worldObject)
     {
         LootObject = worldObject.GetComponent<InventoryObject>();
         LootObject.gameObject.SetActive(false);
         Loot.Add(LootObject);
+        Inventory.Add(worldObject);
         Createloot(worldObject);
     }
 
@@ -112,7 +115,7 @@ public class PlayerInventory : MonoBehaviour
                 {
                     if(LootObject.GetComponent<WeaponObject>().requieredCells[column][row] == 1 && lootgrid[column][row] == 0)
                     {
-                        lootgrid[column][row] = 1;
+                        lootgrid[column][row] = LootObject.GetComponent<WeaponObject>().ID;
                     }
                 }
             }
@@ -126,9 +129,8 @@ public class PlayerInventory : MonoBehaviour
         InvObj.GetComponent<PanelManager>().itemObj = worldObject;
 
         BoxCollider2D InvObjCollider = InvObj.GetComponent<BoxCollider2D>();
-        InvObjCollider.size = new Vector2(160 * (scalewidth+1), 160*(scaleheight+1));
+        InvObjCollider.size = new Vector2(150 * (scalewidth+1), 150*(scaleheight+1));
         InvObjCollider.offset = new Vector2(InvObjCollider.size.x/2, InvObjCollider.size.y/-2);
-        Debug.Log((scalewidth, scaleheight));
 
         foreach(Transform obj in ChestLoot.transform)
         {
@@ -161,7 +163,7 @@ public class PlayerInventory : MonoBehaviour
                 {
                     if(spritePanel.GetComponent<PanelManager>().itemObj.GetComponent<InventoryObject>().requieredCells[column][row] == 1 && lootgrid[column][row] == 0)
                     {
-                        lootgrid[column][row] = 1;
+                        lootgrid[column][row] = spritePanel.GetComponent<PanelManager>().WeaponID;
                     }
                 }
             }
@@ -170,34 +172,74 @@ public class PlayerInventory : MonoBehaviour
         return false;
     }
 
-    public void ResetChestLootGrid()
+    public void RemoveWeaponFromChestLootGrid(int ID, Vector3 position)
     {
-        //Poner la matriz de Chestloot en 0s
-        lootgrid = new List<List<int>>();
-        for(int i = 0; i < 4; i++)
+        for(int column = 0; column < lootgrid.Count; column++)
         {
-            lootgrid.Add(new List<int> {0,0});
+            for(int row = 0; row < lootgrid[column].Count; row++)
+            {
+                if (lootgrid[column][row] == ID)
+                {
+                    lootgrid[column][row] = 0;
+                }
+            }
         }
 
+        foreach(GameObject item in Inventory)
+        {
+            if(item.GetComponent<InventoryObject>().ID == ID)
+            {
+                item.SetActive(true);
+                item.transform.position = position;
+                Inventory.Remove(item);
+                break;
+            }
+        }
+        
         //Quitar la imagen de ChestLootImage
         foreach(Transform child in ChestLootImages.transform)
         {
-            Destroy(child.gameObject);
+            if(child.GetComponent<PanelManager>().WeaponID == ID)
+            {
+                Destroy(child.gameObject);
+            }
         }
 
         //Quitarles el ID al los objetos descartados y hacer los IDs disponibles otra vez
+        //Esto solo hace que puedas quitar un objeto a la vez
         foreach(InventoryObject item in Loot)
         {
             AvailableIDs.Add(item.GetComponent<InventoryObject>().ID);
             item.GetComponent<InventoryObject>().ID = 0;
+            Loot.Remove(item);
+            break;
         }
-        Loot = new List<InventoryObject>();
+       
     }
 
     public void MovingCursor(Vector2 direction)
     {
+        List<List<int>> currentGrid;
+        if(cursor.GetComponent<CursorObject>().InventoryZone == 0){
+            currentGrid = lootgrid;
+        }
+        else
+        {
+            currentGrid = grid;
+        }
+
         //Derecha
-        if(direction == new Vector2(1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x < lootgrid[0].Count-1)
+        if(direction == new Vector2(1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x == currentGrid[0].Count-1 && cursor.GetComponent<CursorObject>().InventoryZone == 0)
+        {
+            cursor.GetComponent<CursorObject>().InventoryZone = 1;
+            cursor.GetComponent<CursorObject>().CurrentPosition.x = 0;
+        }
+        else if (direction == new Vector2(-1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x == 0  && cursor.GetComponent<CursorObject>().InventoryZone == 1)
+        {
+            cursor.GetComponent<CursorObject>().InventoryZone = 0;
+            cursor.GetComponent<CursorObject>().CurrentPosition.x = lootgrid[0].Count-1;
+        }
+        else if(direction == new Vector2(1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x < currentGrid[0].Count-1)
         {
             cursor.GetComponent<CursorObject>().CurrentPosition.x += 1;
         }
@@ -207,7 +249,7 @@ public class PlayerInventory : MonoBehaviour
             cursor.GetComponent<CursorObject>().CurrentPosition.x -= 1;
         }
         //Abajo
-        else if(direction == new Vector2(0,-1) && cursor.GetComponent<CursorObject>().CurrentPosition.y < lootgrid.Count-1)
+        else if(direction == new Vector2(0,-1) && cursor.GetComponent<CursorObject>().CurrentPosition.y < currentGrid.Count-1)
         {
             cursor.GetComponent<CursorObject>().CurrentPosition.y += 1;
         }
@@ -218,14 +260,31 @@ public class PlayerInventory : MonoBehaviour
         }
 
 
-        foreach(Transform panel in ChestLoot.transform)
+        if (cursor.GetComponent<CursorObject>().InventoryZone == 0)
         {
-            if(panel.GetComponent<PanelManager>().location == cursor.GetComponent<CursorObject>().CurrentPosition)
+           foreach(Transform panel in ChestLoot.transform)
             {
-                RectTransform cursorRect = cursor.GetComponent<RectTransform>();
-                cursorRect.transform.position = panel.transform.position;
-            }
+                if(panel.GetComponent<PanelManager>().location == cursor.GetComponent<CursorObject>().CurrentPosition)
+                {
+                    RectTransform cursorRect = cursor.GetComponent<RectTransform>();
+                    cursorRect.transform.position = panel.transform.position;
+                }
+            } 
         }
+        else{
+            foreach(Transform panel in InventoryLoot.transform)
+            {
+                if(panel.GetComponent<PanelManager>().location == cursor.GetComponent<CursorObject>().CurrentPosition)
+                {
+                    RectTransform cursorRect = cursor.GetComponent<RectTransform>();
+                    cursorRect.transform.position = panel.transform.position;
+                }
+            } 
+        } 
+        
+
+
+        
     }
 
     public void isMovingObject(GameObject spritePanel)
@@ -237,7 +296,12 @@ public class PlayerInventory : MonoBehaviour
         }
         else
         {
-            if (addToLoot(spritePanel))
+            if(cursor.GetComponent<CursorObject>().InventoryZone == 1 && AddObject(spritePanel))
+            {
+                isMoving = false;
+                SpriteObject = null;
+            }
+            else if (cursor.GetComponent<CursorObject>().InventoryZone == 0 && RemoveObject(spritePanel.GetComponent<PanelManager>().WeaponID))
             {
                 isMoving = false;
                 SpriteObject = null;
@@ -249,43 +313,68 @@ public class PlayerInventory : MonoBehaviour
     #endregion
 
 
-    public void AddObject(GameObject NewObject)
+    #region Inventory
+    public bool AddObject(GameObject spritePanel)
     {
-        if(CurrentWeight + NewObject.GetComponent<InventoryObject>().weight <= MaxWeight)
-        {
-            Inventory.Add(NewObject);
-            CurrentWeight += NewObject.GetComponent<InventoryObject>().weight;
-            NewObject.gameObject.SetActive(false);
+        (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) = CheckIfFit();
+        
+        int itemRow = 0;
+        int itemColumn = 0;
 
-            LootObject = null; 
+        //Agregar el objecto al Inventory grid
+        if(canFit)
+        {
+            for(int column = (int)cursor.GetComponent<CursorObject>().CurrentPosition.y; column < grid.Count; column++)
+            {
+                for(int row = (int)cursor.GetComponent<CursorObject>().CurrentPosition.x; row < grid[column].Count; row++)
+                {
+                    if(spritePanel.GetComponent<PanelManager>().itemObj.GetComponent<InventoryObject>().requieredCells[itemColumn][itemRow] == 1 && grid[column][row] == 0)
+                    {
+                        grid[column][row] = spritePanel.GetComponent<PanelManager>().WeaponID;
+                        itemRow ++;
+                        if(itemRow > spritePanel.GetComponent<PanelManager>().itemObj.GetComponent<InventoryObject>().requieredCells[itemColumn].Count - 1)
+                        {
+                            itemRow = 0;
+                            itemColumn ++;
+                        }
+                    }
+                }
+            }
+
+            Loot.Remove(spritePanel.GetComponent<PanelManager>().itemObj.GetComponent<InventoryObject>());
+            return true;
         }
+        return false;
 
     }
 
-    public void DiscartObject(GameObject SelectedObject)
+    public bool RemoveObject(int ID)
     {
-        Vector3 dropPosition = transform.position + transform.forward * 1.5f + Vector3.up * 0.5f;
-
-        if(SelectedObject == LootObject)
+        for(int column = 0; column < grid.Count; column++)
         {
-            LootObject.transform.position = dropPosition;
-            LootObject.transform.rotation = Quaternion.identity;
-            LootObject.gameObject.SetActive(true);
-            LootObject = null;
-        }
-        else
-        {
-            SelectedObject.transform.position = dropPosition;
-            SelectedObject.transform.rotation = Quaternion.identity;
-            SelectedObject.gameObject.SetActive(true);
-
-            Inventory.Remove(SelectedObject);
-            CurrentWeight -= SelectedObject.GetComponent<InventoryObject>().weight;
+            for(int row = 0; row < grid[column].Count; row++)
+            {
+                if (grid[column][row] == ID)
+                {
+                    grid[column][row] = 0;
+                }
+            }
         }
 
         
+        //Quitar la imagen de LootImage
+        foreach(Transform child in ChestLootImages.transform)
+        {
+            if(child.GetComponent<PanelManager>().WeaponID == ID)
+            {
+                Loot.Add(child.GetComponent<PanelManager>().itemObj.GetComponent<InventoryObject>());
+                return addToLoot(child.gameObject);
+            }
+        }
+        return false;
     }
 
+    #endregion
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -316,7 +405,22 @@ public class PlayerInventory : MonoBehaviour
             } 
         }
 
-        //Crear el inventario inicial
+        row_counter = 0;
+        column_counter = 0;
+        for(int i = 0; i < MaxWeight; i++)
+        {
+            GameObject panelObj = Instantiate(InventorySlot, InventoryLoot.transform);   
+            panelObj.GetComponent<PanelManager>().location = new Vector2Int(row_counter, column_counter);
+
+            row_counter ++;
+            if(row_counter >= row)
+            {
+              row_counter = 0;
+              column_counter += 1;  
+            } 
+        }
+
+        //Crear el inventario inicial por codigo
         MaxWeight = row*column;
         List<int> row_array = new List<int>();
 
@@ -343,7 +447,7 @@ public class PlayerInventory : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isMoving)
+        if (isMoving && SpriteObject != null)
         {
             SpriteObject.transform.position = cursor.transform.position;
         }

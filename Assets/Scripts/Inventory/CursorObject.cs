@@ -21,15 +21,22 @@ public class CursorObject : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (select.action.WasPressedThisFrame())
+        if (select.action.WasPressedThisFrame() && isPressed == false)
         {
-            InventoryItem.isMovingObject(InventoryItemObj.gameObject);
+            isPressed = true;
+            if (InventoryItemObj != null)
+            {
+                InventoryItem.isMovingObject(InventoryItemObj.gameObject);
+            }
+            StartCoroutine(counter());
         }
+
     }
 
     IEnumerator counter()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
+        isPressed = false;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -38,7 +45,6 @@ public class CursorObject : MonoBehaviour
         {
             InventoryItem = Inventory.GetComponent<PlayerInventory>();
             InventoryItemObj = other.gameObject;
-            
         }
     }
 

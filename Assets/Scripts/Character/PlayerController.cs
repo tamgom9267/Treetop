@@ -26,7 +26,6 @@ public class PlayerController : MonoBehaviour
     public InputActionReference inventory;
 
     Transform handObj;
-
     public GameObject nearestWeapon;
     public InventoryObject nearestWeaponObj;
     public InventoryObject SelectedItem;
@@ -40,9 +39,10 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+
+    
        rb = GetComponent<Rigidbody>();
        playerClass = GetComponent<PlayerClass>();
-       Inventory = GetComponent<PlayerInventory>();
 
        playerAnimation = GetComponent<Animator>();
 
@@ -53,6 +53,8 @@ public class PlayerController : MonoBehaviour
 
        handObj = transform.Find("Hand");
        GameObject equipedWeapon = Instantiate(weapon.prefab,handObj);
+
+
        equipedWeapon.GetComponent<WeaponObject>().player = this;
        equipedWeapon.GetComponent<SphereCollider>().enabled = false;
        equipedWeapon.GetComponent<BoxCollider>().enabled = false;
@@ -82,9 +84,7 @@ public class PlayerController : MonoBehaviour
         }
         
         
-    
 
-        
         if (attack.action.WasPressedThisFrame() && !isAttacking)
         {
             // leer teclas - ijkl
@@ -108,8 +108,12 @@ public class PlayerController : MonoBehaviour
         {
             if(InventoryUI.activeSelf == true && nearestWeaponObj != null)
             {
-                InventoryUI.GetComponent<PlayerInventory>().ResetChestLootGrid();
-                nearestWeapon.SetActive(true);
+                if(Inventory.Loot.Count > 0)
+                {
+                    InventoryUI.GetComponent<PlayerInventory>().RemoveWeaponFromChestLootGrid(nearestWeapon.GetComponent<InventoryObject>().ID, this.transform.position);
+                }
+                
+                
             }
             InventoryUI.SetActive(!InventoryUI.activeSelf);
         }
