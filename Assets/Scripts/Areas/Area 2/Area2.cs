@@ -19,6 +19,10 @@ public class Area2 : MonoBehaviour
     // El cuarto ya fue completado
     public bool isCompleted;
 
+    [Header("Hint")]
+
+    [SerializeField] private HintController hintController;
+
     private void Start()
     {
         // Inicializamos los estados del cuarto
@@ -56,6 +60,9 @@ public class Area2 : MonoBehaviour
 
         // Activamos el cuarto
         isActive = true;
+
+        // Mostramos el objetivo de el cuarto.
+        hintController.ActivateHint("Objetivo:\nEncuentra el cofre e interactua con el utilizando E para desbloquear el acceso al siguiente cuarto.");
 
         // Mientras se cimpleta el objetivo, las puertas se mantienen cerradas
         CloseDoor(entranceDoor);

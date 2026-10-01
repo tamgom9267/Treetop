@@ -17,6 +17,10 @@ public class Area5 : MonoBehaviour
     public bool isActive;
     public bool isCompleted;
 
+    [Header("Hint")]
+
+    [SerializeField] private HintController hintController;
+
     private void Start()
     {
         // Inicializamos los estados del cuarto
@@ -54,6 +58,9 @@ public class Area5 : MonoBehaviour
 
         // Activamos el cuarto
         isActive = true;
+
+        // Mostramos el objetivo de el cuarto.
+        hintController.ActivateHint("Objetivo:\nUtiliza todo lo aprendido para derrotar al jefe de la zona y completar el tutorial.");
 
         // Mientras se cimpleta el objetivo, las puertas se mantienen cerradas
         CloseDoor(entranceDoor);
