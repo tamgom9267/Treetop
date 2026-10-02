@@ -28,8 +28,6 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] GameObject ChestLoot;
     [SerializeField] GameObject ChestLootImages;
     
-
-
     bool isMoving = false;
     GameObject SpriteObject;
     public GameObject cursor;

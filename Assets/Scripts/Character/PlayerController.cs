@@ -46,6 +46,8 @@ public class PlayerController : MonoBehaviour
     public InventoryObject SelectedItem;
     public bool isSelected = false;
 
+    public GameObject nearChest;
+
     [SerializeField] GameObject InventoryUI;
 
     [SerializeField] Transform handObj;
@@ -144,12 +146,17 @@ public class PlayerController : MonoBehaviour
             InventoryUI.SetActive(!InventoryUI.activeSelf);
         }
 
+        if (interact.action.WasPressedThisFrame() && nearChest != null && nearChest.GetComponent<Chest>().chestInteracted == false)
+        {
+            nearestWeapon = nearChest.GetComponent<Chest>().hasInteracted();
+        }       
         if(interact.action.WasPressedThisFrame() && InventoryUI.activeSelf == false && nearestWeaponObj != null)
         {
             InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);            
             InventoryUI.SetActive(true);
 
         }
+       
 
         // Gira hacia la direccion indicada.
         if (hasTargetRotation)
@@ -299,15 +306,22 @@ public class PlayerController : MonoBehaviour
                 nearestWeaponObj.GetComponent<WeaponObject>().isSelected = true;
             }
         }
+        else if (other.CompareTag("Chest"))
+        {
+            nearChest = other.gameObject;
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-         if(other.CompareTag("Weapon"))
+        if(other.CompareTag("Weapon"))
         {
             nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
-            nearestWeaponObj =null;
-            nearestWeapon = null;
+            //Hay un error con el inventario al agregar el objeto ya que no puede poner null un gameobject que esta desactivado
+            //nearestWeaponObj =null;
+            //nearestWeapon = null;
         }
+        
     }
+    
 }
