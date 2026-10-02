@@ -41,22 +41,14 @@ public class PlayerController : MonoBehaviour
 
     public InputActionReference inventory;
 
-    Transform handObj;
     public GameObject nearestWeapon;
     public InventoryObject nearestWeaponObj;
     public InventoryObject SelectedItem;
     public bool isSelected = false;
 
+    [SerializeField] GameObject InventoryUI;
 
-
-
-
-    [SerializeField] GameObject InventoryUI; 
-    [SerializeField]
-    GameObject InventoryUI;
-
-    [SerializeField]
-    Transform handObj;
+    [SerializeField] Transform handObj;
 
     private void Awake()
     {
@@ -66,8 +58,6 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-
-    
        rb = GetComponent<Rigidbody>();
        playerClass = GetComponent<PlayerClass>();
 
@@ -82,7 +72,6 @@ public class PlayerController : MonoBehaviour
        GameObject equipedWeapon = Instantiate(weapon.prefab,handObj);
 
        equippedWeapon = equipedWeapon.GetComponent<WeaponObject>();
-       equippedWeapon.player = this;
 
        equipedWeapon.GetComponent<WeaponObject>().player = this;
        equipedWeapon.GetComponent<SphereCollider>().enabled = false;
@@ -104,24 +93,19 @@ public class PlayerController : MonoBehaviour
                 InventoryUI.GetComponent<PlayerInventory>().MovingCursor(new Vector2(_moveDirection.x, _moveDirection.y));
             }
         }
+
         else
         {
+            playerAnimation.SetFloat("Speed", _moveDirection.magnitude);
 
-        playerAnimation.SetFloat("Speed", _moveDirection.magnitude);
-
-        if (!inAir)
-        {
-            if (!isAttacking)
+            if (!inAir)
             {
-                RotatePlayer(_moveDirection);    
+                if (!isAttacking)
+                {
+                    RotatePlayer(_moveDirection);    
+                }
+                rb.linearVelocity = new Vector3(_moveDirection.x * playerClass.speed, rb.linearVelocity.y ,_moveDirection.y * playerClass.speed);
             }
-            rb.linearVelocity = new Vector3(_moveDirection.x * playerClass.speed, rb.linearVelocity.y ,_moveDirection.y * playerClass.speed);
-        }
-        
-        
-
-            
-            rb.linearVelocity = new Vector3(_moveDirection.x * playerClass.speed, rb.linearVelocity.y ,_moveDirection.y * playerClass.speed);
         }
         
         if (attack.action.WasPressedThisFrame() && !isAttacking)
@@ -239,17 +223,6 @@ public class PlayerController : MonoBehaviour
         isAttacking = false;
     }
 
-
-    private void OnTriggerExit(Collider other)
-    {
-         if(other.CompareTag("Weapon"))
-        {
-            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
-            nearestWeaponObj =null;
-            nearestWeapon = null;
-        }
-
-
     public void ApplyEnemyKnockback(GameObject enemy)
     {
         // No reinicia el knockback si el jugador esta en el aire
@@ -313,14 +286,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit(Collider other)
-    {   
-        if(other.CompareTag("Weapon"))
-        {
-            nearestWeapon.isSelected = false;
-        }
-    }
-
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Weapon"))
@@ -333,10 +298,16 @@ public class PlayerController : MonoBehaviour
            {
                 nearestWeaponObj.GetComponent<WeaponObject>().isSelected = true;
             }
-            
-            
         }
+    }
 
-        
+    private void OnTriggerExit(Collider other)
+    {
+         if(other.CompareTag("Weapon"))
+        {
+            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
+            nearestWeaponObj =null;
+            nearestWeapon = null;
+        }
     }
 }
