@@ -5,15 +5,16 @@ using UnityEngine;
 public class InventoryObject : MonoBehaviour
 {
 
+    public string Name;
     public string Objectname;
 
     //En caso de tener dos objetos con el mismo nombres
-    public string ID;
+    public int ID;
 
     //Cuanto espacio ocupa
     public int weight;
 
-    public List<List<int>> requieredCells;
+    public List<List<int>> requieredCells = new List<List<int>>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

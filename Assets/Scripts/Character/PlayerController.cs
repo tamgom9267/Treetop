@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
@@ -40,11 +41,17 @@ public class PlayerController : MonoBehaviour
 
     public InputActionReference inventory;
 
-    // Transform handObj;
+    Transform handObj;
+    public GameObject nearestWeapon;
+    public InventoryObject nearestWeaponObj;
+    public InventoryObject SelectedItem;
+    public bool isSelected = false;
 
-    WeaponObject nearestWeapon;
 
 
+
+
+    [SerializeField] GameObject InventoryUI; 
     [SerializeField]
     GameObject InventoryUI;
 
@@ -59,9 +66,10 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+
+    
        rb = GetComponent<Rigidbody>();
        playerClass = GetComponent<PlayerClass>();
-       Inventory = GetComponent<PlayerInventory>();
 
        playerAnimation = GetComponent<Animator>();
 
@@ -87,7 +95,17 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        
         _moveDirection = move.action.ReadValue<Vector2>();
+        if(InventoryUI.activeSelf == true)
+        {
+            if (move.action.WasPressedThisFrame())
+            {
+                InventoryUI.GetComponent<PlayerInventory>().MovingCursor(new Vector2(_moveDirection.x, _moveDirection.y));
+            }
+        }
+        else
+        {
 
         playerAnimation.SetFloat("Speed", _moveDirection.magnitude);
 
@@ -97,6 +115,11 @@ public class PlayerController : MonoBehaviour
             {
                 RotatePlayer(_moveDirection);    
             }
+            rb.linearVelocity = new Vector3(_moveDirection.x * playerClass.speed, rb.linearVelocity.y ,_moveDirection.y * playerClass.speed);
+        }
+        
+        
+
             
             rb.linearVelocity = new Vector3(_moveDirection.x * playerClass.speed, rb.linearVelocity.y ,_moveDirection.y * playerClass.speed);
         }
@@ -125,7 +148,23 @@ public class PlayerController : MonoBehaviour
 
         if (inventory.action.WasPressedThisFrame())
         {
+            if(InventoryUI.activeSelf == true && nearestWeaponObj != null)
+            {
+                if(Inventory.Loot.Count > 0)
+                {
+                    InventoryUI.GetComponent<PlayerInventory>().RemoveWeaponFromChestLootGrid(nearestWeapon.GetComponent<InventoryObject>().ID, this.transform.position);
+                }
+                
+                
+            }
             InventoryUI.SetActive(!InventoryUI.activeSelf);
+        }
+
+        if(interact.action.WasPressedThisFrame() && InventoryUI.activeSelf == false && nearestWeaponObj != null)
+        {
+            InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);            
+            InventoryUI.SetActive(true);
+
         }
 
         // Gira hacia la direccion indicada.
@@ -199,6 +238,17 @@ public class PlayerController : MonoBehaviour
 
         isAttacking = false;
     }
+
+
+    private void OnTriggerExit(Collider other)
+    {
+         if(other.CompareTag("Weapon"))
+        {
+            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
+            nearestWeaponObj =null;
+            nearestWeapon = null;
+        }
+
 
     public void ApplyEnemyKnockback(GameObject enemy)
     {
@@ -277,11 +327,16 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log("a");
             WeaponObject weaponObj = other.gameObject.GetComponent<WeaponObject>();
-            nearestWeapon = weaponObj;
-            if(weaponObj == nearestWeapon)
-            {
-                nearestWeapon.isSelected = true;
-            }            
-        }        
+            nearestWeaponObj =weaponObj;
+            nearestWeapon = other.gameObject;
+            if(weaponObj == nearestWeaponObj)
+           {
+                nearestWeaponObj.GetComponent<WeaponObject>().isSelected = true;
+            }
+            
+            
+        }
+
+        
     }
 }

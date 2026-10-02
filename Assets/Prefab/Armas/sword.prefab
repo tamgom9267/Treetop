@@ -605,8 +605,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba7ea8eaac97bf048b9e09b3de523d00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponObject
-  Objectname: 
-  ID: 
+  Name: 
+  ID: 0
   weight: 0
   player: {fileID: 0}
   weaponData: {fileID: 11400000, guid: a2415408a2bb30d43b0301c3bc2a7f70, type: 2}
