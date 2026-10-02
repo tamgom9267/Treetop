@@ -6,6 +6,7 @@ public class InventoryObject : MonoBehaviour
 {
 
     public string Name;
+    public string Objectname;
 
     //En caso de tener dos objetos con el mismo nombres
     public int ID;

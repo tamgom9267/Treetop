@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PauseController : MonoBehaviour
 {
@@ -67,7 +68,7 @@ public class PauseController : MonoBehaviour
         // Escondemos la barra de vida
         CanvasHealthBar.SetActive(false);
 
-        // Mostramos el menú de pausa
+        // Mostramos el menu de pausa
         CanvasPause.SetActive(true);
     }
 
@@ -82,7 +83,12 @@ public class PauseController : MonoBehaviour
         // Mostramos nuevamente la barra de vida
         CanvasHealthBar.SetActive(true);
 
-        // Escondemos el menú de pausa
+        // Escondemos el menu de pausa
         CanvasPause.SetActive(false);
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("StartMenuScene");
     }
 }

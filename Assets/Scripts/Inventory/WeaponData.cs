@@ -22,9 +22,9 @@ public class WeaponData : ScriptableObject
     public int MP;
     public int defense;
     
-    public int AD;
+    public int WD;
 
-    public int AP;
+    public int PD;
 
     public int HB;
     public int speed;

@@ -6,6 +6,10 @@ TagManager:
   tags:
   - Weapon
   - Item
+  - Projectile
+  - Obstacle
+  - PhysicalEnemy
+  - ProjectileEnemy
   layers:
   - Default
   - TransparentFX

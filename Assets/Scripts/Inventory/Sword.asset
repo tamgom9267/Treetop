@@ -21,7 +21,7 @@ MonoBehaviour:
   health: 0
   MP: 0
   defense: 0
-  AD: 5
-  AP: 0
+  WD: 5
+  PD: 0
   HB: 0
   speed: 0
