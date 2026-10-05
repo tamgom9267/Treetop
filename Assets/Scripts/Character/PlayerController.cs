@@ -72,6 +72,8 @@ public class PlayerController : MonoBehaviour
 
     //    handObj = transform.Find("Hand");
        GameObject equipedWeapon = Instantiate(weapon.prefab,handObj);
+       equipedWeapon.transform.localPosition = new Vector3(0,0,0);
+       equipedWeapon.GetComponent<WeaponObject>().inHand = true;
 
        equippedWeapon = equipedWeapon.GetComponent<WeaponObject>();
 
@@ -150,7 +152,7 @@ public class PlayerController : MonoBehaviour
         {
             nearestWeapon = nearChest.GetComponent<Chest>().hasInteracted();
         }       
-        if(interact.action.WasPressedThisFrame() && InventoryUI.activeSelf == false && nearestWeaponObj != null)
+        else if(interact.action.WasPressedThisFrame() && InventoryUI.activeSelf == false && nearestWeaponObj != null)
         {
             InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);            
             InventoryUI.SetActive(true);

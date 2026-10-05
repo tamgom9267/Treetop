@@ -35,6 +35,7 @@ public class WeaponObject : InventoryObject
     public Transform GetTransform() => transform; 
 
     public bool isSelected = false;   
+    public bool inHand = false;
 
 
     public void looted()
@@ -71,17 +72,17 @@ public class WeaponObject : InventoryObject
         if(isSelected == true)
         {
             GameObject InteractCanva = transform.GetChild(4).gameObject;
-            InteractCanva.SetActive(true);
-           
-
+            if(inHand == false)
+            {
+                InteractCanva.SetActive(true);
+            }
+            
         }
         else
         {
             GameObject InteractCanva = transform.GetChild(4).gameObject;
             InteractCanva.SetActive(false);
         }
-        
-
     }
 
     public void EnableTrail()
