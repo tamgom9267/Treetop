@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,9 +13,13 @@ public class CursorObject : MonoBehaviour
     bool isPressed = false;
     PlayerInventory InventoryItem;
     GameObject InventoryItemObj;
+    
+    Vector2 CopyCurrentsize;
+    
 
     void Start()
     {
+        CopyCurrentsize = transform.GetComponent<RectTransform>().sizeDelta;
         select.action.Enable();
     }
 
@@ -33,6 +38,11 @@ public class CursorObject : MonoBehaviour
 
     }
 
+    void updateSize(Vector2 copy)
+    {
+        transform.GetComponent<RectTransform>().sizeDelta = copy;  
+    }
+
     IEnumerator counter()
     {
         yield return new WaitForSeconds(0.1f);
@@ -43,6 +53,7 @@ public class CursorObject : MonoBehaviour
     {
         if(other.gameObject.CompareTag("Item"))
         {
+            updateSize(other.transform.GetComponent<RectTransform>().sizeDelta);
             InventoryItem = Inventory.GetComponent<PlayerInventory>();
             InventoryItemObj = other.gameObject;
         }
@@ -50,6 +61,7 @@ public class CursorObject : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
+        updateSize(CopyCurrentsize);
         InventoryItem = null;
         InventoryItemObj = null;
     }
