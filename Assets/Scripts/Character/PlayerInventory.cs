@@ -54,7 +54,7 @@ public class PlayerInventory : MonoBehaviour
         Createloot(worldObject);
     }
 
-    public (List<Vector2> ObjImagePosition, bool canFit,int scaleheight,int scalewidth) CheckIfFit()
+    public (List<Vector2> ObjImagePosition, bool canFit,int scaleheight,int scalewidth) CheckIfFit(GameObject imageObj)
     {
         List<Vector2> ObjImagePosition = new List<Vector2>();
         int scaleheight = 0;
@@ -63,15 +63,15 @@ public class PlayerInventory : MonoBehaviour
         bool canFit = true;
         for(int column = 0; column < lootgrid.Count; column++)
         {
-            for(int row = 0; row < LootObject.GetComponent<WeaponObject>().requieredCells[column].Count; row++)
+            for(int row = 0; row < imageObj.GetComponent<InventoryObject>().requieredCells[column].Count; row++)
             {
                 if(lootgrid.Count-1 + (int)cursor.GetComponent<CursorObject>().CurrentPosition.y > lootgrid.Count-1)
                 {
                     canFit = false;
                 }
-                else if(LootObject.GetComponent<WeaponObject>().requieredCells[column][row] == 1 || LootObject.GetComponent<WeaponObject>().requieredCells[column][row] == 0 && lootgrid[column][row] == 0)
+                else if(imageObj.GetComponent<InventoryObject>().requieredCells[column][row] == 1 || imageObj.GetComponent<InventoryObject>().requieredCells[column][row] == 0 && lootgrid[column][row] == 0)
                 {
-                    if(LootObject.GetComponent<WeaponObject>().requieredCells[column][row] == 1)
+                    if(imageObj.GetComponent<InventoryObject>().requieredCells[column][row] == 1)
                     {
                         if(scaleheight < column)
                         {
@@ -85,7 +85,7 @@ public class PlayerInventory : MonoBehaviour
                     }
                     continue;
                 }
-                else if(LootObject.GetComponent<WeaponObject>().requieredCells[column][row] == 0 && lootgrid[column][row] == 1)
+                else if(imageObj.GetComponent<InventoryObject>().requieredCells[column][row] == 0 && lootgrid[column][row] == 1)
                 {
                     continue;
                 }
@@ -102,7 +102,7 @@ public class PlayerInventory : MonoBehaviour
     public void Createloot(GameObject worldObject)
     {
         
-        (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) = CheckIfFit();
+        (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) = CheckIfFit(worldObject);
 
         //Agregar el objecto al chestloot grid
         if(canFit)
@@ -150,7 +150,7 @@ public class PlayerInventory : MonoBehaviour
 
     public bool addToLoot(GameObject spritePanel)
     {
-        (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) = CheckIfFit();
+        (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) = CheckIfFit(spritePanel.GetComponent<PanelManager>().itemObj);
 
         //Agregar el objecto al chestloot grid
         if(canFit)
@@ -256,7 +256,21 @@ public class PlayerInventory : MonoBehaviour
         {
             cursor.GetComponent<CursorObject>().CurrentPosition.y -= 1;
         }
+        
 
+        if(cursor.GetComponent<CursorObject>().InventoryItemObj != null)
+        {
+            (List<Vector2> ObjImagePosition, bool canFit,int scaleheight,int scalewidth) = CheckIfFit(cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj);
+            if(canFit == true)
+            {
+                cursor.GetComponent<Image>().color = Color.green;
+            }
+            else if(canFit == false)
+            {
+                cursor.GetComponent<Image>().color = Color.red;
+            }
+        }
+        
 
         if (cursor.GetComponent<CursorObject>().InventoryZone == 0)
         {
@@ -314,7 +328,7 @@ public class PlayerInventory : MonoBehaviour
     #region Inventory
     public bool AddObject(GameObject spritePanel)
     {
-        (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) = CheckIfFit();
+        (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) = CheckIfFit(spritePanel.GetComponent<PanelManager>().itemObj);
         
         int itemRow = 0;
         int itemColumn = 0;

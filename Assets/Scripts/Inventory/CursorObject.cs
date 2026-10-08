@@ -12,7 +12,7 @@ public class CursorObject : MonoBehaviour
     [SerializeField] InputActionReference select;
     bool isPressed = false;
     PlayerInventory InventoryItem;
-    GameObject InventoryItemObj;
+    public GameObject InventoryItemObj;
     
     Vector2 CopyCurrentsize;
     
