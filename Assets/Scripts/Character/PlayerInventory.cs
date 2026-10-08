@@ -59,7 +59,7 @@ public class PlayerInventory : MonoBehaviour
         List<Vector2> ObjImagePosition = new List<Vector2>();
         int scaleheight = 0;
         int scalewidth = 0;
-        //Checar si se puede poner en el chestloot grid
+        //Checar si se puede poner en el grid
         bool canFit = true;
         for(int column = 0; column < lootgrid.Count; column++)
         {
@@ -377,7 +377,7 @@ public class PlayerInventory : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        cursor = Instantiate(cursorPrefab, this.transform);
+        cursor = Instantiate(cursorPrefab, this.transform.GetChild(0));
         cursor.GetComponent<CursorObject>().Inventory = this;
         RectTransform cursorRect = cursor.GetComponent<RectTransform>();
         

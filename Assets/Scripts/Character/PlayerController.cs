@@ -92,6 +92,7 @@ public class PlayerController : MonoBehaviour
         _moveDirection = move.action.ReadValue<Vector2>();
         if(InventoryUI.activeSelf == true)
         {
+            playerAnimation.SetFloat("Speed", 0);
             if (move.action.WasPressedThisFrame())
             {
                 InventoryUI.GetComponent<PlayerInventory>().MovingCursor(new Vector2(_moveDirection.x, _moveDirection.y));
