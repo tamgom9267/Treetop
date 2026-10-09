@@ -7848,7 +7848,7 @@ MonoBehaviour:
   playerAnimation: {fileID: 707366302}
   isAttacking: 0
   turnSpeed: 720
-  weapon: {fileID: 11400000, guid: a2415408a2bb30d43b0301c3bc2a7f70, type: 2}
+  weapon: {fileID: 0}
   Slot1: {fileID: 0}
   Slot2: {fileID: 0}
   Slot3: {fileID: 0}

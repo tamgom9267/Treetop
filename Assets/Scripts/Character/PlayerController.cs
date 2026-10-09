@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class PlayerController : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class PlayerController : MonoBehaviour
     // Collider que detecta el golpe de la espada.
     private BoxCollider equippedWeaponCollider;
 
-    public WeaponData weapon;
+    public GameObject weapon;
 
     private WeaponObject equippedWeapon;
 
@@ -70,19 +71,6 @@ public class PlayerController : MonoBehaviour
        interact.action.Enable();
        inventory.action.Enable();
 
-    //    handObj = transform.Find("Hand");
-       GameObject equipedWeapon = Instantiate(weapon.prefab,handObj);
-       equipedWeapon.transform.localPosition = new Vector3(0,0,0);
-       equipedWeapon.GetComponent<WeaponObject>().inHand = true;
-
-       equippedWeapon = equipedWeapon.GetComponent<WeaponObject>();
-
-       equipedWeapon.GetComponent<WeaponObject>().player = this;
-       equipedWeapon.GetComponent<SphereCollider>().enabled = false;
-
-       // La espada no puede hacer damage si el jugador no esta atacando.
-        equippedWeaponCollider = equipedWeapon.GetComponent<BoxCollider>();
-        equippedWeaponCollider.enabled = false;
     }
 
     // Update is called once per frame
@@ -96,6 +84,11 @@ public class PlayerController : MonoBehaviour
             if (move.action.WasPressedThisFrame())
             {
                 InventoryUI.GetComponent<PlayerInventory>().MovingCursor(new Vector2(_moveDirection.x, _moveDirection.y));
+            }
+            if (Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>().isPressed == false && Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>().InventoryItemObj != null && attack.action.WasPressedThisFrame())
+            {
+                weapon = Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj;
+                equipWeapon();
             }
         }
 
@@ -141,7 +134,14 @@ public class PlayerController : MonoBehaviour
             {
                 if(Inventory.Loot.Count > 0)
                 {
+                    Debug.Log("Llega Aqui");
                     InventoryUI.GetComponent<PlayerInventory>().RemoveWeaponFromChestLootGrid(nearestWeapon.GetComponent<InventoryObject>().ID, this.transform.position);
+                    
+                    //
+                    //if(weapon.GetComponent<InventoryObject>().ID == nearestWeapon.GetComponent<InventoryObject>().ID)
+                    //{
+                        //UnequipWeapon();    
+                    //}
                 }
                 
                 
@@ -281,6 +281,34 @@ public class PlayerController : MonoBehaviour
 
         // Aplica la fuerza de knockback al Rigidbody del jugador.
         rb.AddForce(knockbackForce, ForceMode.Impulse);
+    }
+
+    public void equipWeapon()
+    {
+     
+
+       //    handObj = transform.Find("Hand");
+       GameObject equipedWeapon = Instantiate(weapon.GetComponent<WeaponObject>().weaponData.prefab,handObj);
+       equipedWeapon.transform.localPosition = new Vector3(0,0,0);
+       equipedWeapon.GetComponent<WeaponObject>().inHand = true;
+
+       equippedWeapon = equipedWeapon.GetComponent<WeaponObject>();
+
+       equipedWeapon.GetComponent<WeaponObject>().player = this;
+       equipedWeapon.GetComponent<SphereCollider>().enabled = false;
+
+       // La espada no puede hacer damage si el jugador no esta atacando.
+        equippedWeaponCollider = equipedWeapon.GetComponent<BoxCollider>();
+        equippedWeaponCollider.enabled = false;
+
+        Inventory.gameObject.GetComponent<UIDisplay>().UIEquippedWeaponDisplay();
+    }
+
+    public void UnequipWeapon()
+    {
+        weapon = null;
+        equippedWeapon = null;
+        Inventory.gameObject.GetComponent<UIDisplay>().UIEquippedWeaponDisplay();
     }
 
     private void OnCollisionEnter(Collision collision)

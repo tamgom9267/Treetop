@@ -94,6 +94,24 @@ public class PlayerInventory : MonoBehaviour
                     canFit = false;
                 }
             }
+
+        }
+
+
+        if(cursor.GetComponent<CursorObject>().InventoryItemObj != null)
+        {
+            if(canFit == false)
+            {
+                cursor.GetComponent<Image>().color = Color.red;
+            }
+            else
+            {
+                cursor.GetComponent<Image>().color = Color.green;
+            }
+        }
+        else
+        {
+            cursor.GetComponent<Image>().color = Color.green;
         }
 
         return (ObjImagePosition, canFit, scaleheight, scalewidth);
@@ -211,7 +229,7 @@ public class PlayerInventory : MonoBehaviour
             item.GetComponent<InventoryObject>().ID = 0;
             Loot.Remove(item);
             break;
-        }
+        }  
        
     }
 
@@ -226,17 +244,19 @@ public class PlayerInventory : MonoBehaviour
             currentGrid = grid;
         }
 
-        //Derecha
+        //Derecha Limite de loot
         if(direction == new Vector2(1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x == currentGrid[0].Count-1 && cursor.GetComponent<CursorObject>().InventoryZone == 0)
         {
             cursor.GetComponent<CursorObject>().InventoryZone = 1;
             cursor.GetComponent<CursorObject>().CurrentPosition.x = 0;
         }
+        //Izquierda Limite de inventory
         else if (direction == new Vector2(-1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x == 0  && cursor.GetComponent<CursorObject>().InventoryZone == 1)
         {
             cursor.GetComponent<CursorObject>().InventoryZone = 0;
             cursor.GetComponent<CursorObject>().CurrentPosition.x = lootgrid[0].Count-1;
         }
+        //Derecha
         else if(direction == new Vector2(1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x < currentGrid[0].Count-1)
         {
             cursor.GetComponent<CursorObject>().CurrentPosition.x += 1;
@@ -255,22 +275,9 @@ public class PlayerInventory : MonoBehaviour
         else if(direction == new Vector2(0,1) && cursor.GetComponent<CursorObject>().CurrentPosition.y > 0)
         {
             cursor.GetComponent<CursorObject>().CurrentPosition.y -= 1;
-        }
-        
+        }        
 
-        if(cursor.GetComponent<CursorObject>().InventoryItemObj != null)
-        {
-            (List<Vector2> ObjImagePosition, bool canFit,int scaleheight,int scalewidth) = CheckIfFit(cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj);
-            if(canFit == true)
-            {
-                cursor.GetComponent<Image>().color = Color.green;
-            }
-            else if(canFit == false)
-            {
-                cursor.GetComponent<Image>().color = Color.red;
-            }
-        }
-        
+
 
         if (cursor.GetComponent<CursorObject>().InventoryZone == 0)
         {
@@ -278,6 +285,7 @@ public class PlayerInventory : MonoBehaviour
             {
                 if(panel.GetComponent<PanelManager>().location == cursor.GetComponent<CursorObject>().CurrentPosition)
                 {
+                    
                     RectTransform cursorRect = cursor.GetComponent<RectTransform>();
                     cursorRect.transform.position = panel.transform.position;
                 }
@@ -286,17 +294,20 @@ public class PlayerInventory : MonoBehaviour
         else{
             foreach(Transform panel in InventoryLoot.transform)
             {
+
                 if(panel.GetComponent<PanelManager>().location == cursor.GetComponent<CursorObject>().CurrentPosition)
                 {
                     RectTransform cursorRect = cursor.GetComponent<RectTransform>();
                     cursorRect.transform.position = panel.transform.position;
                 }
             } 
-        } 
-        
+        }
 
-
-        
+        if (cursor.GetComponent<CursorObject>().InventoryItemObj != null)
+        {
+            CheckIfFit(cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj);    
+        }
+         
     }
 
     public void isMovingObject(GameObject spritePanel)
