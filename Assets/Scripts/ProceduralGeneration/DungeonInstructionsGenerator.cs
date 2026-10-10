@@ -2,32 +2,41 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 
-public class DungeonGenerator : MonoBehaviour
+public class DungeonInstructionsGenerator : MonoBehaviour
 {
-    [SerializeField] private int seed; // Seed for the dungeon generation
-    [SerializeField] private int roomCount = 6; // Number of rooms to generate
-    [SerializeField] private int numberOfRoomPrefabs  = 7; // Number of room prefabs available
+    [SerializeField, Range(00000, 99999)] private int baseSeed = 12345;
 
-    string[] bossRooms = { "boss1", "boss2", "boss3" }; // List of boss room IDs
+    private int floorNumber = 1;
+    private int finalSeed;
+
+    private int roomCount = 6; // Number of rooms to generate
+    private int numberOfRoomPrefabs  = 8; // Number of room prefabs available
+
+    private int numberOfEnemyTypes = 2; // Numeber of enemy types.
+
+    string[] bossRooms = { "boss1", "boss2"}; // List of boss room IDs
 
     HashSet<Vector3Int> occupiedPositions = new HashSet<Vector3Int>(); // To keep track of occupied positions in the grid
 
     private FloorData floorData; // Data for the generated floor
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void RegenerateFloorInstructions()
     {
-        GenerateFloor();
+        floorNumber++;
+        GenerateFloorInstructions();
     }
 
-    private void GenerateFloor()
+    private void GenerateFloorInstructions()
     {
-        Random.InitState(seed); // Initialize the random number generator with the seed
+        string combinedSeed = floorNumber.ToString() + baseSeed.ToString();
+        finalSeed = int.Parse(combinedSeed);
+
+        Random.InitState(finalSeed); // Initialize the random number generator with the seed
 
         occupiedPositions.Clear(); // Clear the set of occupied positions for a new floor generation
         occupiedPositions.Add(Vector3Int.zero); // Mark the starting position as occupied
 
-        floorData = new FloorData(seed); // Create a new FloorData object with the seed
+        floorData = new FloorData(finalSeed); // Create a new FloorData object with the seed
 
         Vector3Int currentPosition = Vector3Int.zero; // Start at the origin
 
@@ -47,12 +56,12 @@ public class DungeonGenerator : MonoBehaviour
             }
             else
             {
-                int randomRoomID = Random.Range(1, numberOfRoomPrefabs - 1); // Randomly select a room ID for intermediate rooms
+                int randomRoomID = Random.Range(1, numberOfRoomPrefabs + 1); // Randomly select a room ID for intermediate rooms
                 roomID = randomRoomID.ToString();
 
                 if (randomRoomID > 1) // Room ID 1 is for the store/rest point so no enemies should be placed there
                 {
-                    enemyType = Random.Range(1, 4); // Randomly select an enemy type (1-3) for rooms with enemies
+                    enemyType = Random.Range(1, numberOfEnemyTypes + 1); // Randomly select an enemy type for rooms with enemies
                 }
             }
 
@@ -100,13 +109,13 @@ public class DungeonGenerator : MonoBehaviour
         switch (direction)
         {
             case Direction.North:
-                return new Vector3Int(0, 0, 57);
+                return new Vector3Int(0, 0, 41);
             case Direction.East:
-                return new Vector3Int(41, 0, 0);
+                return new Vector3Int(57, 0, 0);
             case Direction.South:
-                return new Vector3Int(0, 0, -57);
+                return new Vector3Int(0, 0, -41);
             case Direction.West:
-                return new Vector3Int(-41, 0, 0);
+                return new Vector3Int(-57, 0, 0);
             default:
                 return Vector3Int.zero;
         }

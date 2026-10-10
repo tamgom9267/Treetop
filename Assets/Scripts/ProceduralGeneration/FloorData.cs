@@ -3,13 +3,13 @@ using System;
 using System.Collections.Generic;
 
 [Serializable]
-public class FloorData : MonoBehaviour
+public class FloorData
 {
-    public int seed; // Seed for the floor generation
-    public List<RoomData> rooms = new List<RoomData>(); // List of rooms in the floor
+    public int finalSeed;
+    public List<RoomData> rooms = new List<RoomData>();
 
-    public FloorData(int seed)
+    public FloorData(int finalSeed)
     {
-        this.seed = seed; // Initialize the seed for the floor generation
+        this.finalSeed = finalSeed;
     }
 }
