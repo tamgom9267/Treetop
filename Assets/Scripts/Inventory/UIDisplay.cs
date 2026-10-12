@@ -25,8 +25,9 @@ public class UIDisplay : MonoBehaviour
     {
        if (player.weapon != null)
         {
+            
             Transform weaponSlotObj = transform.Find("InventoryBackground/WeaponSlot");
-            GameObject WeaponSprite = new GameObject("WeaponSprite");
+            WeaponSprite = new GameObject("WeaponSprite");
             
             WeaponSprite.transform.SetParent(weaponSlotObj, false);
             Image Image = WeaponSprite.AddComponent<Image>();
@@ -35,7 +36,10 @@ public class UIDisplay : MonoBehaviour
         }
         else
         {
-            Destroy(WeaponSprite);
+            if (WeaponSprite)
+            {
+                Destroy(WeaponSprite);
+            }
         } 
     }
 }
