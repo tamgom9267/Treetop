@@ -219,18 +219,26 @@ public class PlayerController : MonoBehaviour
     // Se llama en Animation Event cuando inicia el ataque.
     public void EnableWeaponCollider()
     {
-        equippedWeaponCollider.enabled = true;
-        equippedWeapon.EnableTrail();
+        if (weapon)
+        {
+            equippedWeaponCollider.enabled = true;
+            equippedWeapon.EnableTrail();  
+        }
+        
     }
 
     // esta funcion llama por Animation Event al terminar la animacion de ataque.
     public void EndAttack()
     {
         // Desactiva el collider al terminar el ataque.
-        equippedWeaponCollider.enabled = false;
-        equippedWeapon.DisableTrail();
 
-        isAttacking = false;
+        if (weapon)
+        {
+            equippedWeaponCollider.enabled = false;
+            equippedWeapon.DisableTrail();
+ 
+        }
+        isAttacking = false;  
     }
 
     public void ApplyEnemyKnockback(GameObject enemy)
@@ -288,17 +296,17 @@ public class PlayerController : MonoBehaviour
      
 
        //    handObj = transform.Find("Hand");
-       GameObject equipedWeapon = Instantiate(weapon.GetComponent<WeaponObject>().weaponData.prefab,handObj);
-       equipedWeapon.transform.localPosition = new Vector3(0,0,0);
-       equipedWeapon.GetComponent<WeaponObject>().inHand = true;
+       GameObject WeaponObj = Instantiate(weapon.GetComponent<WeaponObject>().weaponData.prefab,handObj);
+       WeaponObj.transform.localPosition = new Vector3(0,0,0);
+       WeaponObj.GetComponent<WeaponObject>().inHand = true;
 
-       equippedWeapon = equipedWeapon.GetComponent<WeaponObject>();
+       equippedWeapon = WeaponObj.GetComponent<WeaponObject>();
 
-       equipedWeapon.GetComponent<WeaponObject>().player = this;
-       equipedWeapon.GetComponent<SphereCollider>().enabled = false;
+       WeaponObj.GetComponent<WeaponObject>().player = this;
+       WeaponObj.GetComponent<SphereCollider>().enabled = false;
 
        // La espada no puede hacer damage si el jugador no esta atacando.
-        equippedWeaponCollider = equipedWeapon.GetComponent<BoxCollider>();
+        equippedWeaponCollider = WeaponObj.GetComponent<BoxCollider>();
         equippedWeaponCollider.enabled = false;
 
         Inventory.gameObject.GetComponent<UIDisplay>().UIEquippedWeaponDisplay();
