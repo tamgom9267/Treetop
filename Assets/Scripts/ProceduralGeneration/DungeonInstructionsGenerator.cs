@@ -6,7 +6,7 @@ public class DungeonInstructionsGenerator : MonoBehaviour
 {
     [SerializeField, Range(00000, 99999)] private int baseSeed = 12345;
 
-    private int floorNumber = 1;
+    private int floorNumber = 0;
     private int finalSeed;
 
     private int roomCount = 6; // Number of rooms to generate
@@ -33,6 +33,12 @@ public class DungeonInstructionsGenerator : MonoBehaviour
 
         Random.InitState(finalSeed); // Initialize the random number generator with the seed
 
+        List<int> availableRoomPrefabs = new List<int>();
+        for (int i = 1; i <= numberOfRoomPrefabs; i++)
+        {
+            availableRoomPrefabs.Add(i);
+        }
+
         occupiedPositions.Clear(); // Clear the set of occupied positions for a new floor generation
         occupiedPositions.Add(Vector3Int.zero); // Mark the starting position as occupied
 
@@ -56,7 +62,11 @@ public class DungeonInstructionsGenerator : MonoBehaviour
             }
             else
             {
-                int randomRoomID = Random.Range(1, numberOfRoomPrefabs + 1); // Randomly select a room ID for intermediate rooms
+                int randomIndex = Random.Range(0, availableRoomPrefabs.Count);
+                int randomRoomID = availableRoomPrefabs[randomIndex];
+
+                availableRoomPrefabs.RemoveAt(randomIndex);
+
                 roomID = randomRoomID.ToString();
 
                 if (randomRoomID > 1) // Room ID 1 is for the store/rest point so no enemies should be placed there
