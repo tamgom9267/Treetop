@@ -80,6 +80,7 @@ public class PlayerController : MonoBehaviour
         _moveDirection = move.action.ReadValue<Vector2>();
         if(InventoryUI.activeSelf == true)
         {
+            rb.linearVelocity = new Vector3(0,0,0);
             playerAnimation.SetFloat("Speed", 0);
             if (move.action.WasPressedThisFrame())
             {
@@ -134,14 +135,17 @@ public class PlayerController : MonoBehaviour
             {
                 if(Inventory.Loot.Count > 0)
                 {
-                    Debug.Log("Llega Aqui");
                     InventoryUI.GetComponent<PlayerInventory>().RemoveWeaponFromChestLootGrid(nearestWeapon.GetComponent<InventoryObject>().ID, this.transform.position);
+                    if (weapon)
+                    {
+                        Debug.Log("Simon");
+                        if(weapon.GetComponent<InventoryObject>().ID == nearestWeapon.GetComponent<InventoryObject>().ID)
+                        {
+                            Debug.Log("Ya se la sabe carnal, suelte el arma");
+                            UnequipWeapon();    
+                        }
+                    }
                     
-                    //
-                    //if(weapon.GetComponent<InventoryObject>().ID == nearestWeapon.GetComponent<InventoryObject>().ID)
-                    //{
-                        //UnequipWeapon();    
-                    //}
                 }
                 
                 
