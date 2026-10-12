@@ -1,0 +1,236 @@
+fileFormatVersion: 2
+guid: fc65e0370e6a6763c8d613dfc346d0a9
+ModelImporter:
+  serializedVersion: 24300
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.001
+    second: {fileID: 2100000, guid: 609610a97615b4ac082ea868afb20db1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.002
+    second: {fileID: 2100000, guid: 609610a97615b4ac082ea868afb20db1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.005
+    second: {fileID: 2100000, guid: 0d90856d45b4245a1a0f2edbec71046e, type: 2}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+    searchTexturesGlobally: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton:
+    - name: WarriorClass_Anims(Clone)
+      parentName: 
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Armature
+      parentName: WarriorClass_Anims(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 100, y: 100, z: 100}
+    - name: Estomago
+      parentName: Armature
+      position: {x: 0, y: -5.9604643e-10, z: 0.0055079293}
+      rotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Pierna_I
+      parentName: Estomago
+      position: {x: -6.7972315e-11, y: 0.00048879144, z: -0.0015529976}
+      rotation: {x: 0.99982005, y: 3.60701e-17, z: 3.607061e-17, w: -0.018971222}
+      scale: {x: 1, y: 0.99999994, z: 1.0000004}
+    - name: Pie_I
+      parentName: Pierna_I
+      position: {x: -4.4066295e-19, y: 0.002624004, z: 5.5879353e-11}
+      rotation: {x: -0.0050215973, y: -0.0000043884424, z: -0.00089951063, w: 0.999987}
+      scale: {x: 1, y: 1.0000001, z: 1}
+    - name: Pie_I_Base
+      parentName: Pie_I
+      position: {x: -7.366907e-13, y: 0.0026384979, z: -7.328502e-11}
+      rotation: {x: -0.44942588, y: -0.37294698, z: 0.5497953, w: 0.5972036}
+      scale: {x: 0.99999994, y: 0.99999994, z: 0.9999999}
+    - name: Pie_I_Base_end
+      parentName: Pie_I_Base
+      position: {x: -0, y: 0.0013883956, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Pierna_D
+      parentName: Estomago
+      position: {x: -1.0427021e-11, y: 0.00051426113, z: 0.0014270113}
+      rotation: {x: -0.00000055417377, y: 0.01669973, z: 0.9998606, w: -0.0000001239208}
+      scale: {x: 1, y: 1.0000001, z: 1.0000002}
+    - name: Pie_D
+      parentName: Pierna_D
+      position: {x: -5.1070257e-17, y: 0.0026775668, z: -4.6566116e-11}
+      rotation: {x: -0.01492551, y: 0.000008488737, z: 0.00058216543, w: 0.9998885}
+      scale: {x: 1, y: 0.99999994, z: 1}
+    - name: Pie_D_Base
+      parentName: Pie_D
+      position: {x: -4.6441074e-13, y: 0.0027005707, z: 6.2986415e-11}
+      rotation: {x: 0.3357041, y: -0.53977466, z: -0.57070196, w: 0.51985127}
+      scale: {x: 1, y: 0.99999994, z: 1.0000001}
+    - name: Pie_D_Base_end
+      parentName: Pie_D_Base
+      position: {x: -0, y: 0.0014455954, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Torso
+      parentName: Estomago
+      position: {x: -0, y: 0.0032506112, z: 0}
+      rotation: {x: -0.13935116, y: 0.00790871, z: 0.039542083, w: 0.9894216}
+      scale: {x: 1, y: 0.99999994, z: 1}
+    - name: Cabeza
+      parentName: Torso
+      position: {x: 4.8858053e-11, y: 0.0025988596, z: -9.348079e-12}
+      rotation: {x: 0.0024853724, y: 0.00006210134, z: -0.024931228, w: 0.99968606}
+      scale: {x: 1, y: 0.99999994, z: 1}
+    - name: Cabeza_end
+      parentName: Cabeza
+      position: {x: -0, y: 0.0049851653, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Hombro_D
+      parentName: Torso
+      position: {x: 6.170012e-11, y: 0.002450373, z: 0.002327846}
+      rotation: {x: 0.00000033522468, y: 0.3185916, z: 0.9478921, w: 0.00000016828538}
+      scale: {x: 1, y: 0.9999998, z: 0.9999999}
+    - name: Brazo_D
+      parentName: Hombro_D
+      position: {x: -1.1641532e-12, y: 0.0035059499, z: -2.0372681e-11}
+      rotation: {x: -0.22858573, y: 0.03850295, z: -0.21042922, w: 0.94972926}
+      scale: {x: 1, y: 1, z: 0.9999999}
+    - name: Brazo_D_end
+      parentName: Brazo_D
+      position: {x: -0, y: 0.0029336822, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Hombro_I
+      parentName: Torso
+      position: {x: 8.440111e-12, y: 0.0022965737, z: -0.002293369}
+      rotation: {x: -0.19470419, y: -0.24389632, z: 0.77775306, w: -0.5456236}
+      scale: {x: 1, y: 1.0000005, z: 1.0000002}
+    - name: Brazo_I
+      parentName: Hombro_I
+      position: {x: 2.9103829e-12, y: 0.003588399, z: -6.286427e-11}
+      rotation: {x: 0.030271675, y: -0.07642133, z: 0.116157204, w: 0.9898237}
+      scale: {x: 1, y: 1.0000001, z: 0.99999994}
+    - name: Hand
+      parentName: Brazo_I
+      position: {x: -7.4505804e-11, y: 0.003223491, z: 9.313225e-11}
+      rotation: {x: -0.13571282, y: 0.095246196, z: -0.7555535, w: 0.63375795}
+      scale: {x: 1.0000001, y: 1.0000001, z: 1}
+    - name: Hand_end
+      parentName: Hand
+      position: {x: -0, y: 0.0018790745, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Armguard
+      parentName: WarriorClass_Anims(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 100, y: 100, z: 100}
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 1
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
