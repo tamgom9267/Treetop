@@ -158,7 +158,7 @@ public class PlayerController : MonoBehaviour
                 {
                     if(Inventory.Loot.Count > 0)
                     {
-                        InventoryUI.GetComponent<PlayerInventory>().RemoveWeaponFromChestLootGrid(nearestWeapon.GetComponent<InventoryObject>().ID, this.transform.position);
+                        InventoryUI.GetComponent<PlayerInventory>().RemoveWeaponFromChestLootGrid(this.transform.position);
                         if (weapon)
                         {
                             if(weapon.GetComponent<InventoryObject>().ID == nearestWeapon.GetComponent<InventoryObject>().ID)
