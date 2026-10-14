@@ -29,6 +29,15 @@ public partial class WorldGenerator : MonoBehaviour
         
         // Genera el piso de el mundo
         GenerateFloor();
+
+        // Genera los puentes con paredes
+        GenerateBridge();
+
+        // Genera paredes
+        GenerateWalls();
+
+        // Genera puertas con paredes a los lados
+        GenerateDoors();
     }
 
     // Destruir el mundo generado

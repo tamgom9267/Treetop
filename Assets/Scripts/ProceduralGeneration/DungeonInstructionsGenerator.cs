@@ -118,12 +118,16 @@ public class DungeonInstructionsGenerator : MonoBehaviour
     {
         switch (direction)
         {
+            // 0
             case Direction.North:
                 return new Vector3Int(0, 0, 41);
+            // 1
             case Direction.East:
                 return new Vector3Int(57, 0, 0);
+            // 2
             case Direction.South:
                 return new Vector3Int(0, 0, -41);
+            // 3
             case Direction.West:
                 return new Vector3Int(-57, 0, 0);
             default:
@@ -156,12 +160,12 @@ public class DungeonInstructionsGenerator : MonoBehaviour
     {
         foreach(RoomData room in floorData.rooms)
         {
-            Debug.Log(
-                $"Room: {room.roomID} | " +
-                $"Position: {room.gridPosition} | " +
-                $"Exit Direction: {room.exitDirection} | " +
-                $"Enemy Type: {room.enemyType}"
-            );
+            //Debug.Log(
+            //    $"Room: {room.roomID} | " +
+            //    $"Position: {room.gridPosition} | " +
+            //    $"Exit Direction: {room.exitDirection} | " +
+            //    $"Enemy Type: {room.enemyType}"
+            //);
         }
     }
 
@@ -176,6 +180,6 @@ public class DungeonInstructionsGenerator : MonoBehaviour
 
         File.WriteAllText(path, json);
 
-        Debug.Log("Floor JSON saved to: " + path);
+        //Debug.Log("Floor JSON saved to: " + path);
     }
 }
