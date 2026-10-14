@@ -53,6 +53,8 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] Transform handObj;
 
+    public List<GameObject> nearWeapons = new List<GameObject>();
+
     private void Awake()
     {
         // Guarda la rotacion inicial
@@ -71,11 +73,17 @@ public class PlayerController : MonoBehaviour
        interact.action.Enable();
        inventory.action.Enable();
 
+       Inventory.GetComponent<PlayerInventory>().AssignPlayer(this);
+
     }
 
     // Update is called once per frame
     private void Update()
     {
+        if(InventoryUI.activeSelf == false)
+        {
+            UpdateNearestWeapon();
+        }
         
         _moveDirection = move.action.ReadValue<Vector2>();
         if(InventoryUI.activeSelf == true)
@@ -135,7 +143,7 @@ public class PlayerController : MonoBehaviour
             }       
             else if(interact.action.WasPressedThisFrame() && InventoryUI.activeSelf == false && nearestWeaponObj != null)
             {
-                InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);            
+                InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);    
                 InventoryUI.SetActive(true);
 
             }
@@ -154,7 +162,7 @@ public class PlayerController : MonoBehaviour
 
         if (inventory.action.WasPressedThisFrame())
             {
-                if(InventoryUI.activeSelf == true && nearestWeaponObj != null)
+                if(InventoryUI.activeSelf == true)
                 {
                     if(Inventory.Loot.Count > 0)
                     {
@@ -336,16 +344,64 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void SetNearestWeaponFalse()
+    {
+        if(nearestWeapon != null)
+        {
+            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
+            nearestWeaponObj =null;
+            nearestWeapon = null;    
+        }
+    }
+
+
+    void UpdateNearestWeapon()
+    {
+        nearWeapons.RemoveAll(w => w == null || w.activeInHierarchy == false);
+
+        GameObject closest = null;
+        float closestDistance = 1000f;
+
+        for(int i = 0; i < nearWeapons.Count; i++)
+        {
+            float distance = Vector3.Distance(transform.position, nearWeapons[i].transform.position);
+            if(distance < closestDistance)
+            {
+                closestDistance = distance;
+                closest = nearWeapons[i];
+            }
+        }
+
+        if(closest == nearestWeapon)
+        {
+            return;
+        }
+
+        if(nearestWeaponObj != null)
+        {
+            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
+        }
+
+        nearestWeapon = closest;
+
+        if(closest != null)
+        {
+            nearestWeaponObj = closest.GetComponent<WeaponObject>();
+            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = true;
+        }
+        else
+        {
+            nearestWeaponObj = null;
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Weapon"))
         {
-            WeaponObject weaponObj = other.gameObject.GetComponent<WeaponObject>();
-            nearestWeaponObj =weaponObj;
-            nearestWeapon = other.gameObject;
-            if(weaponObj == nearestWeaponObj)
-           {
-                nearestWeaponObj.GetComponent<WeaponObject>().isSelected = true;
+            if(nearWeapons.Contains(other.gameObject) == false)
+            {
+                nearWeapons.Add(other.gameObject);
             }
         }
         else if (other.CompareTag("Chest"))
@@ -358,12 +414,8 @@ public class PlayerController : MonoBehaviour
     {
         if(other.CompareTag("Weapon"))
         {
-            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
-            //Hay un error con el inventario al agregar el objeto ya que no puede poner null un gameobject que esta desactivado
-            //nearestWeaponObj =null;
-            //nearestWeapon = null;
+            nearWeapons.Remove(other.gameObject);
         }
-        
     }
-    
+
 }

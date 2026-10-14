@@ -35,7 +35,6 @@ public class CursorObject : MonoBehaviour
         if (select.action.WasPressedThisFrame() && isPressed == false)
         {
             isPressed = true;
-            
             if (InventoryItemObj != null)
             {
                 InventoryItem.isMovingObject(InventoryItemObj.gameObject);
@@ -77,6 +76,7 @@ public class CursorObject : MonoBehaviour
             updateSize(other.gameObject);
             InventoryItem = Inventory.GetComponent<PlayerInventory>();
             InventoryItemObj = other.gameObject;
+            Inventory.SnapCursorToItem(other.gameObject);
         }
     }
 
