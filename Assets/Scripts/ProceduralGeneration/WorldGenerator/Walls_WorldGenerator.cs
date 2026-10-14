@@ -2,7 +2,7 @@ using UnityEngine;
 
 public partial class WorldGenerator : MonoBehaviour
 {
-    private void GenerateWalls()
+    private void GenerateWallsForRoom(RoomData room, Direction? enterDirection)
     {
         // Obtiene los prefabs
         GameObject paredHorizontal = Resources.Load<GameObject>("GeneracionDeCuartos/Paredes/ParedHorizontal");
@@ -12,41 +12,32 @@ public partial class WorldGenerator : MonoBehaviour
         if (paredHorizontal == null || paredVertical == null)
         {
             Debug.LogError("No se encontro el prefab de la pared");
+            return;
         }
 
-        Direction? previousExitDirection = null;
-
-        foreach (RoomData room in floorData.rooms)
+        if (room.exitDirection != Direction.North && enterDirection != Direction.North)
         {
-            // Si existe una habitacion anterior, su salida opuesta sera la entrada de la habitacion actual. En la primera habitacion no hay salida anterior, por eso enterDirection sera null.
-            Direction? enterDirection = previousExitDirection.HasValue? GetOppositeDirection(previousExitDirection.Value): null;
-            // Guarda la salida de esta habitacion. Se usara como referencia para calcular el enter de la siguiente habitacion.
-            previousExitDirection = room.exitDirection;
-
-            if (room.exitDirection != Direction.North && enterDirection != Direction.North)
-            {
-                Vector3 wallLocation = room.gridPosition + new Vector3(0, 0, 13.5f);
-                GameObject newWall = Instantiate(paredHorizontal, wallLocation, Quaternion.identity, generatedWorld.transform);
-            }
-            if (room.exitDirection != Direction.East && enterDirection != Direction.East)
-            {
-                Vector3 wallLocation = room.gridPosition + new Vector3(21.5f, 0, 0);
-                GameObject newWall = Instantiate(paredVertical, wallLocation, Quaternion.identity, generatedWorld.transform);
-            }
-            if (room.exitDirection != Direction.South && enterDirection != Direction.South)
-            {
-                Vector3 wallLocation = room.gridPosition + new Vector3(0, 0, -13.5f);
-                GameObject newWall = Instantiate(paredHorizontal, wallLocation, Quaternion.identity, generatedWorld.transform);
-            }
-            if (room.exitDirection != Direction.West && enterDirection != Direction.West)
-            {
-                Vector3 wallLocation = room.gridPosition + new Vector3(-21.5f, 0, 0);
-                GameObject newWall = Instantiate(paredVertical, wallLocation, Quaternion.identity, generatedWorld.transform);
-            }
+            Vector3 wallLocation = room.gridPosition + new Vector3(0, 0, 13.5f);
+            Instantiate(paredHorizontal, wallLocation, Quaternion.identity, generatedWorld.transform);
+        }
+        if (room.exitDirection != Direction.East && enterDirection != Direction.East)
+        {
+            Vector3 wallLocation = room.gridPosition + new Vector3(21.5f, 0, 0);
+            Instantiate(paredVertical, wallLocation, Quaternion.identity, generatedWorld.transform);
+        }
+        if (room.exitDirection != Direction.South && enterDirection != Direction.South)
+        {
+            Vector3 wallLocation = room.gridPosition + new Vector3(0, 0, -13.5f);
+            Instantiate(paredHorizontal, wallLocation, Quaternion.identity, generatedWorld.transform);
+        }
+        if (room.exitDirection != Direction.West && enterDirection != Direction.West)
+        {
+            Vector3 wallLocation = room.gridPosition + new Vector3(-21.5f, 0, 0);
+            Instantiate(paredVertical, wallLocation, Quaternion.identity, generatedWorld.transform);
         }
     }
 
-    private void GenerateDoors()
+    private void GenerateDoorsForRoom(RoomData room, Direction? enterDirection, GeneratedRoomController roomController)
     {
         // Obtiene los prefabs
         GameObject paredDePuertaHorizontal = Resources.Load<GameObject>("GeneracionDeCuartos/Paredes/ParedDePuertaHorizontal");
@@ -58,82 +49,82 @@ public partial class WorldGenerator : MonoBehaviour
         if (puertaHorizontal == null || paredDePuertaHorizontal == null || puertaVertical == null || paredDePuertaVertical == null)
         {
             Debug.LogError("No se encontro el prefab de el puente");
+            return;
         }
-        
-        Direction? previousExitDirection = null;
 
-        foreach (RoomData room in floorData.rooms)
+        if (room.exitDirection == Direction.North)
         {
-            // Si existe una habitacion anterior, su salida opuesta sera la entrada de la habitacion actual. En la primera habitacion no hay salida anterior, por eso enterDirection sera null.
-            Direction? enterDirection = previousExitDirection.HasValue? GetOppositeDirection(previousExitDirection.Value): null;
-            // Guarda la salida de esta habitacion. Se usara como referencia para calcular el enter de la siguiente habitacion.
-            previousExitDirection = room.exitDirection;
+            Vector3 wallLocation = room.gridPosition + new Vector3(0, 0, 13.5f);
+            Instantiate(paredDePuertaHorizontal, wallLocation, Quaternion.identity, generatedWorld.transform);
+            Vector3 doorLocation = wallLocation + new Vector3(0, 2.2f, 0);
+            GameObject newDoor = Instantiate(puertaHorizontal, doorLocation, Quaternion.identity, generatedWorld.transform);
+            roomController.exitDoor = newDoor;
+        }
+        else if (room.exitDirection == Direction.East)
+        {
+            Vector3 wallLocation = room.gridPosition + new Vector3(21.5f, 0, 0);
+            Instantiate(paredDePuertaVertical, wallLocation, Quaternion.identity, generatedWorld.transform);
+            Vector3 doorLocation = wallLocation + new Vector3(0, 2.2f, 0);
+            GameObject newDoor = Instantiate(puertaVertical, doorLocation, Quaternion.identity, generatedWorld.transform);
+            roomController.exitDoor = newDoor;
+        }
+        else if (room.exitDirection == Direction.South)
+        {
+            Vector3 wallLocation = room.gridPosition + new Vector3(0, 0, -13.5f);
+            Instantiate(paredDePuertaHorizontal, wallLocation, Quaternion.identity, generatedWorld.transform);
+            Vector3 doorLocation = wallLocation + new Vector3(0, 2.2f, 0);
+            GameObject newDoor = Instantiate(puertaHorizontal, doorLocation, Quaternion.identity, generatedWorld.transform);
+            roomController.exitDoor = newDoor;
+        }
+        else if (room.exitDirection == Direction.West)
+        {
+            Vector3 wallLocation = room.gridPosition + new Vector3(-21.5f, 0, 0);
+            Instantiate(paredDePuertaVertical, wallLocation, Quaternion.identity, generatedWorld.transform);
+            Vector3 doorLocation = wallLocation + new Vector3(0, 2.2f, 0);
+            GameObject newDoor = Instantiate(puertaVertical, doorLocation, Quaternion.identity, generatedWorld.transform);
+            roomController.exitDoor = newDoor;
+        }
 
-            if (room.exitDirection == Direction.North)
+        if (enterDirection.HasValue && room.exitDirection != enterDirection.Value)
+        {
+            if (enterDirection.Value == Direction.North)
             {
                 Vector3 wallLocation = room.gridPosition + new Vector3(0, 0, 13.5f);
-                GameObject newWallForDoor = Instantiate(paredDePuertaHorizontal, wallLocation, Quaternion.identity, generatedWorld.transform);
+                Instantiate(paredDePuertaHorizontal, wallLocation, Quaternion.identity, generatedWorld.transform);
+
                 Vector3 doorLocation = wallLocation + new Vector3(0, 2.2f, 0);
                 GameObject newDoor = Instantiate(puertaHorizontal, doorLocation, Quaternion.identity, generatedWorld.transform);
+                roomController.enterDoor = newDoor;
             }
-            else if (room.exitDirection == Direction.East)
+            else if (enterDirection.Value == Direction.East)
             {
                 Vector3 wallLocation = room.gridPosition + new Vector3(21.5f, 0, 0);
-                GameObject newWallForDoor = Instantiate(paredDePuertaVertical, wallLocation, Quaternion.identity, generatedWorld.transform);
+                Instantiate(paredDePuertaVertical, wallLocation, Quaternion.identity, generatedWorld.transform);
+
                 Vector3 doorLocation = wallLocation + new Vector3(0, 2.2f, 0);
                 GameObject newDoor = Instantiate(puertaVertical, doorLocation, Quaternion.identity, generatedWorld.transform);
+                roomController.enterDoor = newDoor;
             }
-            else if (room.exitDirection == Direction.South)
+            else if (enterDirection.Value == Direction.South)
             {
                 Vector3 wallLocation = room.gridPosition + new Vector3(0, 0, -13.5f);
-                GameObject newWallForDoor = Instantiate(paredDePuertaHorizontal, wallLocation, Quaternion.identity, generatedWorld.transform);
+                Instantiate(paredDePuertaHorizontal, wallLocation, Quaternion.identity, generatedWorld.transform);
+
                 Vector3 doorLocation = wallLocation + new Vector3(0, 2.2f, 0);
                 GameObject newDoor = Instantiate(puertaHorizontal, doorLocation, Quaternion.identity, generatedWorld.transform);
+                roomController.enterDoor = newDoor;
             }
-            else if (room.exitDirection == Direction.West)
+            else if (enterDirection.Value == Direction.West)
             {
                 Vector3 wallLocation = room.gridPosition + new Vector3(-21.5f, 0, 0);
-                GameObject newWallForDoor = Instantiate(paredDePuertaVertical, wallLocation, Quaternion.identity, generatedWorld.transform);
+                Instantiate(paredDePuertaVertical, wallLocation, Quaternion.identity, generatedWorld.transform);
+
                 Vector3 doorLocation = wallLocation + new Vector3(0, 2.2f, 0);
                 GameObject newDoor = Instantiate(puertaVertical, doorLocation, Quaternion.identity, generatedWorld.transform);
-            }
-
-            if (enterDirection.HasValue && room.exitDirection != enterDirection.Value)
-            {
-                if (enterDirection.Value == Direction.North)
-                {
-                    Vector3 wallLocation = room.gridPosition + new Vector3(0, 0, 13.5f);
-                    Instantiate(paredDePuertaHorizontal, wallLocation, Quaternion.identity, generatedWorld.transform);
-
-                    Vector3 doorLocation = wallLocation + new Vector3(0, 2.2f, 0);
-                    Instantiate(puertaHorizontal, doorLocation, Quaternion.identity, generatedWorld.transform);
-                }
-                else if (enterDirection.Value == Direction.East)
-                {
-                    Vector3 wallLocation = room.gridPosition + new Vector3(21.5f, 0, 0);
-                    Instantiate(paredDePuertaVertical, wallLocation, Quaternion.identity, generatedWorld.transform);
-
-                    Vector3 doorLocation = wallLocation + new Vector3(0, 2.2f, 0);
-                    Instantiate(puertaVertical, doorLocation, Quaternion.identity, generatedWorld.transform);
-                }
-                else if (enterDirection.Value == Direction.South)
-                {
-                    Vector3 wallLocation = room.gridPosition + new Vector3(0, 0, -13.5f);
-                    Instantiate(paredDePuertaHorizontal, wallLocation, Quaternion.identity, generatedWorld.transform);
-
-                    Vector3 doorLocation = wallLocation + new Vector3(0, 2.2f, 0);
-                    Instantiate(puertaHorizontal, doorLocation, Quaternion.identity, generatedWorld.transform);
-                }
-                else if (enterDirection.Value == Direction.West)
-                {
-                    Vector3 wallLocation = room.gridPosition + new Vector3(-21.5f, 0, 0);
-                    Instantiate(paredDePuertaVertical, wallLocation, Quaternion.identity, generatedWorld.transform);
-
-                    Vector3 doorLocation = wallLocation + new Vector3(0, 2.2f, 0);
-                    Instantiate(puertaVertical, doorLocation, Quaternion.identity, generatedWorld.transform);
-                }
+                roomController.enterDoor = newDoor;
             }
         }
+        
     }
 
     private Direction GetOppositeDirection(Direction direction)

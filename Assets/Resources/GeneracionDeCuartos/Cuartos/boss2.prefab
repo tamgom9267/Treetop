@@ -9641,6 +9641,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6213949460756484785}
+  - component: {fileID: -3203408165802787266}
   m_Layer: 0
   m_Name: boss2
   m_TagString: Untagged
@@ -9665,6 +9666,23 @@ Transform:
   - {fileID: 1319775147578189465}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-3203408165802787266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2790284918412206579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da135e1f3a8d6714a87dd0a6e1f88a2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GeneratedRoomController
+  enemyType: 0
+  spawners: []
+  enemies: []
+  isActive: 0
+  isCompleted: 0
 --- !u!1 &2813733424720853852
 GameObject:
   m_ObjectHideFlags: 0
