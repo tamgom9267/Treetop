@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour
     public InputActionReference interact;
 
     public InputActionReference inventory;
+    public InputActionReference rotate;
 
     public GameObject nearestWeapon;
     public InventoryObject nearestWeaponObj;
@@ -54,6 +55,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform handObj;
 
     public List<GameObject> nearWeapons = new List<GameObject>();
+    
 
     private void Awake()
     {
@@ -72,6 +74,7 @@ public class PlayerController : MonoBehaviour
        attack.action.Enable();
        interact.action.Enable();
        inventory.action.Enable();
+       rotate.action.Enable();
 
        Inventory.GetComponent<PlayerInventory>().AssignPlayer(this);
 
@@ -98,6 +101,11 @@ public class PlayerController : MonoBehaviour
             {
                 weapon = Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj;
                 equipWeapon();
+            }
+
+            if (rotate.action.WasPressedThisFrame())
+            {
+                Inventory.GetComponent<PlayerInventory>().RotateObject();
             }
         }
 

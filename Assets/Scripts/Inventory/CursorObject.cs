@@ -20,6 +20,8 @@ public class CursorObject : MonoBehaviour
     Vector2 CopyCurrentsize;
     Vector2 CopyColliderSize;
     Vector2 CopyColliderOffset;
+
+    bool isRotating = false;
     void Start()
     {
         CopyCurrentsize = GetComponent<RectTransform>().sizeDelta;
@@ -58,15 +60,53 @@ public class CursorObject : MonoBehaviour
 
     void updateSize(GameObject obj)
     {
-        GetComponent<RectTransform>().sizeDelta = obj.GetComponent<RectTransform>().sizeDelta;
-        GetComponent<BoxCollider2D>().size = obj.GetComponent<BoxCollider2D>().size;
-        GetComponent<BoxCollider2D>().offset = obj.GetComponent<BoxCollider2D>().offset;
+        float angle = (Mathf.Round(obj.GetComponent<RectTransform>().localEulerAngles.z / 90f) * 90f) % 360f;
+        Vector2 newSize = obj.GetComponent<RectTransform>().sizeDelta;
+        Vector2 newColliderSize = obj.GetComponent<BoxCollider2D>().size;
+        Vector2 itemOffset = obj.GetComponent<BoxCollider2D>().offset;
+        Vector2 newOffset = itemOffset;
+
+        if(angle == 90)
+        {
+            newOffset = new Vector2(-itemOffset.y, itemOffset.x);
+        }
+        else if(angle == 180)
+        {
+            newOffset = new Vector2(-itemOffset.x, -itemOffset.y);
+        }
+        else if(angle == 270)
+        {
+            newOffset = new Vector2(itemOffset.y, -itemOffset.x);
+        }
+
+        if(angle == 90 || angle == 270)
+        {
+            newSize = new Vector2(newSize.y, newSize.x);
+            newColliderSize = new Vector2(newColliderSize.y, newColliderSize.x);
+        }
+
+        GetComponent<RectTransform>().sizeDelta = newSize;
+        GetComponent<BoxCollider2D>().size = newColliderSize;
+        GetComponent<BoxCollider2D>().offset = newOffset;
     }
 
     IEnumerator counter()
     {
         yield return new WaitForSeconds(0.1f);
         isPressed = false;
+    }
+
+    public void RotatedObject()
+    {
+        isRotating = true;
+        updateSize(InventoryItemObj);
+        StartCoroutine(rotateCounter());
+    }
+
+    IEnumerator rotateCounter()
+    {
+        yield return new WaitForSeconds(0.2f);
+        isRotating = false;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -82,7 +122,12 @@ public class CursorObject : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if(isMoving == false || other == InventoryItemObj.GetComponent<Collider2D>())
+        if(isRotating == true)
+        {
+            return;
+        }
+
+        if(isMoving == false || (InventoryItemObj != null && other == InventoryItemObj.GetComponent<Collider2D>()))
         {
             GetComponent<RectTransform>().sizeDelta = CopyCurrentsize;
             GetComponent<BoxCollider2D>().size = CopyColliderSize;
@@ -92,11 +137,8 @@ public class CursorObject : MonoBehaviour
             InventoryItemObj = null;
             isMoving = false;
             updateSize();
-            gameObject.GetComponent<Image>().color = Color.green;   
+            gameObject.GetComponent<Image>().color = Color.green;
         }
-        
-        
     }
-
 
 }

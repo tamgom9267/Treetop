@@ -361,6 +361,11 @@ public class PlayerInventory : MonoBehaviour
         int shapeMaxRow = 0;
         int shapeMaxColumn = 0;
 
+        if(direction == new Vector2(-1,0) && cursor.GetComponent<CursorObject>().InventoryZone == 1 && cursor.GetComponent<CursorObject>().CurrentPosition.x == 0 && isMoving)
+        {
+            ResetRotation();
+        }
+
         if(cursor.GetComponent<CursorObject>().InventoryZone == 0)
         {
             currentGrid = lootgrid;
@@ -551,6 +556,171 @@ public class PlayerInventory : MonoBehaviour
     }
 
     #endregion
+
+
+
+    public void RotateObject()
+    {
+        if(isMoving == false || cursor.GetComponent<CursorObject>().InventoryItemObj == null)
+        {
+            return;
+        }
+
+        GameObject itemObj = cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj;
+        List<List<int>> cells = itemObj.GetComponent<InventoryObject>().requieredCells;
+
+        int size = cells.Count;
+        for(int column = 0; column < cells.Count; column++)
+        {
+            if(cells[column].Count > size)
+            {
+                size = cells[column].Count;
+            }
+        }
+
+        while(cells.Count < size)
+        {
+            cells.Add(new List<int>());
+        }
+
+        for(int column = 0; column < size; column++)
+        {
+            while(cells[column].Count < size)
+            {
+                cells[column].Add(0);
+            }
+        }
+
+        for(int layer = 0; layer < size / 2; layer++)
+        {
+            int first = layer;
+            int last = size - 1 - layer;
+
+            for(int i = first; i < last; i++)
+            {
+                int offset = i - first;
+                int temp = cells[first][i];
+
+                cells[first][i] = cells[last - offset][first];
+                cells[last - offset][first] = cells[last][last - offset];
+                cells[last][last - offset] = cells[i][last];
+                cells[i][last] = temp;
+            }
+        }
+
+        int minColumn = size;
+        int minRow = size;
+
+        for(int column = 0; column < size; column++)
+        {
+            for(int row = 0; row < size; row++)
+            {
+                if(cells[column][row] > 0)
+                {
+                    if(minColumn > column)
+                    {
+                        minColumn = column;
+                    }
+                    if(minRow > row)
+                    {
+                        minRow = row;
+                    }
+                }
+            }
+        }
+
+        if(minColumn < size)
+        {
+            for(int column = 0; column < size; column++)
+            {
+                for(int row = 0; row < size; row++)
+                {
+                    if(column + minColumn < size && row + minRow < size)
+                    {
+                        cells[column][row] = cells[column + minColumn][row + minRow];
+                    }
+                    else
+                    {
+                        cells[column][row] = 0;
+                    }
+                }
+            }
+        }
+
+        RectTransform rect = cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<RectTransform>();
+        Vector2 oldPivot = rect.pivot;
+        float angle = Mathf.Round(rect.localEulerAngles.z / 90f) * 90f;
+        angle = (angle - 90f + 360f) % 360f;
+        rect.localRotation = Quaternion.Euler(0, 0, angle);
+
+        if(angle == 0)
+        {
+            rect.pivot = new Vector2(0, 1);
+        }
+        else if(angle == 270)
+        {
+            rect.pivot = new Vector2(0, 0);
+        }
+        else if(angle == 180)
+        {
+            rect.pivot = new Vector2(1, 0);
+        }
+        else
+        {
+            rect.pivot = new Vector2(1, 1);
+        }
+
+        BoxCollider2D itemCollider = cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<BoxCollider2D>();
+        itemCollider.offset = new Vector2(
+            itemCollider.offset.x + (oldPivot.x - rect.pivot.x) * rect.rect.width,
+            itemCollider.offset.y + (oldPivot.y - rect.pivot.y) * rect.rect.height
+        );
+
+        cursor.GetComponent<CursorObject>().RotatedObject();
+
+        List<List<int>> currentGrid;
+        if(cursor.GetComponent<CursorObject>().InventoryZone == 0)
+        {
+            currentGrid = lootgrid;
+        }
+        else
+        {
+            currentGrid = grid;
+        }
+
+        (int maxRow, int maxColumn, int minR, int minC) = GetShapeSize(itemObj);
+
+        if(cursor.GetComponent<CursorObject>().CurrentPosition.x > currentGrid[0].Count - 1 - maxRow)
+        {
+            cursor.GetComponent<CursorObject>().CurrentPosition.x = Mathf.Max(0, currentGrid[0].Count - 1 - maxRow);
+        }
+        if(cursor.GetComponent<CursorObject>().CurrentPosition.y > currentGrid.Count - 1 - maxColumn)
+        {
+            cursor.GetComponent<CursorObject>().CurrentPosition.y = Mathf.Max(0, currentGrid.Count - 1 - maxColumn);
+        }
+
+        PlaceCursor();
+        CheckIfFit(itemObj);
+
+        
+    }
+
+    public void ResetRotation()
+    {
+        if(cursor.GetComponent<CursorObject>().InventoryItemObj == null)
+        {
+            return;
+        }
+
+        RectTransform rect = cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<RectTransform>();
+        int turnsDone = (4 - Mathf.RoundToInt(rect.localEulerAngles.z / 90f) % 4) % 4;
+        int missing = (4 - turnsDone) % 4;
+
+        for(int i = 0; i < missing; i++)
+        {
+            RotateObject();
+        }
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
