@@ -94,6 +94,8 @@ MonoBehaviour:
   InventoryZone: 0
   Inventory: {fileID: 0}
   select: {fileID: 7163403867976402669, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  isPressed: 0
+  InventoryItemObj: {fileID: 0}
 --- !u!61 &2272026519794868274
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -128,7 +130,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 80, y: -80}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -138,7 +140,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 160, y: 160}
   m_EdgeRadius: 0
 --- !u!50 &-4630818482692661191
 Rigidbody2D:

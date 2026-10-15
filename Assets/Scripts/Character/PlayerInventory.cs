@@ -42,76 +42,203 @@ public class PlayerInventory : MonoBehaviour
     public InventoryObject SelectedObject;
     public int lootWeight = 8;
     public List<List<int>> lootgrid = new List<List<int>>();
-    public List<InventoryObject> Loot = new List<InventoryObject>();
+    public List<GameObject> Loot = new List<GameObject>();
+
+    PlayerController Player;
+
+    public void AssignPlayer(PlayerController player)
+    {
+        Player = player;
+    }
+
+   public void PickUpWeapon()
+    {
+        CursorObject cursorObj = cursor.GetComponent<CursorObject>();
+        List<List<int>> zone = (cursorObj.InventoryZone == 0) ? lootgrid : grid;
+        int id = cursorObj.InventoryItemObj.GetComponent<PanelManager>().WeaponID;
+
+        for (int y = 0; y < zone.Count; y++)
+        {
+            for (int x = 0; x < zone[y].Count; x++)
+            {
+                if (zone[y][x] == id)
+                    zone[y][x] = 0;
+            }
+        }
+    }
+
+    public (int maxRow, int maxColumn, int minRow, int minColumn) GetShapeSize(GameObject itemObj)
+    {
+        int maxRow = 0;
+        int maxColumn = 0;
+        int minRow = 100;
+        int minColumn = 100;
+
+        for(int column = 0; column < itemObj.GetComponent<InventoryObject>().requieredCells.Count; column++)
+        {
+            for(int row = 0; row < itemObj.GetComponent<InventoryObject>().requieredCells[column].Count; row++)
+            {
+                if(itemObj.GetComponent<InventoryObject>().requieredCells[column][row] > 0)
+                {
+                    if(maxRow < row)
+                    {
+                        maxRow = row;
+                    }
+                    if(maxColumn < column)
+                    {
+                        maxColumn = column;
+                    }
+                    if(minRow > row)
+                    {
+                        minRow = row;
+                    }
+                    if(minColumn > column)
+                    {
+                        minColumn = column;
+                    }
+                }
+            }
+        }
+
+        if(minRow == 100)
+        {
+            minRow = 0;
+        }
+        if(minColumn == 100)
+        {
+            minColumn = 0;
+        }
+
+        return (maxRow, maxColumn, minRow, minColumn);
+    }
+
+    public void PlaceCursor()
+    {
+        Transform Slots;
+
+        if(cursor.GetComponent<CursorObject>().InventoryZone == 0)
+        {
+            Slots = ChestLoot.transform;
+        }
+        else
+        {
+            Slots = InventoryLoot.transform;
+        }
+
+        foreach(Transform panel in Slots)
+        {
+            if(panel.GetComponent<PanelManager>().location == cursor.GetComponent<CursorObject>().CurrentPosition)
+            {
+                RectTransform cursorRect = cursor.GetComponent<RectTransform>();
+                cursorRect.transform.position = panel.transform.position;
+            }
+        }
+    }
+
+    public void SnapCursorToItem(GameObject itemPanel)
+    {
+        List<List<int>> DesignatedZone;
+
+        if(cursor.GetComponent<CursorObject>().InventoryZone == 0)
+        {
+            DesignatedZone = lootgrid;
+        }
+        else
+        {
+            DesignatedZone = grid;
+        }
+
+        int foundRow = 100;
+        int foundColumn = 100;
+
+        for(int column = 0; column < DesignatedZone.Count; column++)
+        {
+            for(int row = 0; row < DesignatedZone[column].Count; row++)
+            {
+                if(DesignatedZone[column][row] == itemPanel.GetComponent<PanelManager>().WeaponID)
+                {
+                    if(foundRow > row)
+                    {
+                        foundRow = row;
+                    }
+                    if(foundColumn > column)
+                    {
+                        foundColumn = column;
+                    }
+                }
+            }
+        }
+
+        if(foundRow == 100)
+        {
+            return;
+        }
+
+        (int maxRow, int maxColumn, int minRow, int minColumn) = GetShapeSize(itemPanel.GetComponent<PanelManager>().itemObj);
+
+        cursor.GetComponent<CursorObject>().CurrentPosition = new Vector2(foundRow - minRow, foundColumn - minColumn);
+        PlaceCursor();
+    }
 
     #region LootWeapon
     public void InspectLoot(GameObject worldObject)
     {
-        LootObject = worldObject.GetComponent<InventoryObject>();
-        LootObject.gameObject.SetActive(false);
-        Loot.Add(LootObject);
-        Inventory.Add(worldObject);
+        worldObject.SetActive(false);
+        Loot.Add(worldObject);
         Createloot(worldObject);
     }
 
-    public (List<Vector2> ObjImagePosition, bool canFit,int scaleheight,int scalewidth) CheckIfFit(GameObject imageObj)
+    public (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) CheckIfFit(GameObject imageObj)
+    {
+        CursorObject cursorObj = cursor.GetComponent<CursorObject>();
+        List<List<int>> zone = (cursorObj.InventoryZone == 0) ? lootgrid : grid;
+
+        var result = CheckFit(imageObj, zone, (int)cursorObj.CurrentPosition.x, (int)cursorObj.CurrentPosition.y);
+
+        // Solo se marca rojo/verde si estás cargando un objeto.
+        // Si solo estás pasando el cursor por encima, siempre verde.
+        if (cursorObj.InventoryItemObj != null && isMoving)
+            cursor.GetComponent<Image>().color = result.canFit ? Color.green : Color.red;
+        else
+            cursor.GetComponent<Image>().color = Color.green;
+
+        return result;
+    }
+
+    public (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) CheckFit(GameObject imageObj, List<List<int>> zone, int offsetX, int offsetY)
     {
         List<Vector2> ObjImagePosition = new List<Vector2>();
         int scaleheight = 0;
         int scalewidth = 0;
-        //Checar si se puede poner en el grid
         bool canFit = true;
-        for(int column = 0; column < lootgrid.Count; column++)
+
+        List<List<int>> cells = imageObj.GetComponent<InventoryObject>().requieredCells;
+
+        for (int c = 0; c < cells.Count; c++)
         {
-            for(int row = 0; row < imageObj.GetComponent<InventoryObject>().requieredCells[column].Count; row++)
+            for (int r = 0; r < cells[c].Count; r++)
             {
-                if(lootgrid.Count-1 + (int)cursor.GetComponent<CursorObject>().CurrentPosition.y > lootgrid.Count-1)
+                if (cells[c][r] <= 0) continue;
+
+                int gridY = c + offsetY;
+                int gridX = r + offsetX;
+
+                if (gridY < 0 || gridY >= zone.Count || gridX < 0 || gridX >= zone[gridY].Count)
                 {
                     canFit = false;
-                }
-                else if(imageObj.GetComponent<InventoryObject>().requieredCells[column][row] == 1 || imageObj.GetComponent<InventoryObject>().requieredCells[column][row] == 0 && lootgrid[column][row] == 0)
-                {
-                    if(imageObj.GetComponent<InventoryObject>().requieredCells[column][row] == 1)
-                    {
-                        if(scaleheight < column)
-                        {
-                            scaleheight = column;
-                        }
-                        if(scalewidth < row)
-                        {
-                            scalewidth = row;
-                        }
-                        ObjImagePosition.Add(new Vector2(row,column));   
-                    }
                     continue;
                 }
-                else if(imageObj.GetComponent<InventoryObject>().requieredCells[column][row] == 0 && lootgrid[column][row] == 1)
-                {
-                    continue;
-                }
-                else
+
+                if (zone[gridY][gridX] != 0)
                 {
                     canFit = false;
+                    continue;
                 }
-            }
 
-        }
-
-
-        if(cursor.GetComponent<CursorObject>().InventoryItemObj != null)
-        {
-            if(canFit == false)
-            {
-                cursor.GetComponent<Image>().color = Color.red;
+                scaleheight = Mathf.Max(scaleheight, c);
+                scalewidth = Mathf.Max(scalewidth, r);
+                ObjImagePosition.Add(new Vector2(r, c));
             }
-            else
-            {
-                cursor.GetComponent<Image>().color = Color.green;
-            }
-        }
-        else
-        {
-            cursor.GetComponent<Image>().color = Color.green;
         }
 
         return (ObjImagePosition, canFit, scaleheight, scalewidth);
@@ -119,9 +246,27 @@ public class PlayerInventory : MonoBehaviour
     
     public void Createloot(GameObject worldObject)
     {
-        
-        (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) = CheckIfFit(worldObject);
 
+        if (Inventory.Contains(worldObject))
+        {
+            Inventory.Remove(worldObject);
+            Loot.Add(worldObject);
+        }
+        else
+        {
+            worldObject.GetComponent<InventoryObject>().ID = AvailableIDs[0];
+            AvailableIDs.RemoveAt(0); 
+        }
+        
+        
+        (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) = CheckFit(worldObject, lootgrid, 0, 0);
+
+        if (!canFit || ObjImagePosition.Count == 0)
+        {
+            Debug.LogWarning("Createloot: el objeto no cabe en el lootgrid (¿slot ocupado?)");
+            return;
+        }
+        
         //Agregar el objecto al chestloot grid
         if(canFit)
         {
@@ -129,9 +274,9 @@ public class PlayerInventory : MonoBehaviour
             {
                 for(int row = 0; row < lootgrid[column].Count; row++)
                 {
-                    if(LootObject.GetComponent<WeaponObject>().requieredCells[column][row] == 1 && lootgrid[column][row] == 0)
+                    if(worldObject.GetComponent<WeaponObject>().requieredCells[column][row] == 1 && lootgrid[column][row] == 0)
                     {
-                        lootgrid[column][row] = LootObject.GetComponent<WeaponObject>().ID;
+                        lootgrid[column][row] = worldObject.GetComponent<WeaponObject>().ID;
                     }
                 }
             }
@@ -139,14 +284,13 @@ public class PlayerInventory : MonoBehaviour
 
         //Reflejar el cambio en la UI
         GameObject InvObj = Instantiate(ObjectImagePanel, ChestLootImages.transform);
-        worldObject.GetComponent<InventoryObject>().ID = AvailableIDs[0];
-        AvailableIDs.Remove(0);
+       
         InvObj.GetComponent<PanelManager>().WeaponID = worldObject.GetComponent<InventoryObject>().ID;
         InvObj.GetComponent<PanelManager>().itemObj = worldObject;
 
         BoxCollider2D InvObjCollider = InvObj.GetComponent<BoxCollider2D>();
-        InvObjCollider.size = new Vector2(150 * (scalewidth+1), 150*(scaleheight+1));
-        InvObjCollider.offset = new Vector2(InvObjCollider.size.x/2, InvObjCollider.size.y/-2);
+        InvObjCollider.size = new Vector2(120 * (scalewidth+1), 150*(scaleheight+1));
+        InvObjCollider.offset = new Vector2(InvObjCollider.size.x *0.66f  , InvObjCollider.size.y/-2 + (-5*scaleheight) );
 
         foreach(Transform obj in ChestLoot.transform)
         {
@@ -166,29 +310,212 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    public bool addToLoot(GameObject spritePanel)
+    
+    public void RemoveWeaponFromChestLootGrid(Vector3 position)
     {
-        (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) = CheckIfFit(spritePanel.GetComponent<PanelManager>().itemObj);
+        List<GameObject> itemsToDrop = new List<GameObject>(Loot);
 
-        //Agregar el objecto al chestloot grid
-        if(canFit)
+        foreach (GameObject item in itemsToDrop)
         {
-            for(int column = (int)cursor.GetComponent<CursorObject>().CurrentPosition.y; column < lootgrid.Count; column++)
+            if (item == null) continue;
+            InventoryObject invObj = item.GetComponent<InventoryObject>();
+            if (invObj == null) continue;
+            int itemID = invObj.ID;
+
+            for (int column = 0; column < lootgrid.Count; column++)
             {
-                for(int row = (int)cursor.GetComponent<CursorObject>().CurrentPosition.x; row < lootgrid[column].Count; row++)
+                for (int row = 0; row < lootgrid[column].Count; row++)
                 {
-                    if(spritePanel.GetComponent<PanelManager>().itemObj.GetComponent<InventoryObject>().requieredCells[column][row] == 1 && lootgrid[column][row] == 0)
+                    if (lootgrid[column][row] == itemID)
                     {
-                        lootgrid[column][row] = spritePanel.GetComponent<PanelManager>().WeaponID;
+                        lootgrid[column][row] = 0;
                     }
                 }
             }
-            return true;
+
+            item.SetActive(true);
+            item.transform.position = position; 
+
+            foreach (Transform child in ChestLootImages.transform)
+            {
+                PanelManager panel = child.GetComponent<PanelManager>();
+                if (panel != null && panel.WeaponID == itemID)
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+
+            if (!AvailableIDs.Contains(itemID))
+            {
+                AvailableIDs.Add(itemID);
+            }
+            invObj.ID = 0;
         }
-        return false;
+
+        Loot.Clear();
     }
 
-    public void RemoveWeaponFromChestLootGrid(int ID, Vector3 position)
+    public void MovingCursor(Vector2 direction)
+    {
+        List<List<int>> currentGrid;
+        int shapeMaxRow = 0;
+        int shapeMaxColumn = 0;
+
+        if(direction == new Vector2(-1,0) && cursor.GetComponent<CursorObject>().InventoryZone == 1 && cursor.GetComponent<CursorObject>().CurrentPosition.x == 0 && isMoving)
+        {
+            ResetRotation();
+        }
+
+        if(cursor.GetComponent<CursorObject>().InventoryZone == 0)
+        {
+            currentGrid = lootgrid;
+        }
+        else
+        {
+            currentGrid = grid;
+        }
+
+        if(cursor.GetComponent<CursorObject>().InventoryItemObj != null)
+        {
+            (int maxRow, int maxColumn, int minRow, int minColumn) = GetShapeSize(cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj);
+            shapeMaxRow = maxRow;
+            shapeMaxColumn = maxColumn;
+        }
+
+        int limitRow = currentGrid[0].Count - 1 - shapeMaxRow;
+        int limitColumn = currentGrid.Count - 1 - shapeMaxColumn;
+
+        if(limitRow < 0)
+        {
+            limitRow = 0;
+        }
+        if(limitColumn < 0)
+        {
+            limitColumn = 0;
+        }
+
+        //Derecha Limite de loot
+        if(direction == new Vector2(1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x >= limitRow && cursor.GetComponent<CursorObject>().InventoryZone == 0)
+        {
+            cursor.GetComponent<CursorObject>().InventoryZone = 1;
+            cursor.GetComponent<CursorObject>().CurrentPosition.x = 0;
+
+            if(cursor.GetComponent<CursorObject>().CurrentPosition.y > grid.Count - 1 - shapeMaxColumn)
+            {
+                cursor.GetComponent<CursorObject>().CurrentPosition.y = grid.Count - 1 - shapeMaxColumn;
+            }
+        }
+        //Izquierda Limite de inventory
+        else if (direction == new Vector2(-1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x == 0  && cursor.GetComponent<CursorObject>().InventoryZone == 1)
+        {
+            cursor.GetComponent<CursorObject>().InventoryZone = 0;
+            cursor.GetComponent<CursorObject>().CurrentPosition.x = lootgrid[0].Count - 1 - shapeMaxRow;
+
+            if(cursor.GetComponent<CursorObject>().CurrentPosition.x < 0)
+            {
+                cursor.GetComponent<CursorObject>().CurrentPosition.x = 0;
+            }
+            if(cursor.GetComponent<CursorObject>().CurrentPosition.y > lootgrid.Count - 1 - shapeMaxColumn)
+            {
+                cursor.GetComponent<CursorObject>().CurrentPosition.y = lootgrid.Count - 1 - shapeMaxColumn;
+            }
+        }
+        //Derecha
+        else if(direction == new Vector2(1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x < limitRow)
+        {
+            cursor.GetComponent<CursorObject>().CurrentPosition.x += 1;
+        }
+        //Izquierda
+        else if(direction == new Vector2(-1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x > 0)
+        {
+            cursor.GetComponent<CursorObject>().CurrentPosition.x -= 1;
+        }
+        //Abajo
+        else if(direction == new Vector2(0,-1) && cursor.GetComponent<CursorObject>().CurrentPosition.y < limitColumn)
+        {
+            cursor.GetComponent<CursorObject>().CurrentPosition.y += 1;
+        }
+        //Arriba
+        else if(direction == new Vector2(0,1) && cursor.GetComponent<CursorObject>().CurrentPosition.y > 0)
+        {
+            cursor.GetComponent<CursorObject>().CurrentPosition.y -= 1;
+        }
+
+        PlaceCursor();
+
+        if (cursor.GetComponent<CursorObject>().InventoryItemObj != null)
+        {
+            CheckIfFit(cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj);
+        }
+    }
+
+    public void isMovingObject(GameObject spritePanel)
+    {
+        if (isMoving == false)
+        {
+            isMoving = true;
+            SpriteObject = spritePanel;
+            PickUpWeapon();
+        }
+        else
+        {
+            if(cursor.GetComponent<CursorObject>().InventoryZone == 1 && AddObject(spritePanel))
+            {
+                if (SpriteObject != null)
+                {
+                    SpriteObject = null;
+                }
+                isMoving = false;
+            }
+            else if (cursor.GetComponent<CursorObject>().InventoryZone == 0 && RemoveObject(spritePanel.GetComponent<PanelManager>().WeaponID))
+            {
+                if (SpriteObject != null)
+                {
+                    SpriteObject = null;
+                }
+                isMoving = false;
+                
+            }
+        }
+        
+    }
+
+    #endregion
+
+
+    #region Inventory
+    public bool AddObject(GameObject spritePanel)
+    {
+        PanelManager panel = spritePanel.GetComponent<PanelManager>();
+        var result = CheckIfFit(panel.itemObj);
+
+        if (!result.canFit) return false;
+
+        if (!Inventory.Contains(panel.itemObj))
+        {
+            Inventory.Add(panel.itemObj);
+            Loot.Remove(panel.itemObj);
+        }
+
+        CursorObject cursorObj = cursor.GetComponent<CursorObject>();
+        int offsetX = (int)cursorObj.CurrentPosition.x;
+        int offsetY = (int)cursorObj.CurrentPosition.y;
+        List<List<int>> cells = panel.itemObj.GetComponent<InventoryObject>().requieredCells;
+
+        for (int c = 0; c < cells.Count; c++)
+        {
+            for (int r = 0; r < cells[c].Count; r++)
+            {
+                if (cells[c][r] == 1)
+                    grid[offsetY + c][offsetX + r] = panel.WeaponID;
+            }
+        }
+
+        Player.GetComponent<PlayerController>().SetNearestWeaponFalse();
+        return true;
+    }
+
+    public bool RemoveObject(int ID)
     {
         for(int column = 0; column < lootgrid.Count; column++)
         {
@@ -201,42 +528,159 @@ public class PlayerInventory : MonoBehaviour
             }
         }
 
-        foreach(GameObject item in Inventory)
+        GameObject targetPanel = null;
+        foreach(Transform child in ChestLootImages.transform)
         {
-            if(item.GetComponent<InventoryObject>().ID == ID)
+            PanelManager panelManager = child.GetComponent<PanelManager>();
+            if(panelManager != null && panelManager.WeaponID == ID)
             {
-                item.SetActive(true);
-                item.transform.position = position;
-                Inventory.Remove(item);
+                targetPanel = child.gameObject;
                 break;
             }
         }
-        
-        //Quitar la imagen de ChestLootImage
-        foreach(Transform child in ChestLootImages.transform)
+
+        if (targetPanel != null)
         {
-            if(child.GetComponent<PanelManager>().WeaponID == ID)
+            PanelManager targetPanelManager = targetPanel.GetComponent<PanelManager>();
+            
+            if (targetPanelManager.itemObj != null && !Loot.Contains(targetPanelManager.itemObj))
             {
-                Destroy(child.gameObject);
+                Loot.Add(targetPanelManager.itemObj);
+                Inventory.Remove(targetPanelManager.itemObj);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    #endregion
+
+
+
+    public void RotateObject()
+    {
+        if(isMoving == false || cursor.GetComponent<CursorObject>().InventoryItemObj == null)
+        {
+            return;
+        }
+
+        GameObject itemObj = cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj;
+        List<List<int>> cells = itemObj.GetComponent<InventoryObject>().requieredCells;
+
+        int size = cells.Count;
+        for(int column = 0; column < cells.Count; column++)
+        {
+            if(cells[column].Count > size)
+            {
+                size = cells[column].Count;
             }
         }
 
-        //Quitarles el ID al los objetos descartados y hacer los IDs disponibles otra vez
-        //Esto solo hace que puedas quitar un objeto a la vez
-        foreach(InventoryObject item in Loot)
+        while(cells.Count < size)
         {
-            AvailableIDs.Add(item.GetComponent<InventoryObject>().ID);
-            item.GetComponent<InventoryObject>().ID = 0;
-            Loot.Remove(item);
-            break;
-        }  
-       
-    }
+            cells.Add(new List<int>());
+        }
 
-    public void MovingCursor(Vector2 direction)
-    {
+        for(int column = 0; column < size; column++)
+        {
+            while(cells[column].Count < size)
+            {
+                cells[column].Add(0);
+            }
+        }
+
+        for(int layer = 0; layer < size / 2; layer++)
+        {
+            int first = layer;
+            int last = size - 1 - layer;
+
+            for(int i = first; i < last; i++)
+            {
+                int offset = i - first;
+                int temp = cells[first][i];
+
+                cells[first][i] = cells[last - offset][first];
+                cells[last - offset][first] = cells[last][last - offset];
+                cells[last][last - offset] = cells[i][last];
+                cells[i][last] = temp;
+            }
+        }
+
+        int minColumn = size;
+        int minRow = size;
+
+        for(int column = 0; column < size; column++)
+        {
+            for(int row = 0; row < size; row++)
+            {
+                if(cells[column][row] > 0)
+                {
+                    if(minColumn > column)
+                    {
+                        minColumn = column;
+                    }
+                    if(minRow > row)
+                    {
+                        minRow = row;
+                    }
+                }
+            }
+        }
+
+        if(minColumn < size)
+        {
+            for(int column = 0; column < size; column++)
+            {
+                for(int row = 0; row < size; row++)
+                {
+                    if(column + minColumn < size && row + minRow < size)
+                    {
+                        cells[column][row] = cells[column + minColumn][row + minRow];
+                    }
+                    else
+                    {
+                        cells[column][row] = 0;
+                    }
+                }
+            }
+        }
+
+        RectTransform rect = cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<RectTransform>();
+        Vector2 oldPivot = rect.pivot;
+        float angle = Mathf.Round(rect.localEulerAngles.z / 90f) * 90f;
+        angle = (angle - 90f + 360f) % 360f;
+        rect.localRotation = Quaternion.Euler(0, 0, angle);
+
+        if(angle == 0)
+        {
+            rect.pivot = new Vector2(0, 1);
+        }
+        else if(angle == 270)
+        {
+            rect.pivot = new Vector2(0, 0);
+        }
+        else if(angle == 180)
+        {
+            rect.pivot = new Vector2(1, 0);
+        }
+        else
+        {
+            rect.pivot = new Vector2(1, 1);
+        }
+
+        BoxCollider2D itemCollider = cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<BoxCollider2D>();
+        itemCollider.offset = new Vector2(
+            itemCollider.offset.x + (oldPivot.x - rect.pivot.x) * rect.rect.width,
+            itemCollider.offset.y + (oldPivot.y - rect.pivot.y) * rect.rect.height
+        );
+
+        cursor.GetComponent<CursorObject>().RotatedObject();
+
         List<List<int>> currentGrid;
-        if(cursor.GetComponent<CursorObject>().InventoryZone == 0){
+        if(cursor.GetComponent<CursorObject>().InventoryZone == 0)
+        {
             currentGrid = lootgrid;
         }
         else
@@ -244,160 +688,39 @@ public class PlayerInventory : MonoBehaviour
             currentGrid = grid;
         }
 
-        //Derecha Limite de loot
-        if(direction == new Vector2(1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x == currentGrid[0].Count-1 && cursor.GetComponent<CursorObject>().InventoryZone == 0)
-        {
-            cursor.GetComponent<CursorObject>().InventoryZone = 1;
-            cursor.GetComponent<CursorObject>().CurrentPosition.x = 0;
-        }
-        //Izquierda Limite de inventory
-        else if (direction == new Vector2(-1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x == 0  && cursor.GetComponent<CursorObject>().InventoryZone == 1)
-        {
-            cursor.GetComponent<CursorObject>().InventoryZone = 0;
-            cursor.GetComponent<CursorObject>().CurrentPosition.x = lootgrid[0].Count-1;
-        }
-        //Derecha
-        else if(direction == new Vector2(1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x < currentGrid[0].Count-1)
-        {
-            cursor.GetComponent<CursorObject>().CurrentPosition.x += 1;
-        }
-        //Izquierda
-        else if(direction == new Vector2(-1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x > 0)
-        {
-            cursor.GetComponent<CursorObject>().CurrentPosition.x -= 1;
-        }
-        //Abajo
-        else if(direction == new Vector2(0,-1) && cursor.GetComponent<CursorObject>().CurrentPosition.y < currentGrid.Count-1)
-        {
-            cursor.GetComponent<CursorObject>().CurrentPosition.y += 1;
-        }
-        //Arriba
-        else if(direction == new Vector2(0,1) && cursor.GetComponent<CursorObject>().CurrentPosition.y > 0)
-        {
-            cursor.GetComponent<CursorObject>().CurrentPosition.y -= 1;
-        }        
+        (int maxRow, int maxColumn, int minR, int minC) = GetShapeSize(itemObj);
 
-
-
-        if (cursor.GetComponent<CursorObject>().InventoryZone == 0)
+        if(cursor.GetComponent<CursorObject>().CurrentPosition.x > currentGrid[0].Count - 1 - maxRow)
         {
-           foreach(Transform panel in ChestLoot.transform)
-            {
-                if(panel.GetComponent<PanelManager>().location == cursor.GetComponent<CursorObject>().CurrentPosition)
-                {
-                    
-                    RectTransform cursorRect = cursor.GetComponent<RectTransform>();
-                    cursorRect.transform.position = panel.transform.position;
-                }
-            } 
+            cursor.GetComponent<CursorObject>().CurrentPosition.x = Mathf.Max(0, currentGrid[0].Count - 1 - maxRow);
         }
-        else{
-            foreach(Transform panel in InventoryLoot.transform)
-            {
-
-                if(panel.GetComponent<PanelManager>().location == cursor.GetComponent<CursorObject>().CurrentPosition)
-                {
-                    RectTransform cursorRect = cursor.GetComponent<RectTransform>();
-                    cursorRect.transform.position = panel.transform.position;
-                }
-            } 
+        if(cursor.GetComponent<CursorObject>().CurrentPosition.y > currentGrid.Count - 1 - maxColumn)
+        {
+            cursor.GetComponent<CursorObject>().CurrentPosition.y = Mathf.Max(0, currentGrid.Count - 1 - maxColumn);
         }
 
-        if (cursor.GetComponent<CursorObject>().InventoryItemObj != null)
-        {
-            CheckIfFit(cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj);    
-        }
-         
-    }
+        PlaceCursor();
+        CheckIfFit(itemObj);
 
-    public void isMovingObject(GameObject spritePanel)
-    {
-        if (isMoving == false)
-        {
-            isMoving = true;
-            SpriteObject = spritePanel;
-        }
-        else
-        {
-            if(cursor.GetComponent<CursorObject>().InventoryZone == 1 && AddObject(spritePanel))
-            {
-                isMoving = false;
-                SpriteObject = null;
-            }
-            else if (cursor.GetComponent<CursorObject>().InventoryZone == 0 && RemoveObject(spritePanel.GetComponent<PanelManager>().WeaponID))
-            {
-                isMoving = false;
-                SpriteObject = null;
-            }
-        }
         
     }
 
-    #endregion
-
-
-    #region Inventory
-    public bool AddObject(GameObject spritePanel)
+    public void ResetRotation()
     {
-        (List<Vector2> ObjImagePosition, bool canFit, int scaleheight, int scalewidth) = CheckIfFit(spritePanel.GetComponent<PanelManager>().itemObj);
-        
-        int itemRow = 0;
-        int itemColumn = 0;
-
-        //Agregar el objecto al Inventory grid
-        if(canFit)
+        if(cursor.GetComponent<CursorObject>().InventoryItemObj == null)
         {
-            for(int column = (int)cursor.GetComponent<CursorObject>().CurrentPosition.y; column < grid.Count; column++)
-            {
-                for(int row = (int)cursor.GetComponent<CursorObject>().CurrentPosition.x; row < grid[column].Count; row++)
-                {
-                    if(spritePanel.GetComponent<PanelManager>().itemObj.GetComponent<InventoryObject>().requieredCells[itemColumn][itemRow] == 1 && grid[column][row] == 0)
-                    {
-                        grid[column][row] = spritePanel.GetComponent<PanelManager>().WeaponID;
-                        itemRow ++;
-                        if(itemRow > spritePanel.GetComponent<PanelManager>().itemObj.GetComponent<InventoryObject>().requieredCells[itemColumn].Count - 1)
-                        {
-                            itemRow = 0;
-                            itemColumn ++;
-                        }
-                    }
-                }
-            }
-
-            Loot.Remove(spritePanel.GetComponent<PanelManager>().itemObj.GetComponent<InventoryObject>());
-            return true;
+            return;
         }
-        return false;
 
+        RectTransform rect = cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<RectTransform>();
+        int turnsDone = (4 - Mathf.RoundToInt(rect.localEulerAngles.z / 90f) % 4) % 4;
+        int missing = (4 - turnsDone) % 4;
+
+        for(int i = 0; i < missing; i++)
+        {
+            RotateObject();
+        }
     }
-
-    public bool RemoveObject(int ID)
-    {
-        for(int column = 0; column < grid.Count; column++)
-        {
-            for(int row = 0; row < grid[column].Count; row++)
-            {
-                if (grid[column][row] == ID)
-                {
-                    grid[column][row] = 0;
-                }
-            }
-        }
-
-        
-        //Quitar la imagen de LootImage
-        foreach(Transform child in ChestLootImages.transform)
-        {
-            if(child.GetComponent<PanelManager>().WeaponID == ID)
-            {
-                Loot.Add(child.GetComponent<PanelManager>().itemObj.GetComponent<InventoryObject>());
-                return addToLoot(child.gameObject);
-            }
-        }
-        return false;
-    }
-
-    #endregion
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -407,7 +730,7 @@ public class PlayerInventory : MonoBehaviour
         RectTransform cursorRect = cursor.GetComponent<RectTransform>();
         
         //Hacer los available ID's en base a la cantidad maxima de objetos que un jugador podria tener
-        for(int i = 0; i < MaxWeight + lootWeight; i++)
+        for(int i = 1; i < MaxWeight + lootWeight; i++)
         {
             AvailableIDs.Add(i);
         }
@@ -454,7 +777,7 @@ public class PlayerInventory : MonoBehaviour
 
         for (int i = 0; i < column; i++)
         {
-            grid.Add(row_array);
+            grid.Add(new List<int>(row_array));
         }
 
         for(int i = 0; i < 4; i++)

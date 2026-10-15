@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour
     public InputActionReference interact;
 
     public InputActionReference inventory;
+    public InputActionReference rotate;
 
     public GameObject nearestWeapon;
     public InventoryObject nearestWeaponObj;
@@ -52,6 +53,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject InventoryUI;
 
     [SerializeField] Transform handObj;
+
+    public List<GameObject> nearWeapons = new List<GameObject>();
+    
 
     private void Awake()
     {
@@ -70,16 +74,24 @@ public class PlayerController : MonoBehaviour
        attack.action.Enable();
        interact.action.Enable();
        inventory.action.Enable();
+       rotate.action.Enable();
+
+       Inventory.GetComponent<PlayerInventory>().AssignPlayer(this);
 
     }
 
     // Update is called once per frame
     private void Update()
     {
+        if(InventoryUI.activeSelf == false)
+        {
+            UpdateNearestWeapon();
+        }
         
         _moveDirection = move.action.ReadValue<Vector2>();
         if(InventoryUI.activeSelf == true)
         {
+            rb.linearVelocity = new Vector3(0,0,0);
             playerAnimation.SetFloat("Speed", 0);
             if (move.action.WasPressedThisFrame())
             {
@@ -90,6 +102,11 @@ public class PlayerController : MonoBehaviour
                 weapon = Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj;
                 equipWeapon();
             }
+
+            if (rotate.action.WasPressedThisFrame())
+            {
+                Inventory.GetComponent<PlayerInventory>().RotateObject();
+            }
         }
 
         else
@@ -97,79 +114,81 @@ public class PlayerController : MonoBehaviour
             playerAnimation.SetFloat("Speed", _moveDirection.magnitude);
 
             if (!inAir)
-            {
-                if (!isAttacking)
                 {
-                    RotatePlayer(_moveDirection);    
+                    if (!isAttacking)
+                    {
+                        RotatePlayer(_moveDirection);    
+                    }
+                    rb.linearVelocity = new Vector3(_moveDirection.x * playerClass.speed, rb.linearVelocity.y ,_moveDirection.y * playerClass.speed);
                 }
-                rb.linearVelocity = new Vector3(_moveDirection.x * playerClass.speed, rb.linearVelocity.y ,_moveDirection.y * playerClass.speed);
+
+                if (attack.action.WasPressedThisFrame() && !isAttacking)
+            {
+                // leer teclas - ijkl
+                Vector2 attackInput = attack.action.ReadValue<Vector2>();
+
+                // Definir direccion de ataque - arriba, abajo, isquierda, derecha 
+                // (no es posible hacer ataques diagonales una de las direcciones va a tomar prioridad)
+                Vector2 attackDirection = GetAttackDirections(attackInput);
+
+                // se rota el personaje a la direccion assignada
+                RotatePlayer(attackDirection);
+
+                Debug.Log("Attaque: " + attackDirection);
+
+                // Un nuevo ataque puede volver a golpear a los slimes.
+                enemiesHitThisAttack.Clear();
+                
+                isAttacking = true;
+
+                playerAnimation.SetTrigger("isAttacking");
             }
-        }
+
+
+            if (interact.action.WasPressedThisFrame() && nearChest != null && nearChest.GetComponent<Chest>().chestInteracted == false)
+            {
+                nearestWeapon = nearChest.GetComponent<Chest>().hasInteracted();
+            }       
+            else if(interact.action.WasPressedThisFrame() && InventoryUI.activeSelf == false && nearestWeaponObj != null)
+            {
+                InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);    
+                InventoryUI.SetActive(true);
+
+            }
         
-        if (attack.action.WasPressedThisFrame() && !isAttacking)
-        {
-            // leer teclas - ijkl
-            Vector2 attackInput = attack.action.ReadValue<Vector2>();
 
-            // Definir direccion de ataque - arriba, abajo, isquierda, derecha 
-            // (no es posible hacer ataques diagonales una de las direcciones va a tomar prioridad)
-            Vector2 attackDirection = GetAttackDirections(attackInput);
-
-            // se rota el personaje a la direccion assignada
-            RotatePlayer(attackDirection);
-
-            Debug.Log("Attaque: " + attackDirection);
-
-            // Un nuevo ataque puede volver a golpear a los slimes.
-            enemiesHitThisAttack.Clear();
-            
-            isAttacking = true;
-
-            playerAnimation.SetTrigger("isAttacking");
+            // Gira hacia la direccion indicada.
+            if (hasTargetRotation)
+            {
+                transform.rotation = Quaternion.RotateTowards(
+                    transform.rotation,
+                    targetRotation,
+                    turnSpeed * Time.deltaTime
+                );
+            }
         }
 
         if (inventory.action.WasPressedThisFrame())
-        {
-            if(InventoryUI.activeSelf == true && nearestWeaponObj != null)
             {
-                if(Inventory.Loot.Count > 0)
+                if(InventoryUI.activeSelf == true)
                 {
-                    Debug.Log("Llega Aqui");
-                    InventoryUI.GetComponent<PlayerInventory>().RemoveWeaponFromChestLootGrid(nearestWeapon.GetComponent<InventoryObject>().ID, this.transform.position);
+                    if(Inventory.Loot.Count > 0)
+                    {
+                        InventoryUI.GetComponent<PlayerInventory>().RemoveWeaponFromChestLootGrid(this.transform.position);
+                        if (weapon)
+                        {
+                            if(weapon.GetComponent<InventoryObject>().ID == nearestWeapon.GetComponent<InventoryObject>().ID)
+                            {
+                                UnequipWeapon();    
+                            }
+                        }
+                        
+                    }
                     
-                    //
-                    //if(weapon.GetComponent<InventoryObject>().ID == nearestWeapon.GetComponent<InventoryObject>().ID)
-                    //{
-                        //UnequipWeapon();    
-                    //}
+                    
                 }
-                
-                
+                InventoryUI.SetActive(!InventoryUI.activeSelf);
             }
-            InventoryUI.SetActive(!InventoryUI.activeSelf);
-        }
-
-        if (interact.action.WasPressedThisFrame() && nearChest != null && nearChest.GetComponent<Chest>().chestInteracted == false)
-        {
-            nearestWeapon = nearChest.GetComponent<Chest>().hasInteracted();
-        }       
-        else if(interact.action.WasPressedThisFrame() && InventoryUI.activeSelf == false && nearestWeaponObj != null)
-        {
-            InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);            
-            InventoryUI.SetActive(true);
-
-        }
-       
-
-        // Gira hacia la direccion indicada.
-        if (hasTargetRotation)
-        {
-            transform.rotation = Quaternion.RotateTowards(
-                transform.rotation,
-                targetRotation,
-                turnSpeed * Time.deltaTime
-            );
-        }
     }
     
     private void RotatePlayer(Vector2 direction)
@@ -219,18 +238,26 @@ public class PlayerController : MonoBehaviour
     // Se llama en Animation Event cuando inicia el ataque.
     public void EnableWeaponCollider()
     {
-        equippedWeaponCollider.enabled = true;
-        equippedWeapon.EnableTrail();
+        if (weapon)
+        {
+            equippedWeaponCollider.enabled = true;
+            equippedWeapon.EnableTrail();  
+        }
+        
     }
 
     // esta funcion llama por Animation Event al terminar la animacion de ataque.
     public void EndAttack()
     {
         // Desactiva el collider al terminar el ataque.
-        equippedWeaponCollider.enabled = false;
-        equippedWeapon.DisableTrail();
 
-        isAttacking = false;
+        if (weapon)
+        {
+            equippedWeaponCollider.enabled = false;
+            equippedWeapon.DisableTrail();
+ 
+        }
+        isAttacking = false;  
     }
 
     public void ApplyEnemyKnockback(GameObject enemy)
@@ -288,17 +315,17 @@ public class PlayerController : MonoBehaviour
      
 
        //    handObj = transform.Find("Hand");
-       GameObject equipedWeapon = Instantiate(weapon.GetComponent<WeaponObject>().weaponData.prefab,handObj);
-       equipedWeapon.transform.localPosition = new Vector3(0,0,0);
-       equipedWeapon.GetComponent<WeaponObject>().inHand = true;
+       GameObject WeaponObj = Instantiate(weapon.GetComponent<WeaponObject>().weaponData.prefab,handObj);
+       WeaponObj.transform.localPosition = new Vector3(0,0,0);
+       WeaponObj.GetComponent<WeaponObject>().inHand = true;
 
-       equippedWeapon = equipedWeapon.GetComponent<WeaponObject>();
+       equippedWeapon = WeaponObj.GetComponent<WeaponObject>();
 
-       equipedWeapon.GetComponent<WeaponObject>().player = this;
-       equipedWeapon.GetComponent<SphereCollider>().enabled = false;
+       WeaponObj.GetComponent<WeaponObject>().player = this;
+       WeaponObj.GetComponent<SphereCollider>().enabled = false;
 
        // La espada no puede hacer damage si el jugador no esta atacando.
-        equippedWeaponCollider = equipedWeapon.GetComponent<BoxCollider>();
+        equippedWeaponCollider = WeaponObj.GetComponent<BoxCollider>();
         equippedWeaponCollider.enabled = false;
 
         Inventory.gameObject.GetComponent<UIDisplay>().UIEquippedWeaponDisplay();
@@ -308,6 +335,7 @@ public class PlayerController : MonoBehaviour
     {
         weapon = null;
         equippedWeapon = null;
+        Destroy(handObj.GetChild(1).gameObject);
         Inventory.gameObject.GetComponent<UIDisplay>().UIEquippedWeaponDisplay();
     }
 
@@ -324,17 +352,64 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void SetNearestWeaponFalse()
+    {
+        if(nearestWeapon != null)
+        {
+            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
+            nearestWeaponObj =null;
+            nearestWeapon = null;    
+        }
+    }
+
+
+    void UpdateNearestWeapon()
+    {
+        nearWeapons.RemoveAll(w => w == null || w.activeInHierarchy == false);
+
+        GameObject closest = null;
+        float closestDistance = 1000f;
+
+        for(int i = 0; i < nearWeapons.Count; i++)
+        {
+            float distance = Vector3.Distance(transform.position, nearWeapons[i].transform.position);
+            if(distance < closestDistance)
+            {
+                closestDistance = distance;
+                closest = nearWeapons[i];
+            }
+        }
+
+        if(closest == nearestWeapon)
+        {
+            return;
+        }
+
+        if(nearestWeaponObj != null)
+        {
+            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
+        }
+
+        nearestWeapon = closest;
+
+        if(closest != null)
+        {
+            nearestWeaponObj = closest.GetComponent<WeaponObject>();
+            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = true;
+        }
+        else
+        {
+            nearestWeaponObj = null;
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Weapon"))
         {
-            Debug.Log("a");
-            WeaponObject weaponObj = other.gameObject.GetComponent<WeaponObject>();
-            nearestWeaponObj =weaponObj;
-            nearestWeapon = other.gameObject;
-            if(weaponObj == nearestWeaponObj)
-           {
-                nearestWeaponObj.GetComponent<WeaponObject>().isSelected = true;
+            if(nearWeapons.Contains(other.gameObject) == false)
+            {
+                nearWeapons.Add(other.gameObject);
             }
         }
         else if (other.CompareTag("Chest"))
@@ -347,12 +422,8 @@ public class PlayerController : MonoBehaviour
     {
         if(other.CompareTag("Weapon"))
         {
-            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
-            //Hay un error con el inventario al agregar el objeto ya que no puede poner null un gameobject que esta desactivado
-            //nearestWeaponObj =null;
-            //nearestWeapon = null;
+            nearWeapons.Remove(other.gameObject);
         }
-        
     }
-    
+
 }
