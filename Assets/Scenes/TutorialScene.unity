@@ -7027,6 +7027,7 @@ MonoBehaviour:
   attack: {fileID: 1120369429361536294, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   interact: {fileID: 1781555164194001046, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   inventory: {fileID: 7186299553699024577, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  rotate: {fileID: -3050445605200399684, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   nearestWeapon: {fileID: 0}
   nearestWeaponObj: {fileID: 0}
   SelectedItem: {fileID: 0}
@@ -7034,6 +7035,7 @@ MonoBehaviour:
   nearChest: {fileID: 0}
   InventoryUI: {fileID: 1309465085}
   handObj: {fileID: 604001198}
+  nearWeapons: []
 --- !u!136 &707366306
 CapsuleCollider:
   m_ObjectHideFlags: 0
