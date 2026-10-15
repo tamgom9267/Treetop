@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class CursorObject : MonoBehaviour
 {
@@ -10,12 +11,11 @@ public class CursorObject : MonoBehaviour
     public int InventoryZone = 0;
     public PlayerInventory Inventory;
     [SerializeField] InputActionReference select;
-    bool isPressed = false;
+    public bool isPressed = false;
     PlayerInventory InventoryItem;
-    GameObject InventoryItemObj;
+    public GameObject InventoryItemObj;
     
     Vector2 CopyCurrentsize;
-    
 
     void Start()
     {
@@ -64,6 +64,7 @@ public class CursorObject : MonoBehaviour
         updateSize(CopyCurrentsize);
         InventoryItem = null;
         InventoryItemObj = null;
+        gameObject.GetComponent<Image>().color = Color.green;
     }
 
 
