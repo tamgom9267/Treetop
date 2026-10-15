@@ -322,6 +322,11 @@ public class PlayerInventory : MonoBehaviour
             if (invObj == null) continue;
             int itemID = invObj.ID;
 
+            if (Player.weapon != null && Player.weapon == item)
+            {
+                Player.UnequipWeapon();
+            }
+
             for (int column = 0; column < lootgrid.Count; column++)
             {
                 for (int row = 0; row < lootgrid[column].Count; row++)
@@ -345,15 +350,14 @@ public class PlayerInventory : MonoBehaviour
                 }
             }
 
-            if (!AvailableIDs.Contains(itemID))
-            {
-                AvailableIDs.Add(itemID);
+                if (!AvailableIDs.Contains(itemID))
+                {
+                    AvailableIDs.Add(itemID);
+                }
+                invObj.ID = 0;
             }
-            invObj.ID = 0;
+            Loot.Clear();
         }
-
-        Loot.Clear();
-    }
 
     public void MovingCursor(Vector2 direction)
     {
