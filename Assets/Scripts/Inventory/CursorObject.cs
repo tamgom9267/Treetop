@@ -51,6 +51,15 @@ public class CursorObject : MonoBehaviour
 
     }
 
+    public void ResetCursor()
+    {
+        InventoryItem = null;
+        InventoryItemObj = null;
+        isMoving = false;
+        updateSize();
+        gameObject.GetComponent<Image>().color = Color.green;
+    }
+
     void updateSize()
     {
         GetComponent<RectTransform>().sizeDelta = CopyCurrentsize;

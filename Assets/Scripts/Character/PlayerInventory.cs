@@ -359,7 +359,7 @@ public class PlayerInventory : MonoBehaviour
             Loot.Clear();
         }
 
-    public void MovingCursor(Vector2 direction)
+   public void MovingCursor(Vector2 direction)
     {
         List<List<int>> currentGrid;
         int shapeMaxRow = 0;
@@ -401,6 +401,13 @@ public class PlayerInventory : MonoBehaviour
         //Derecha Limite de loot
         if(direction == new Vector2(1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x >= limitRow && cursor.GetComponent<CursorObject>().InventoryZone == 0)
         {
+            if(isMoving == false)
+            {
+                cursor.GetComponent<CursorObject>().ResetCursor();
+                shapeMaxRow = 0;
+                shapeMaxColumn = 0;
+            }
+
             cursor.GetComponent<CursorObject>().InventoryZone = 1;
             cursor.GetComponent<CursorObject>().CurrentPosition.x = 0;
 
@@ -412,6 +419,13 @@ public class PlayerInventory : MonoBehaviour
         //Izquierda Limite de inventory
         else if (direction == new Vector2(-1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x == 0  && cursor.GetComponent<CursorObject>().InventoryZone == 1)
         {
+            if(isMoving == false)
+            {
+                cursor.GetComponent<CursorObject>().ResetCursor();
+                shapeMaxRow = 0;
+                shapeMaxColumn = 0;
+            }
+
             cursor.GetComponent<CursorObject>().InventoryZone = 0;
             cursor.GetComponent<CursorObject>().CurrentPosition.x = lootgrid[0].Count - 1 - shapeMaxRow;
 
