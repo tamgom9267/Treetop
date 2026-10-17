@@ -7,6 +7,8 @@ public class Chest : MonoBehaviour
     public bool chestInteracted;
     public bool PlayerNear = false;
 
+    private Animator animator;
+
     [SerializeField] GameObject Weapon;
     [SerializeField] GameObject Text;
 
@@ -14,10 +16,15 @@ public class Chest : MonoBehaviour
     {
         // inicia como falso
         chestInteracted = false;
+
+        animator = GetComponent<Animator>();
     }
 
     public GameObject hasInteracted()
     {
+        // Activar la animación de abrir cofre
+        animator.SetBool("isOpen", true);
+
         // Se activa el estado de interaccion con el cofre
         chestInteracted = true;
         Text.SetActive(false);
