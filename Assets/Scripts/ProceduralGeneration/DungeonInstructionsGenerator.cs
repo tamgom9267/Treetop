@@ -135,7 +135,7 @@ public class DungeonInstructionsGenerator : MonoBehaviour
         }
     }
 
-    private Direction GetOppositeDirection(Direction direction) // Get opposite direction to use when the random direction gives a 
+    private Direction GetOppositeDirection(Direction direction) // Get opposite direction to use when the random direction gives a used position
 {
     switch (direction)
     {
