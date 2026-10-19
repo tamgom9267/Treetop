@@ -8902,7 +8902,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9679eeb823c42ce44bc877eb69d6c3f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeBoss
-  vidaSlime: 10
+  vidaSlime: 50
   contactDamage: 5
   knockbackForce: 5
   knockbackUpForce: 2

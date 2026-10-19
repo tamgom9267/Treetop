@@ -3,7 +3,7 @@ using UnityEngine;
 public class SlimeBoss : MonoBehaviour
 {
     [Header("Estadisticas del slime")]
-    [SerializeField] private int vidaSlime = 10;
+    [SerializeField] private int vidaSlime = 50;
 
     [Header("Ataque del slime")]
 
