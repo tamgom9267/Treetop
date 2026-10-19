@@ -2772,7 +2772,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   rb: {fileID: 1427407327}
   playerClass: {fileID: 1427407324}
-  Inventory: {fileID: 0}
+  Inventory: {fileID: 2040965467}
   playerAnimation: {fileID: 1427407322}
   isAttacking: 0
   turnSpeed: 720
@@ -4569,7 +4569,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2040965467
 MonoBehaviour:
   m_ObjectHideFlags: 0

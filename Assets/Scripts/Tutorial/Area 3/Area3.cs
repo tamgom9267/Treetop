@@ -59,7 +59,7 @@ public class Area3 : MonoBehaviour
         isActive = true;
 
         // Mostramos el objetivo de el cuarto.
-        hintController.ActivateHint("Objetivo:\nUtiliza I, J, K y L para atacar y derrotar a todos los enemigos antes de continuar.");
+        hintController.ActivateHint("Objetivo:\nUtiliza ↑, ↓, →, ← para atacar y derrotar a todos los enemigos antes de continuar.");
 
         // Activa la IA y animaciones de todos los slimes del cuarto.
         foreach (GameObject enemy in enemies)
