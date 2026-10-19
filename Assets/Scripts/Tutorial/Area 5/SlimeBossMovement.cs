@@ -15,14 +15,14 @@ public class SlimeBossMovement : MonoBehaviour
     [Header("Salto")]
 
     // Tiempo minimo que espera entre un salto y el siguiente.
-    [SerializeField] private float minJumpCooldown = 0.8f;
-    [SerializeField] private float maxJumpCooldown = 1.3f;
+    [SerializeField] private float minJumpCooldown = 1f;
+    [SerializeField] private float maxJumpCooldown = 2f;
 
     // Fuerza horizontal maxima del salto.
-    [SerializeField] private float horizontalJumpForce = 5f;
+    [SerializeField] private float horizontalJumpForce = 8f;
 
     // Fuerza vertical del salto.
-    [SerializeField] private float verticalJumpForce = 3f;
+    [SerializeField] private float verticalJumpForce = 4f;
 
     [Header("Rotacion")]
     [SerializeField] private float turnSpeed = 360f;

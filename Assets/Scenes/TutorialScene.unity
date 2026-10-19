@@ -8884,10 +8884,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb62be8604c2ea04885ca1d3bca20c89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeBossMovement
-  minJumpCooldown: 0.8
-  maxJumpCooldown: 1.3
-  horizontalJumpForce: 5
-  verticalJumpForce: 3
+  minJumpCooldown: 1
+  maxJumpCooldown: 2
+  horizontalJumpForce: 8
+  verticalJumpForce: 4
   turnSpeed: 360
   navMeshCheckDistance: 1
 --- !u!114 &244622943
@@ -8954,7 +8954,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.08, y: 0.07, z: 0.093}
-  m_Center: {x: 0, y: 0.04, z: 0}
+  m_Center: {x: 0, y: 0.035, z: 0}
 --- !u!65 &244622946
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8975,7 +8975,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.08, y: 0.07, z: 0.093}
-  m_Center: {x: 0, y: 0.04, z: 0}
+  m_Center: {x: 0, y: 0.035, z: 0}
 --- !u!1001 &250597821
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14808,7 +14808,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
-  m_Center: {x: 0, y: 0.02, z: 0}
+  m_Center: {x: 0, y: 0.035, z: 0}
 --- !u!65 &604066506
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -14829,7 +14829,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
-  m_Center: {x: 0, y: 0.02, z: 0}
+  m_Center: {x: 0, y: 0.035, z: 0}
 --- !u!1001 &606854750
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20115,7 +20115,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
-  m_Center: {x: 0, y: 0.02, z: 0}
+  m_Center: {x: 0, y: 0.035, z: 0}
 --- !u!65 &1006441017
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -20136,7 +20136,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
-  m_Center: {x: 0, y: 0.02, z: 0}
+  m_Center: {x: 0, y: 0.035, z: 0}
 --- !u!1001 &1006766753
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21594,7 +21594,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
-  m_Center: {x: 0, y: 0.02, z: 0}
+  m_Center: {x: 0, y: 0.035, z: 0}
 --- !u!65 &1100221710
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -21615,7 +21615,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
-  m_Center: {x: 0, y: 0.02, z: 0}
+  m_Center: {x: 0, y: 0.035, z: 0}
 --- !u!1 &1100802642
 GameObject:
   m_ObjectHideFlags: 0
@@ -24734,7 +24734,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1309465086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32492,7 +32492,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
-  m_Center: {x: 0, y: 0.02, z: 0}
+  m_Center: {x: 0, y: 0.035, z: 0}
 --- !u!65 &1840048245
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -32513,7 +32513,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
-  m_Center: {x: 0, y: 0.02, z: 0}
+  m_Center: {x: 0, y: 0.035, z: 0}
 --- !u!1 &1850352209
 GameObject:
   m_ObjectHideFlags: 0
@@ -36094,7 +36094,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
-  m_Center: {x: 0, y: 0.02, z: 0}
+  m_Center: {x: 0, y: 0.035, z: 0}
 --- !u!65 &2104839232
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -36115,7 +36115,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
-  m_Center: {x: 0, y: 0.02, z: 0}
+  m_Center: {x: 0, y: 0.035, z: 0}
 --- !u!1001 &2121688846
 PrefabInstance:
   m_ObjectHideFlags: 0
