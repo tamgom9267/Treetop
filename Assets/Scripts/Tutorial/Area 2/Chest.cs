@@ -98,6 +98,7 @@ public class Chest : MonoBehaviour
             );
 
             // 4 es el modificador, t es el tiempo y (1-t) es para que vuelva a bajar
+            // la funcion es una parábola que sube y baja, multiplicada por la altura
             float salto = 4f * altura * t * (1f - t);
             weaponObj.transform.position += Vector3.up * salto;
 
@@ -112,6 +113,8 @@ public class Chest : MonoBehaviour
         while (tiempoRebote < duracionRebote)
         {
             tiempoRebote += Time.deltaTime;
+            // clamp 01 hace que el valor de t siempre este entre 0 y 1
+            // para que no se pase del tiempo de rebote
             float t = Mathf.Clamp01(tiempoRebote / duracionRebote);
 
             // sube y baja rapido
