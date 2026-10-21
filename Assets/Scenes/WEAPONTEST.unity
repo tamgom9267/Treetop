@@ -1449,7 +1449,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
       propertyPath: m_Name
-      value: fantasma2
+      value: fantasmaSmooth
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
