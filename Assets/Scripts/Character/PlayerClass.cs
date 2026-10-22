@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerClass : MonoBehaviour
@@ -7,9 +8,13 @@ public class PlayerClass : MonoBehaviour
 
     public int maxHealth;
     public int health;
+
+    public int maxMP;
     public int MP;
+
+
     public int defense;
-    
+
     //Dano fisico(Weapon Damage)
     public int WD;
 
@@ -26,11 +31,13 @@ public class PlayerClass : MonoBehaviour
     // Fuerza vertical fija de knockback que todos los enemigos aplican al jugador.
     public float enemyKnockbackUpForce = 3f;
 
+
+    // Patron observer - cuando cambia la vida notifica al HUD
+    public event Action<int, int, int, int> OnStatsChanged;
+
     void Awake()
     {
-
-       assignClass();
-        
+       assignClass();   
     }
 
 
@@ -40,7 +47,10 @@ public class PlayerClass : MonoBehaviour
         {
             maxHealth = classStats.health;
             health = maxHealth;
-            MP = classStats.MP;
+
+            maxMP = classStats.MP;
+            MP= maxMP;
+
             defense = classStats.defense;
             WD = classStats.WD;
             PD = classStats.PD;
@@ -48,7 +58,7 @@ public class PlayerClass : MonoBehaviour
         }
         else
         {
-            //For when the player doesn't have a class assigned
+            // Si por alguna razon el jugador no tiene clase
             health = 1;
             MP = 1;
             defense = 1;
@@ -56,6 +66,9 @@ public class PlayerClass : MonoBehaviour
             PD = 1;
             speed = 1;
         }
+
+        // para observer
+        NotifyStatsChanged();
     }
 
     public void TakeDamage(int damage)
@@ -64,12 +77,58 @@ public class PlayerClass : MonoBehaviour
         if (damage <= 0)
             return;
         
-        health -= damage;
+        // health -= damage;
+        
 
         // la vida no puede ser menor a 0
-        if (health < 0)
-            health = 0;
+        // if (health < 0)
+        //    health = 0;
+
+
+        // Cambio a Mathf para que la vida no pueda ser menor a 0 y evitar errores en el HUD
+        health = Mathf.Max(0, health - damage);
 
         Debug.Log("Player took " + damage + " damage. Current health: " + health);
+
+        // para observer
+        NotifyStatsChanged();
+    }
+
+    public void Heal(int cantidad)
+    {
+        if (cantidad <= 0) { return; }
+
+        // Math.f.Min para que no puedas tener más de la vida máxima.
+        health = Mathf.Min(maxHealth, health + cantidad);
+
+        // para observer
+        NotifyStatsChanged();
+    }
+
+    public void SpendMP(int cantidad)
+    {
+        if (cantidad <= 0) { return; }
+
+        MP = Mathf.Max(0, MP - cantidad);
+
+        // para observer
+        NotifyStatsChanged();
+    }
+
+    public void RestoreMP(int cantidad)
+    {
+        if (cantidad <= 0) { return; }
+
+        MP = Mathf.Min(maxMP, MP + cantidad);
+
+        NotifyStatsChanged();
+    }
+
+    private void NotifyStatsChanged()
+    {
+        if (OnStatsChanged != null)
+        {
+            OnStatsChanged.Invoke(health, maxHealth, MP, maxMP);
+        }
     }
 }

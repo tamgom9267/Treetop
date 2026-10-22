@@ -48,7 +48,11 @@ public class Campfire : MonoBehaviour
         if (healTimer < 0.5f)
             return;
 
-        playerClass.health = Mathf.Min(playerClass.health + 2, playerClass.maxHealth);
+        // implementacion anterior, no funciona con observer
+        // playerClass.health = Mathf.Min(playerClass.health + 2, playerClass.maxHealth);
+
+        // version de observer:
+        playerClass.Heal(2);
 
         // Reiniciamos el contador para la siguiente curacion
         healTimer = 0f;
