@@ -2746,6 +2746,7 @@ MonoBehaviour:
   exitDoor: {fileID: 0}
   isActive: 0
   isCompleted: 0
+  activateTemporal: 0
 --- !u!1 &2945361633659228345
 GameObject:
   m_ObjectHideFlags: 0
@@ -4693,7 +4694,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1e6c158061471b74ebaae295063dd96d, type: 2}
+  - {fileID: 2100000, guid: 0eeb199a0e1bd72178fc788d7b247cc6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -999,7 +999,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1e6c158061471b74ebaae295063dd96d, type: 2}
+  - {fileID: 2100000, guid: 0eeb199a0e1bd72178fc788d7b247cc6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3652,8 +3652,11 @@ MonoBehaviour:
   - {fileID: 5931164103783871709}
   - {fileID: 5364486813030457085}
   enemies: []
+  enterDoor: {fileID: 0}
+  exitDoor: {fileID: 0}
   isActive: 0
   isCompleted: 0
+  activateTemporal: 0
 --- !u!1 &6697376152145411554
 GameObject:
   m_ObjectHideFlags: 0
