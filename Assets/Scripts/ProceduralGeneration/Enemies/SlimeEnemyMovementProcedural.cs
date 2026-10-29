@@ -28,7 +28,7 @@ public class SlimeEnemyMovementProcedural : MonoBehaviour
     [Header("NavMesh")]
 
     // Distancia maxima para comprobar que jugador y slime estan sobre NavMesh.
-    [SerializeField] private float navMeshCheckDistance = 1f;
+    [SerializeField] private float navMeshCheckDistance = 10f;
 
     private NavMeshPath path;
     private Vector3 jumpDirection;

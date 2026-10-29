@@ -201,7 +201,7 @@ MonoBehaviour:
   horizontalJumpForce: 5
   verticalJumpForce: 3
   turnSpeed: 360
-  navMeshCheckDistance: 1
+  navMeshCheckDistance: 10
 --- !u!95 &8506469368512303603
 Animator:
   serializedVersion: 7
