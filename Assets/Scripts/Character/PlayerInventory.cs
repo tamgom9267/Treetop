@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 
 public class PlayerInventory : MonoBehaviour
@@ -45,6 +46,21 @@ public class PlayerInventory : MonoBehaviour
     public List<GameObject> Loot = new List<GameObject>();
 
     PlayerController Player;
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        GetOrCreateWorldLootContainer(scene);
+    }
 
     public void AssignPlayer(PlayerController player)
     {
@@ -338,8 +354,13 @@ public class PlayerInventory : MonoBehaviour
                 }
             }
 
+            // Saca el arma de la jerarquia persistente y la mueve a la escena activa.
+            item.transform.SetParent(null, true);
+            Scene activeScene = SceneManager.GetActiveScene();
+            SceneManager.MoveGameObjectToScene(item, activeScene);
+            item.transform.SetParent(GetOrCreateWorldLootContainer(), true);
+            item.transform.position = position;
             item.SetActive(true);
-            item.transform.position = position; 
 
             foreach (Transform child in ChestLootImages.transform)
             {
@@ -529,8 +550,38 @@ public class PlayerInventory : MonoBehaviour
             }
         }
 
+        // Conserva la instancia real del arma bajo el jugador mientras esta
+        // guardada. La instancia equipada para atacar se crea por separado.
+        panel.itemObj.transform.SetParent(Player.transform, true);
+
         Player.GetComponent<PlayerController>().SetNearestWeaponFalse();
         return true;
+    }
+
+    /// <summary>
+    /// Devuelve el contenedor Loot de la escena activa, creandolo como objeto raiz
+    /// si todavia no existe. Tambien sirve para agregar otros objetos del mundo.
+    /// </summary>
+    public Transform GetOrCreateWorldLootContainer()
+    {
+        return GetOrCreateWorldLootContainer(SceneManager.GetActiveScene());
+    }
+
+    private Transform GetOrCreateWorldLootContainer(Scene scene)
+    {
+        GameObject[] rootObjects = scene.GetRootGameObjects();
+
+        foreach (GameObject rootObject in rootObjects)
+        {
+            if (rootObject.name == "Loot")
+            {
+                return rootObject.transform;
+            }
+        }
+
+        GameObject lootContainer = new GameObject("Loot");
+        SceneManager.MoveGameObjectToScene(lootContainer, scene);
+        return lootContainer.transform;
     }
 
     public bool RemoveObject(int ID)
@@ -743,6 +794,8 @@ public class PlayerInventory : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        GetOrCreateWorldLootContainer();
+
         cursor = Instantiate(cursorPrefab, this.transform.GetChild(0));
         cursor.GetComponent<CursorObject>().Inventory = this;
         RectTransform cursorRect = cursor.GetComponent<RectTransform>();

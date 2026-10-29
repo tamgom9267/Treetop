@@ -127,6 +127,70 @@ public partial class WorldGenerator : MonoBehaviour
         
     }
 
+    private void GenerateFinalPortal()
+    {
+        if (floorData == null || floorData.rooms == null || floorData.rooms.Count == 0)
+        {
+            Debug.LogWarning("No se puede generar el portal final porque el piso no tiene cuartos.");
+            return;
+        }
+
+        RoomData finalRoom = floorData.rooms[floorData.rooms.Count - 1];
+        Direction nextRoomEntryDirection = GetOppositeDirection(finalRoom.exitDirection);
+        Vector3Int nextRoomPosition = finalRoom.gridPosition + GetRoomOffset(finalRoom.exitDirection);
+
+        GameObject portalPrefab = Resources.Load<GameObject>("GeneracionDeCuartos/Portal/Portal");
+        Vector3 wallLocation;
+        Quaternion portalRotation = Quaternion.identity;
+
+        switch (nextRoomEntryDirection)
+        {
+            case Direction.North:
+                wallLocation = nextRoomPosition + new Vector3(0, 0, 13.5f);
+                portalRotation = Quaternion.Euler(0, 90, 0);
+                break;
+            case Direction.East:
+                wallLocation = nextRoomPosition + new Vector3(21.5f, 0, 0);
+                break;
+            case Direction.South:
+                wallLocation = nextRoomPosition + new Vector3(0, 0, -13.5f);
+                portalRotation = Quaternion.Euler(0, 90, 0);
+                break;
+            case Direction.West:
+                wallLocation = nextRoomPosition + new Vector3(-21.5f, 0, 0);
+                break;
+            default:
+                Debug.LogError("La direccion de salida del cuarto final no es valida.");
+                return;
+        }
+
+        if (portalPrefab == null)
+        {
+            Debug.LogError("No se encontro el prefab del portal final en Resources/GeneracionDeCuartos/Portal.");
+            return;
+        }
+
+        Vector3 portalLocation = wallLocation + new Vector3(0, 2.2f, 0);
+        Instantiate(portalPrefab, portalLocation, portalRotation, generatedWorld.transform);
+    }
+
+    private Vector3Int GetRoomOffset(Direction direction)
+    {
+        switch (direction)
+        {
+            case Direction.North:
+                return new Vector3Int(0, 0, 41);
+            case Direction.East:
+                return new Vector3Int(57, 0, 0);
+            case Direction.South:
+                return new Vector3Int(0, 0, -41);
+            case Direction.West:
+                return new Vector3Int(-57, 0, 0);
+            default:
+                return Vector3Int.zero;
+        }
+    }
+
     private Direction GetOppositeDirection(Direction direction)
     {
         switch (direction)

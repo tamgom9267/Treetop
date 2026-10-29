@@ -32,6 +32,9 @@ public partial class WorldGenerator : MonoBehaviour
 
         // Genera los puentes con paredes
         GenerateBridge();
+
+        // Coloca el portal en la entrada hipotetica del siguiente cuarto.
+        GenerateFinalPortal();
     }
 
     // Destruir el mundo generado
