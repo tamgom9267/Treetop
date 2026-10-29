@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4308462036177484285}
   - component: {fileID: 718181931013271356}
   - component: {fileID: 3231866606961963897}
+  - component: {fileID: 6958220153983315148}
   m_Layer: 0
   m_Name: Plano
   m_TagString: Obstacle
@@ -135,6 +136,38 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 9.3, y: 0.1, z: 8.9}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6958220153983315148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114972132261356328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 1
+  m_Size: {x: 42, y: 1, z: 26}
+  m_Center: {x: 0, y: 0, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.59999996
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 5f5e6eb8ee0149148be700f613af0f4e, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!1 &271246021549743594
 GameObject:
   m_ObjectHideFlags: 0
@@ -5552,7 +5585,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3890402337990127579
 Transform:
   m_ObjectHideFlags: 0

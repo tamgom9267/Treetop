@@ -4410,7 +4410,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4863322619751152639
 Transform:
   m_ObjectHideFlags: 0
@@ -5339,6 +5339,7 @@ GameObject:
   - component: {fileID: 6917570294031082891}
   - component: {fileID: 1060391696868900399}
   - component: {fileID: 3452499591465152093}
+  - component: {fileID: 7995518986358698934}
   m_Layer: 0
   m_Name: Plano
   m_TagString: Obstacle
@@ -5461,6 +5462,38 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 9.3, y: 0.1, z: 8.9}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7995518986358698934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6993162962034045653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 1
+  m_Size: {x: 42, y: 1, z: 26}
+  m_Center: {x: 0, y: 0, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.59999996
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 37f504565c76d0443bcf773b97bacaba, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!1 &7008680682833965098
 GameObject:
   m_ObjectHideFlags: 0
@@ -7947,15 +7980,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6008618956496421692, guid: bf6afce6b40369643b99b8c265466066, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.5483627
+      value: -2.1930604
       objectReference: {fileID: 0}
     - target: {fileID: 6008618956496421692, guid: bf6afce6b40369643b99b8c265466066, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.14
+      value: 1.4558542
       objectReference: {fileID: 0}
     - target: {fileID: 6008618956496421692, guid: bf6afce6b40369643b99b8c265466066, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -11.41394
+      value: -11.665714
       objectReference: {fileID: 0}
     - target: {fileID: 6008618956496421692, guid: bf6afce6b40369643b99b8c265466066, type: 3}
       propertyPath: m_LocalRotation.w
@@ -8103,15 +8136,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6008618956496421692, guid: bf6afce6b40369643b99b8c265466066, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.5483627
+      value: -2.7094216
       objectReference: {fileID: 0}
     - target: {fileID: 6008618956496421692, guid: bf6afce6b40369643b99b8c265466066, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.14
+      value: 1.1400001
       objectReference: {fileID: 0}
     - target: {fileID: 6008618956496421692, guid: bf6afce6b40369643b99b8c265466066, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -11.41394
+      value: -10.8697195
       objectReference: {fileID: 0}
     - target: {fileID: 6008618956496421692, guid: bf6afce6b40369643b99b8c265466066, type: 3}
       propertyPath: m_LocalRotation.w
