@@ -184,6 +184,9 @@ MonoBehaviour:
   contactDamage: 5
   knockbackForce: 5
   knockbackUpForce: 2
+  rend: {fileID: 3698917979460000861}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
 --- !u!114 &-8475786150345472201
 MonoBehaviour:
   m_ObjectHideFlags: 0

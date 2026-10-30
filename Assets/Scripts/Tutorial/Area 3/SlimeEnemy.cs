@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Collections;
 public class SlimeEnemy : MonoBehaviour
 {
     [Header("Estadisticas del slime")]
@@ -17,6 +17,14 @@ public class SlimeEnemy : MonoBehaviour
 
     // Fuerza vertical que eleva un poco al slime.
     [SerializeField] private float knockbackUpForce = 2f;
+
+    [Header("Hit Feedback")]
+    public Renderer rend;
+    public Color flashColor = Color.red;
+    public float flashDuration = 0.1f;
+
+    private Material[] slimeMaterials;
+    private Color[] originalColors;
 
     [Header("Estado")]
     public bool isActive = false;
@@ -44,6 +52,12 @@ public class SlimeEnemy : MonoBehaviour
 
         if (player != null)
             playerClass = player.GetComponent<PlayerClass>();
+
+        slimeMaterials = rend.materials;
+        originalColors = new Color[slimeMaterials.Length];
+
+        for (int i = 0; i < slimeMaterials.Length; i++)
+            originalColors[i] = slimeMaterials[i].color;
     }
 
     // Activa el slime cuando el jugador entra al Area 3.
@@ -143,6 +157,7 @@ public class SlimeEnemy : MonoBehaviour
         vidaSlime -= damage;
 
         Debug.Log("Slime recibio " + damage + " de dano. Vida actual: " + vidaSlime);
+        StartCoroutine(DoFlash());
 
         // Se elimina al llegar a cero.
         if (vidaSlime <= 0)
@@ -176,4 +191,17 @@ public class SlimeEnemy : MonoBehaviour
         if (playerController != null)
             playerController.ApplyEnemyKnockback(gameObject);
     }
+
+    private IEnumerator DoFlash()
+    {
+        for (int i = 0; i < slimeMaterials.Length; i++)
+            slimeMaterials[i].color = flashColor;
+
+        yield return new WaitForSeconds(flashDuration);
+
+        for (int i = 0; i < slimeMaterials.Length; i++)
+            slimeMaterials[i].color = originalColors[i];
+    }
+
+
 }

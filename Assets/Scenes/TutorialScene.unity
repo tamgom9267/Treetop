@@ -5761,6 +5761,9 @@ MonoBehaviour:
   knockbackForce: 5
   knockbackUpForce: 2
   isActive: 0
+  rend: {fileID: 1711813855794313950}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
 --- !u!54 &244622944
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7485,6 +7488,9 @@ MonoBehaviour:
   contactDamage: 5
   knockbackForce: 8
   knockbackUpForce: 3
+  rend: {fileID: 1711813856237702726}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
   isActive: 0
 --- !u!54 &604066503
 Rigidbody:
@@ -9584,6 +9590,9 @@ MonoBehaviour:
   contactDamage: 5
   knockbackForce: 8
   knockbackUpForce: 3
+  rend: {fileID: 1711813856015126197}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
   isActive: 0
 --- !u!54 &1006441014
 Rigidbody:
@@ -10025,6 +10034,9 @@ MonoBehaviour:
   contactDamage: 5
   knockbackForce: 8
   knockbackUpForce: 3
+  rend: {fileID: 1711813854569599362}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
   isActive: 0
 --- !u!54 &1100221707
 Rigidbody:
@@ -19569,6 +19581,9 @@ MonoBehaviour:
   contactDamage: 5
   knockbackForce: 8
   knockbackUpForce: 3
+  rend: {fileID: 1711813855049928892}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
   isActive: 0
 --- !u!54 &2104839229
 Rigidbody:
@@ -44143,6 +44158,9 @@ MonoBehaviour:
   contactDamage: 5
   knockbackForce: 8
   knockbackUpForce: 3
+  rend: {fileID: 1339674108841426699}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
   isActive: 0
 --- !u!1 &5718729192580051224
 GameObject:
