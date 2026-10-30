@@ -6,11 +6,16 @@ public class NewestSingleton : MonoBehaviour
 
     private void Awake()
     {
-        // La instancia de la escena nueva reemplaza a la que venia de otra escena.
+        // Conserva al personaje y su inventario al cargar otra escena.
         if (Instance != null && Instance != this)
         {
-            Instance.gameObject.SetActive(false);
-            Destroy(Instance.gameObject);
+            // Usa la posicion inicial configurada para el personaje en la escena nueva.
+            Instance.transform.SetPositionAndRotation(transform.position, transform.rotation);
+
+            // La instancia existente permanece como singleton; se descarta el duplicado.
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+            return;
         }
 
         Instance = this;
