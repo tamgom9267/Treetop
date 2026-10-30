@@ -23,6 +23,9 @@ public class SlimeEnemy : MonoBehaviour
     public Color flashColor = Color.red;
     public float flashDuration = 0.1f;
 
+    [Header("Hit Stop")]
+    [SerializeField] private float hitStopDuration = 0.08f;
+
     private Material[] slimeMaterials;
     private Color[] originalColors;
 
@@ -94,8 +97,9 @@ public class SlimeEnemy : MonoBehaviour
             // Define el multiplicador de knockback
             knockbackMultiplier = 1f;
 
-            // Aplica el knockback
-            ApplyKnockback(other.gameObject, knockbackMultiplier);
+            // Pausa la animacion del atacante y retrasa el knockback hasta que termine.
+            weaponObject.player.TriggerHitStop(hitStopDuration);
+            StartCoroutine(ApplyKnockbackAfterHitStop(other.transform.position, knockbackMultiplier));
             
             // Aplica el Damage
             if (playerClass != null)
@@ -111,7 +115,7 @@ public class SlimeEnemy : MonoBehaviour
             knockbackMultiplier = 1f / 3f;
 
             // Aplica el knockback
-            ApplyKnockback(other.gameObject, knockbackMultiplier);
+            ApplyKnockback(other.transform.position, knockbackMultiplier);
 
             // Aplica el Damage
             if (playerClass != null)
@@ -120,10 +124,16 @@ public class SlimeEnemy : MonoBehaviour
     }
 
     // Knockback al slime
-    private void ApplyKnockback(GameObject attacker, float knockbackMultiplier)
+    private IEnumerator ApplyKnockbackAfterHitStop(Vector3 attackerPosition, float knockbackMultiplier)
+    {
+        yield return new WaitForSecondsRealtime(hitStopDuration);
+        ApplyKnockback(attackerPosition, knockbackMultiplier);
+    }
+
+    private void ApplyKnockback(Vector3 attackerPosition, float knockbackMultiplier)
     {
         // Direccion desde el atacante hacia el slime.
-        Vector3 knockbackDirection = transform.position - attacker.transform.position;
+        Vector3 knockbackDirection = transform.position - attackerPosition;
 
         // X y Z son el empuje hacia atras; Y se usa solo para elevarlo.
         knockbackDirection.y = 0f;
