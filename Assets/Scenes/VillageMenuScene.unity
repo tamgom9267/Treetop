@@ -3044,7 +3044,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &781635834
 Transform:
   m_ObjectHideFlags: 0
@@ -4320,7 +4320,6 @@ MonoBehaviour:
   hostRow: {fileID: 1810970345}
   client1Row: {fileID: 1882905116}
   client2Row: {fileID: 550424807}
-  allowKickButtons: 1
 --- !u!1 &1062675928
 GameObject:
   m_ObjectHideFlags: 0
@@ -17854,7 +17853,6 @@ MonoBehaviour:
   hostRow: {fileID: 4509720327766455174}
   client1Row: {fileID: 9120974091335359890}
   client2Row: {fileID: 4767043576439886865}
-  allowKickButtons: 1
 --- !u!1 &8176375427766264933
 GameObject:
   m_ObjectHideFlags: 0
