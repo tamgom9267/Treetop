@@ -19,6 +19,9 @@ public class PlayerController : MonoBehaviour
     private float hitStopEndTime;
     private float animatorSpeedBeforeHitStop;
 
+    [SerializeField] private float receivedHitStopDuration = 0.08f;
+    private Coroutine receivedHitCoroutine;
+
     // Guarda los slimes que ya fueron golpeados durante el ataque actual.
     private HashSet<GameObject> enemiesHitThisAttack = new HashSet<GameObject>();
     public bool isAttacking = false;
@@ -256,6 +259,36 @@ public class PlayerController : MonoBehaviour
         playerAnimation.speed = animatorSpeedBeforeHitStop;
         hitStopCoroutine = null;
     }
+
+    public void TriggerReceivedHitStop()
+    {
+        TriggerHitStop(receivedHitStopDuration);
+    }
+
+    public void ReceiveHit(GameObject enemy)
+    {
+        // Detener temporalmente la animación
+        TriggerHitStop(receivedHitStopDuration);
+
+        // Esperar a que termine el hitstop antes de aplicar knockback
+        if (receivedHitCoroutine != null)
+            StopCoroutine(receivedHitCoroutine);
+
+        receivedHitCoroutine = StartCoroutine(
+            ApplyKnockbackAfterHitStop(enemy)
+        );
+    }
+
+    private IEnumerator ApplyKnockbackAfterHitStop(GameObject enemy)
+    {
+        while (Time.unscaledTime < hitStopEndTime)
+            yield return null;
+
+        ApplyEnemyKnockback(enemy);
+
+        receivedHitCoroutine = null;
+    }
+
 
     // Se llama en Animation Event cuando inicia el ataque.
     public void EnableWeaponCollider()
