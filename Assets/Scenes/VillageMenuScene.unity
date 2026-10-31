@@ -5666,6 +5666,9 @@ MonoBehaviour:
   speed: 0
   enemyKnockbackForce: 8
   enemyKnockbackUpForce: 3
+  playerRenderer: {fileID: 1662720469}
+  flashColor: {r: 0, g: 1, b: 0.95873094, a: 1}
+  flashDuration: 0.1
 --- !u!114 &1408362007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5682,6 +5685,7 @@ MonoBehaviour:
   playerClass: {fileID: 1408362006}
   Inventory: {fileID: 2040965467}
   playerAnimation: {fileID: 1408362004}
+  receivedHitStopDuration: 0.08
   isAttacking: 0
   turnSpeed: 720
   weapon: {fileID: 0}

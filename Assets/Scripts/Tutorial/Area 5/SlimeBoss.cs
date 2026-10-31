@@ -195,13 +195,19 @@ public class SlimeBoss : MonoBehaviour
         PlayerClass playerClass = collision.gameObject.GetComponent<PlayerClass>();
         PlayerController playerController = collision.gameObject.GetComponent<PlayerController>();
 
-        // Aplica el dano del slime al jugador.
-        if (playerClass != null)
-            playerClass.TakeDamage(contactDamage);
+        // // Aplica el dano del slime al jugador.
+        // if (playerClass != null)
+        //     playerClass.TakeDamage(contactDamage);
 
-        // Aplica el knockback.
+        // // Aplica el knockback.
+        // if (playerController != null)
+        //     playerController.ApplyEnemyKnockback(gameObject);
+        
         if (playerController != null)
-            playerController.ApplyEnemyKnockback(gameObject);
+        {
+            playerClass.TakeDamage(contactDamage);
+            playerController.ReceiveHit(gameObject);
+        }
     }
 
     private IEnumerator DoFlash()

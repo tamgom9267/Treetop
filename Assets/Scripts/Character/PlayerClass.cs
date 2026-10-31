@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using System.Collections;
+
 
 public class PlayerClass : MonoBehaviour
 {
@@ -35,9 +37,35 @@ public class PlayerClass : MonoBehaviour
     // Patron observer - cuando cambia la vida notifica al HUD
     public event Action<int, int, int, int> OnStatsChanged;
 
+    [Header("Hit Feedback")]
+    [SerializeField] private Renderer playerRenderer;
+    [SerializeField] public Color flashColor = Color.red;
+    [SerializeField] private float flashDuration = 0.1f;
+
+    private Material[] playerMaterials;
+    private Color[] originalColors;
+    private Coroutine flashCoroutine;
+
+
+    private PlayerController playerController;
+
+
     void Awake()
     {
-       assignClass();   
+       assignClass();
+
+       playerController = GetComponent<PlayerController>();
+    }
+
+    void Start()
+    {
+        playerMaterials = playerRenderer.materials;
+        originalColors = new Color[playerMaterials.Length];
+
+        for (int i = 0; i < playerMaterials.Length; i++)
+        {
+            originalColors[i] = playerMaterials[i].color;
+        }
     }
 
 
@@ -74,8 +102,7 @@ public class PlayerClass : MonoBehaviour
     public void TakeDamage(int damage)
     {
         // Evita recibir dano si el dano es menor o igual a 0
-        if (damage <= 0)
-            return;
+        if (damage <= 0 || health <= 0) { return; }
         
         // health -= damage;
         
@@ -89,6 +116,15 @@ public class PlayerClass : MonoBehaviour
         health = Mathf.Max(0, health - damage);
 
         Debug.Log("Player took " + damage + " damage. Current health: " + health);
+
+        // feedback visual
+        TriggerHitFeedback();
+
+        //hit stop
+        if (playerController != null)
+        {
+            playerController.TriggerReceivedHitStop();
+        }
 
         // para observer
         NotifyStatsChanged();
@@ -130,5 +166,32 @@ public class PlayerClass : MonoBehaviour
         {
             OnStatsChanged.Invoke(health, maxHealth, MP, maxMP);
         }
+    }
+    
+    public void TriggerHitFeedback()
+    {
+        if (flashCoroutine != null)
+            StopCoroutine(flashCoroutine);
+
+        flashCoroutine = StartCoroutine(DoFlash());
+    }
+
+    private IEnumerator DoFlash()
+    {
+        // Aplica el color del flash a todos los materiales
+        for (int i = 0; i < playerMaterials.Length; i++)
+        {
+            playerMaterials[i].color = flashColor;
+        }
+
+        yield return new WaitForSeconds(flashDuration);
+
+        // Restaura los colores originales
+        for (int i = 0; i < playerMaterials.Length; i++)
+        {
+            playerMaterials[i].color = originalColors[i];
+        }
+
+        flashCoroutine = null;
     }
 }
