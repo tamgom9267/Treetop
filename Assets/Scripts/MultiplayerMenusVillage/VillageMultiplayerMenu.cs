@@ -41,8 +41,38 @@ public class VillageMultiplayerMenu : MonoBehaviour
     private bool wasInParty;
     private bool wasLocked;
     private bool noticeVisible;
+    private bool externalMenuOpen;
 
-    public bool IsModalOpen => screen != Screen.None || noticeVisible;
+    public bool IsModalOpen => screen != Screen.None || noticeVisible || externalMenuOpen;
+    private static bool IsRunActive => MultiplayerRunSession.Instance != null && MultiplayerRunSession.Instance.IsRunning;
+
+    public bool TryOpenExternalMenu()
+    {
+        PlayerController player = MultiplayerStartingRoomSpawns.LocalPlayer;
+        if (IsRunActive || IsModalOpen || Time.timeScale <= 0f || player != null && player.IsInventoryOpen ||
+            service != null && service.IsBusy) return false;
+        externalMenuOpen = true;
+        RenderPanels();
+        UpdateInputBlock();
+        return true;
+    }
+
+    public void CloseExternalMenu()
+    {
+        externalMenuOpen = false;
+        RenderPanels();
+        UpdateInputBlock();
+    }
+
+    public void ShowExternalNotice(string message)
+    {
+        ShowNotice(message);
+    }
+
+    private void Start()
+    {
+        if (MultiplayerRunSession.TryConsumeVillageNotice(out string message)) ShowNotice(message);
+    }
 
     private void Awake()
     {
@@ -79,6 +109,7 @@ public class VillageMultiplayerMenu : MonoBehaviour
         if (clientNameInput != null) clientNameInput.onValueChanged.RemoveListener(OnInputChanged);
         if (roomCodeInput != null) roomCodeInput.onValueChanged.RemoveListener(OnInputChanged);
         noticeVisible = false;
+        externalMenuOpen = false;
         SetScreen(Screen.None);
         SetPanel(compactPartyPanel, false);
     }
@@ -104,7 +135,7 @@ public class VillageMultiplayerMenu : MonoBehaviour
 
     public void OpenFromInteraction()
     {
-        if (IsModalOpen) return;
+        if (IsModalOpen || IsRunActive) return;
         AttachService();
         if (service == null)
         {
@@ -204,7 +235,7 @@ public class VillageMultiplayerMenu : MonoBehaviour
     private bool CanNavigate()
     {
         AttachService();
-        return service != null && !service.IsBusy;
+        return service != null && !service.IsBusy && !IsRunActive;
     }
 
     private void OnPartyChanged()
