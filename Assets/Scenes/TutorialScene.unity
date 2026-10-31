@@ -5756,15 +5756,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9679eeb823c42ce44bc877eb69d6c3f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeBoss
-  vidaSlime: 50
-  contactDamage: 5
-  knockbackForce: 5
-  knockbackUpForce: 2
   isActive: 0
-  rend: {fileID: 1711813855794313950}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
 --- !u!54 &244622944
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7485,14 +7477,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
-  vidaSlime: 10
-  contactDamage: 5
-  knockbackForce: 8
-  knockbackUpForce: 3
-  rend: {fileID: 1711813856237702726}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
   isActive: 0
 --- !u!54 &604066503
 Rigidbody:
@@ -9592,14 +9576,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
-  vidaSlime: 10
-  contactDamage: 5
-  knockbackForce: 8
-  knockbackUpForce: 3
-  rend: {fileID: 1711813856015126197}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
   isActive: 0
 --- !u!54 &1006441014
 Rigidbody:
@@ -10037,14 +10013,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
-  vidaSlime: 10
-  contactDamage: 5
-  knockbackForce: 8
-  knockbackUpForce: 3
-  rend: {fileID: 1711813854569599362}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
   isActive: 0
 --- !u!54 &1100221707
 Rigidbody:
@@ -19585,14 +19553,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
-  vidaSlime: 10
-  contactDamage: 5
-  knockbackForce: 8
-  knockbackUpForce: 3
-  rend: {fileID: 1711813855049928892}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
   isActive: 0
 --- !u!54 &2104839229
 Rigidbody:
@@ -21544,6 +21504,7 @@ GameObject:
   - component: {fileID: 2104839229}
   - component: {fileID: 2104839228}
   - component: {fileID: 2104839227}
+  - component: {fileID: 3469287837701448823}
   m_Layer: 0
   m_Name: Slime2
   m_TagString: PhysicalEnemy
@@ -21625,6 +21586,7 @@ GameObject:
   - component: {fileID: 1100221707}
   - component: {fileID: 1100221706}
   - component: {fileID: 1100221705}
+  - component: {fileID: 3469287838563329353}
   m_Layer: 0
   m_Name: Slime1
   m_TagString: PhysicalEnemy
@@ -21725,6 +21687,7 @@ GameObject:
   - component: {fileID: 604066503}
   - component: {fileID: 604066502}
   - component: {fileID: 604066501}
+  - component: {fileID: 3469287837012277901}
   m_Layer: 0
   m_Name: Slime2
   m_TagString: PhysicalEnemy
@@ -21863,6 +21826,7 @@ GameObject:
   - component: {fileID: 1006441014}
   - component: {fileID: 1006441013}
   - component: {fileID: 1006441012}
+  - component: {fileID: 3469287836586310272}
   m_Layer: 0
   m_Name: Slime3
   m_TagString: PhysicalEnemy
@@ -21944,6 +21908,7 @@ GameObject:
   - component: {fileID: 244622943}
   - component: {fileID: 244622942}
   - component: {fileID: 244622941}
+  - component: {fileID: 3469287837439282709}
   m_Layer: 0
   m_Name: SlimeBoss
   m_TagString: PhysicalEnemy
@@ -27135,6 +27100,7 @@ GameObject:
   - component: {fileID: 1586654351189724494}
   - component: {fileID: 5700800988000517984}
   - component: {fileID: 3790313950336352115}
+  - component: {fileID: 6972624566733004920}
   m_Layer: 0
   m_Name: Slime1
   m_TagString: PhysicalEnemy
@@ -27310,6 +27276,29 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132149086433120}
   m_Mesh: {fileID: 7113620311128232067, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
+--- !u!114 &3469287836586310272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132149086433120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
+  maxHealth: 10
+  contactDamage: 5
+  knockbackForce: 5
+  knockbackUpForce: 2
+  weaponKnockbackMultiplier: 1
+  projectileKnockbackMultiplier: 0.33333334
+  rend: {fileID: 1711813856015126197}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
+  hitStopDuration: 0.08
+  startsActive: 0
 --- !u!33 &3469287836679994221
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -27342,6 +27331,29 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132148551413651}
   m_Mesh: {fileID: 7113620311128232067, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
+--- !u!114 &3469287837012277901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132148551413651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
+  maxHealth: 10
+  contactDamage: 5
+  knockbackForce: 5
+  knockbackUpForce: 2
+  weaponKnockbackMultiplier: 1
+  projectileKnockbackMultiplier: 0.33333334
+  rend: {fileID: 1711813856237702726}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
+  hitStopDuration: 0.08
+  startsActive: 0
 --- !u!33 &3469287837315990319
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -27366,6 +27378,29 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132149265308427}
   m_Mesh: {fileID: -5837726450781561142, guid: 2b0e98fcff593237380c4c2bfaa8d061, type: 3}
+--- !u!114 &3469287837439282709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132149265308427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
+  maxHealth: 50
+  contactDamage: 8
+  knockbackForce: 5
+  knockbackUpForce: 2
+  weaponKnockbackMultiplier: 1
+  projectileKnockbackMultiplier: 0.33333334
+  rend: {fileID: 1711813855794313950}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
+  hitStopDuration: 0.08
+  startsActive: 1
 --- !u!33 &3469287837520323133
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -27406,6 +27441,29 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132147904180585}
   m_Mesh: {fileID: 7113620311128232067, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
+--- !u!114 &3469287837701448823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132147904180585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
+  maxHealth: 10
+  contactDamage: 5
+  knockbackForce: 5
+  knockbackUpForce: 2
+  weaponKnockbackMultiplier: 1
+  projectileKnockbackMultiplier: 0.33333334
+  rend: {fileID: 1711813855049928892}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
+  hitStopDuration: 0.08
+  startsActive: 0
 --- !u!33 &3469287838068554643
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -27462,6 +27520,29 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132148107653207}
   m_Mesh: {fileID: 7113620311128232067, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
+--- !u!114 &3469287838563329353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132148107653207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
+  maxHealth: 10
+  contactDamage: 5
+  knockbackForce: 5
+  knockbackUpForce: 2
+  weaponKnockbackMultiplier: 1
+  projectileKnockbackMultiplier: 0.33333334
+  rend: {fileID: 1711813854569599362}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
+  hitStopDuration: 0.08
+  startsActive: 0
 --- !u!1 &3471701395223937985
 GameObject:
   m_ObjectHideFlags: 0
@@ -44163,14 +44244,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
-  vidaSlime: 10
-  contactDamage: 5
-  knockbackForce: 8
-  knockbackUpForce: 3
-  rend: {fileID: 1339674108841426699}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
   isActive: 0
 --- !u!1 &5718729192580051224
 GameObject:
@@ -52349,6 +52422,29 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6972624566733004920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3213428666664385178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
+  maxHealth: 10
+  contactDamage: 5
+  knockbackForce: 5
+  knockbackUpForce: 2
+  weaponKnockbackMultiplier: 1
+  projectileKnockbackMultiplier: 0.33333334
+  rend: {fileID: 1339674108841426699}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
+  hitStopDuration: 0.08
+  startsActive: 0
 --- !u!23 &6995960347033874681
 MeshRenderer:
   m_ObjectHideFlags: 0
