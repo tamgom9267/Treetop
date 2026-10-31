@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 8795273727204710034}
   - component: {fileID: 2198120619918924471}
   - component: {fileID: 4019081639953886744}
-  - component: {fileID: 6867529867061431271}
   - component: {fileID: 3213899947818494974}
   - component: {fileID: 8506469368512303603}
+  - component: {fileID: 7006547434091552561}
   m_Layer: 0
   m_Name: Enemigo1
   m_TagString: PhysicalEnemy
@@ -168,25 +168,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
---- !u!114 &6867529867061431271
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 962130485584419276}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4613e91a61604ef58cacda48d5492c30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemyProcedural
-  vidaSlime: 10
-  contactDamage: 5
-  knockbackForce: 5
-  knockbackUpForce: 2
-  rend: {fileID: 3698917979460000861}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
 --- !u!114 &3213899947818494974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -227,3 +208,26 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7006547434091552561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 962130485584419276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
+  maxHealth: 10
+  contactDamage: 5
+  knockbackForce: 5
+  knockbackUpForce: 2
+  weaponKnockbackMultiplier: 1
+  projectileKnockbackMultiplier: 0.33333334
+  rend: {fileID: 3698917979460000861}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
+  hitStopDuration: 0.08
+  startsActive: 1
