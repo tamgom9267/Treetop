@@ -8,6 +8,12 @@ public class PauseController : MonoBehaviour
     [SerializeField] private GameObject CanvasPause;
     private InputAction PauseAction;
     private bool isPaused = false;
+    private bool externalUIBlocked;
+
+    public void SetExternalUIBlocked(bool blocked)
+    {
+        externalUIBlocked = blocked;
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -47,6 +53,8 @@ public class PauseController : MonoBehaviour
 
     public void TogglePause()
     {
+        if (externalUIBlocked) return;
+
         if (isPaused)
         {
             ResumeGame();
@@ -89,6 +97,9 @@ public class PauseController : MonoBehaviour
 
     public void GoToMainMenu()
     {
+        if (PhotonPartyService.Instance != null)
+            PhotonPartyService.Instance.LeaveParty();
+        Time.timeScale = 1f;
         SceneManager.LoadScene("StartMenuScene");
     }
 }
