@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -13,6 +14,10 @@ public class PlayerController : MonoBehaviour
     public PlayerInventory Inventory;
     public Animator playerAnimation;
     private Vector2 _moveDirection;
+
+    private Coroutine hitStopCoroutine;
+    private float hitStopEndTime;
+    private float animatorSpeedBeforeHitStop;
 
     // Guarda los slimes que ya fueron golpeados durante el ataque actual.
     private HashSet<GameObject> enemiesHitThisAttack = new HashSet<GameObject>();
@@ -226,6 +231,30 @@ public class PlayerController : MonoBehaviour
         enemiesHitThisAttack.Add(enemy);
 
         return true;
+    }
+
+    public void TriggerHitStop(float duration)
+    {
+        if (duration <= 0f)
+            return;
+
+        hitStopEndTime = Mathf.Max(hitStopEndTime, Time.unscaledTime + duration);
+
+        if (hitStopCoroutine != null)
+            return;
+
+        animatorSpeedBeforeHitStop = playerAnimation.speed;
+        playerAnimation.speed = 0f;
+        hitStopCoroutine = StartCoroutine(RestoreAnimationAfterHitStop());
+    }
+
+    private IEnumerator RestoreAnimationAfterHitStop()
+    {
+        while (Time.unscaledTime < hitStopEndTime)
+            yield return null;
+
+        playerAnimation.speed = animatorSpeedBeforeHitStop;
+        hitStopCoroutine = null;
     }
 
     // Se llama en Animation Event cuando inicia el ataque.

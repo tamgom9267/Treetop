@@ -25,7 +25,7 @@ RenderSettings:
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 0
-  m_SubtractiveShadowColor: {r: 0.51109904, g: 0.28617838, b: 0.5566038, a: 1}
+  m_SubtractiveShadowColor: {r: 0.3192561, g: 0.08503916, b: 0.3679245, a: 1}
   m_SkyboxMaterial: {fileID: 2100000, guid: 2ddc9dd9550bddd2c9ab40c73e0f008c, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 0}
+  m_Sun: {fileID: 410087040}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5761,6 +5761,9 @@ MonoBehaviour:
   knockbackForce: 5
   knockbackUpForce: 2
   isActive: 0
+  rend: {fileID: 1711813855794313950}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
 --- !u!54 &244622944
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7485,6 +7488,9 @@ MonoBehaviour:
   contactDamage: 5
   knockbackForce: 8
   knockbackUpForce: 3
+  rend: {fileID: 1711813856237702726}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
   isActive: 0
 --- !u!54 &604066503
 Rigidbody:
@@ -9584,6 +9590,9 @@ MonoBehaviour:
   contactDamage: 5
   knockbackForce: 8
   knockbackUpForce: 3
+  rend: {fileID: 1711813856015126197}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
   isActive: 0
 --- !u!54 &1006441014
 Rigidbody:
@@ -10025,6 +10034,9 @@ MonoBehaviour:
   contactDamage: 5
   knockbackForce: 8
   knockbackUpForce: 3
+  rend: {fileID: 1711813854569599362}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
   isActive: 0
 --- !u!54 &1100221707
 Rigidbody:
@@ -15732,7 +15744,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -364}
+  m_AnchoredPosition: {x: 0, y: -463}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!65 &1222095202
@@ -19569,6 +19581,9 @@ MonoBehaviour:
   contactDamage: 5
   knockbackForce: 8
   knockbackUpForce: 3
+  rend: {fileID: 1711813855049928892}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
   isActive: 0
 --- !u!54 &2104839229
 Rigidbody:
@@ -20459,7 +20474,7 @@ Transform:
   m_GameObject: {fileID: 9068085038223145011}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: 0.36592102, y: -2.2133389, z: 58.97345}
+  m_LocalPosition: {x: 0.36592102, y: -2.84, z: 58.97345}
   m_LocalScale: {x: 100, y: 1400, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -44143,6 +44158,9 @@ MonoBehaviour:
   contactDamage: 5
   knockbackForce: 8
   knockbackUpForce: 3
+  rend: {fileID: 1339674108841426699}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
   isActive: 0
 --- !u!1 &5718729192580051224
 GameObject:
@@ -44169,7 +44187,7 @@ Transform:
   m_GameObject: {fileID: 6091474864416653395}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: 0.36592102, y: -2.2133389, z: 86.68506}
+  m_LocalPosition: {x: 0.36592102, y: -2.84, z: 86.68506}
   m_LocalScale: {x: 100, y: 1400, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []

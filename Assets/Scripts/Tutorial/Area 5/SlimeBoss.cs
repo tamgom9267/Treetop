@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class SlimeBoss : MonoBehaviour
 {
@@ -20,6 +21,17 @@ public class SlimeBoss : MonoBehaviour
 
     [Header("Estado")]
     public bool isActive = false;
+
+    [Header("Hit Feedback")]
+    public Renderer rend;
+    public Color flashColor = Color.red;
+    public float flashDuration = 0.1f;
+
+    [Header("Hit Stop")]
+    [SerializeField] private float hitStopDuration = 0.08f;
+
+    private Material[] slimeMaterials;
+    private Color[] originalColors;
 
     [Header("Referencias")]
     private Rigidbody rb;
@@ -44,6 +56,12 @@ public class SlimeBoss : MonoBehaviour
 
         if (player != null)
             playerClass = player.GetComponent<PlayerClass>();
+
+        slimeMaterials = rend.materials;
+        originalColors = new Color[slimeMaterials.Length];
+
+        for (int i = 0; i < slimeMaterials.Length; i++)
+            originalColors[i] = slimeMaterials[i].color;
     }
 
     // Activa el slime cuando el jugador entra al Area 3.
@@ -80,8 +98,9 @@ public class SlimeBoss : MonoBehaviour
             // Define el multiplicador de knockback
             knockbackMultiplier = 1f;
 
-            // Aplica el knockback
-            ApplyKnockback(other.gameObject, knockbackMultiplier);
+            // Pausa la animacion del atacante y retrasa el knockback hasta que termine.
+            weaponObject.player.TriggerHitStop(hitStopDuration);
+            StartCoroutine(ApplyKnockbackAfterHitStop(other.transform.position, knockbackMultiplier));
             
             // Aplica el Damage
             if (playerClass != null)
@@ -97,7 +116,7 @@ public class SlimeBoss : MonoBehaviour
             knockbackMultiplier = 1f / 3f;
 
             // Aplica el knockback
-            ApplyKnockback(other.gameObject, knockbackMultiplier);
+            ApplyKnockback(other.transform.position, knockbackMultiplier);
 
             // Aplica el Damage
             if (playerClass != null)
@@ -106,10 +125,16 @@ public class SlimeBoss : MonoBehaviour
     }
 
     // Knockback al slime
-    private void ApplyKnockback(GameObject attacker, float knockbackMultiplier)
+    private IEnumerator ApplyKnockbackAfterHitStop(Vector3 attackerPosition, float knockbackMultiplier)
+    {
+        yield return new WaitForSecondsRealtime(hitStopDuration);
+        ApplyKnockback(attackerPosition, knockbackMultiplier);
+    }
+
+    private void ApplyKnockback(Vector3 attackerPosition, float knockbackMultiplier)
     {
         // Direccion desde el atacante hacia el slime.
-        Vector3 knockbackDirection = transform.position - attacker.transform.position;
+        Vector3 knockbackDirection = transform.position - attackerPosition;
 
         // X y Z son el empuje hacia atras; Y se usa solo para elevarlo.
         knockbackDirection.y = 0f;
@@ -143,6 +168,8 @@ public class SlimeBoss : MonoBehaviour
         vidaSlime -= damage;
 
         Debug.Log("Slime recibio " + damage + " de dano. Vida actual: " + vidaSlime);
+        StartCoroutine(DoFlash());
+
 
         // Se elimina al llegar a cero.
         if (vidaSlime <= 0)
@@ -175,5 +202,16 @@ public class SlimeBoss : MonoBehaviour
         // Aplica el knockback.
         if (playerController != null)
             playerController.ApplyEnemyKnockback(gameObject);
+    }
+
+    private IEnumerator DoFlash()
+    {
+        for (int i = 0; i < slimeMaterials.Length; i++)
+            slimeMaterials[i].color = flashColor;
+
+        yield return new WaitForSeconds(flashDuration);
+
+        for (int i = 0; i < slimeMaterials.Length; i++)
+            slimeMaterials[i].color = originalColors[i];
     }
 }
