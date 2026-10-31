@@ -60,6 +60,20 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] GameObject InventoryUI;
 
+    public bool IsInventoryOpen => InventoryUI != null && InventoryUI.activeInHierarchy;
+    public bool IsExternalUIBlocked { get; private set; }
+
+    // Bloquea las acciones de juego sin deshabilitar el Input System usado por los campos UI.
+    public void SetExternalUIBlocked(bool blocked)
+    {
+        IsExternalUIBlocked = blocked;
+        if (!blocked) return;
+        _moveDirection = Vector2.zero;
+        if (rb != null)
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+        if (playerAnimation != null) playerAnimation.SetFloat("Speed", 0f);
+    }
+
     [SerializeField] Transform handObj;
 
     public List<GameObject> nearWeapons = new List<GameObject>();
@@ -91,6 +105,12 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        if (IsExternalUIBlocked)
+        {
+            SetExternalUIBlocked(true);
+            return;
+        }
+
         if(InventoryUI.activeSelf == false)
         {
             UpdateNearestWeapon();
