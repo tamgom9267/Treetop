@@ -22,6 +22,9 @@ public class DungeonInstructionsGenerator : MonoBehaviour
 
     public void RegenerateFloorInstructions()
     {
+        if (floorNumber == 0 && RunSeedSettings.TryConsumeSoloSeed(out int selectedSeed))
+            baseSeed = selectedSeed;
+
         floorNumber++;
         GenerateFloorInstructions();
     }
@@ -96,9 +99,11 @@ public class DungeonInstructionsGenerator : MonoBehaviour
 
     private Direction GetRandomDirection(Vector3Int currentPosition) // Randomly select a direction for the room exit that won't repeat
     {
+        return GetFreeDirection(currentPosition, (Direction)Random.Range(0, 4));
+    }
 
-        Direction direction = (Direction)Random.Range(0, 4);
-        
+    private Direction GetFreeDirection(Vector3Int currentPosition, Direction direction)
+    {
         Vector3Int nextPosition = currentPosition + DirectionToVector(direction);
 
         if (occupiedPositions.Contains(nextPosition))
@@ -109,9 +114,61 @@ public class DungeonInstructionsGenerator : MonoBehaviour
             
         }
 
+        // La opuesta tambien puede estar ocupada, especialmente en el ultimo cuarto.
+        // Revisar todas las alternativas evita cerrar el circuito o superponer el portal.
+        if (occupiedPositions.Contains(nextPosition))
+        {
+            List<Direction> freeDirections = new List<Direction>();
+            for (int candidate = 0; candidate < 4; candidate++)
+            {
+                Direction alternative = (Direction)candidate;
+                if (!occupiedPositions.Contains(currentPosition + DirectionToVector(alternative)))
+                    freeDirections.Add(alternative);
+            }
+
+            if (freeDirections.Count == 0)
+                throw new System.InvalidOperationException("No se encontro una salida libre para el cuarto.");
+
+            direction = freeDirections[Random.Range(0, freeDirections.Count)];
+            nextPosition = currentPosition + DirectionToVector(direction);
+        }
+
         occupiedPositions.Add(nextPosition); // Add the new position to the occupied positions set to prevent future overlaps
 
         return direction; // Return the selected direction
+    }
+
+    [ContextMenu("Pruebas/Validar salida del ultimo cuarto")]
+    private void ValidateBlockedFinalExit()
+    {
+        HashSet<Vector3Int> originalPositions = occupiedPositions;
+        Random.State originalRandomState = Random.state;
+        try
+        {
+            // Seis cuartos en forma de U: el ultimo tiene ocupados oeste, este y sur.
+            // Forzar ambos intentos horizontales reproduce el fallo sin depender de una seed.
+            foreach (Direction preferred in new[] { Direction.East, Direction.West })
+            {
+                occupiedPositions = new HashSet<Vector3Int>
+                {
+                    new Vector3Int(0, 0, 0), new Vector3Int(0, 0, -41),
+                    new Vector3Int(57, 0, -41), new Vector3Int(114, 0, -41),
+                    new Vector3Int(114, 0, 0), new Vector3Int(57, 0, 0)
+                };
+                Direction result = GetFreeDirection(new Vector3Int(57, 0, 0), preferred);
+                if (result != Direction.North)
+                {
+                    Debug.LogError("PRUEBA FALLIDA: la salida debia ser Norte y fue " + result + ".", this);
+                    return;
+                }
+            }
+            Debug.Log("PRUEBA CORRECTA: izquierda, derecha y abajo ocupados; salida hacia arriba (Norte) en ambos intentos.", this);
+        }
+        finally
+        {
+            occupiedPositions = originalPositions;
+            Random.state = originalRandomState;
+        }
     }
 
     private Vector3Int DirectionToVector(Direction direction) // Convert a direction to a vector for grid movement
@@ -180,6 +237,6 @@ public class DungeonInstructionsGenerator : MonoBehaviour
 
         File.WriteAllText(path, json);
 
-        //Debug.Log("Floor JSON saved to: " + path);
+        Debug.Log($"Piso {floorNumber} generado | Seed base: {baseSeed} | Seed final: {finalSeed}", this);
     }
 }
