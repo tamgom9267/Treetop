@@ -1,0 +1,6 @@
+<linker>
+  <assembly fullname="Assembly-CSharp">
+    <type fullname="PlayerInventory"><field name="isMoving"/><field name="SpriteObject"/></type>
+    <type fullname="PlayerController"><field name="receivedHitStopDuration"/></type>
+  </assembly>
+</linker>

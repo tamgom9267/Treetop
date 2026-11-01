@@ -58,6 +58,8 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     private bool pauseWasEnabled;
     private bool frozen;
     private MultiplayerPlayers playerSync;
+    private string readyRequestedKey;
+    private bool settlementRequested;
 
     public string RunId { get; private set; }
     public int BaseSeed { get; private set; }
@@ -215,7 +217,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     public bool RequestNextFloor()
     {
-        if (!IsPlaying || party == null || !party.IsHost || !PhotonNetwork.IsMasterClient || hostGenerator == null) return false;
+        if (!IsPlaying || settlementRequested || party == null || !party.IsHost || !PhotonNetwork.IsMasterClient || hostGenerator == null) return false;
         if (FloorNumber == int.MaxValue)
         {
             Debug.LogError("Se alcanzo el limite de pisos.", this);
@@ -226,14 +228,17 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
             Debug.LogError("No se pudo preparar el siguiente piso: " + error, this);
             return false;
         }
-        string json = JsonUtility.ToJson(data);
+        settlementRequested = true;
+        playerSync.World.Loot.Settle(success => { if (success && IsRunning) PublishNextFloor(data); });
+        return true;
+    }
+
+    private void PublishNextFloor(MultiplayerFloorData data)
+    {
         publicationPending = true;
         BeginTransition("Preparando el piso " + data.floorNumber + "...");
-        // El numero local cambia con la confirmacion del servidor, igual que en los clientes.
-        if (Publish(MultiplayerRunPhase.BuildingFloor, json, string.Empty, data.floorNumber)) return true;
-        publicationPending = false;
-        FinishTransition();
-        return false;
+        if (!Publish(MultiplayerRunPhase.BuildingFloor, JsonUtility.ToJson(data), string.Empty, data.floorNumber))
+            FailRun("No se pudo publicar el siguiente piso tras confirmar el inventario.");
     }
 
     private bool Publish(MultiplayerRunPhase phase, string json, string error, int? floor = null)
@@ -312,12 +317,23 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     {
         if (!IsRunning || floorData == null || runId != RunId || floor != FloorNumber ||
             Phase != MultiplayerRunPhase.BuildingFloor && Phase != MultiplayerRunPhase.Playing) return;
+        if (readyRequestedKey == CurrentKey) return;
+        readyRequestedKey = CurrentKey;
+        StartCoroutine(ConfirmWorldReady(runId, floor));
+    }
+
+    private IEnumerator ConfirmWorldReady(string runId, int floor)
+    {
         if (!EnsurePlayerSync(out string syncError) ||
-            !playerSync.PrepareLocalFloor(MultiplayerStartingRoomSpawns.LocalPlayer, out syncError))
-        { ReportBuildFailed(syncError); return; }
+            !playerSync.PrepareGameplay(MultiplayerStartingRoomSpawns.LocalPlayer, out syncError))
+        { ReportBuildFailed(syncError); yield break; }
+        while (IsRunning && runId == RunId && floor == FloorNumber && !playerSync.GameplayReady) yield return null;
+        if (!IsRunning || runId != RunId || floor != FloorNumber) yield break;
+        if (!playerSync.PrepareLocalFloor(MultiplayerStartingRoomSpawns.LocalPlayer, out syncError))
+        { ReportBuildFailed(syncError); yield break; }
         localBuiltKey = CurrentKey;
         if (!PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { ReadyKey, CurrentKey }, { FailureKey, string.Empty } }))
-        { ReportBuildFailed("No se pudo confirmar la construccion del piso."); return; }
+        { ReportBuildFailed("No se pudo confirmar la construccion del piso."); yield break; }
         Debug.Log("Mapa listo: " + CurrentKey + " | seed " + BaseSeed + " | final " + floorData.finalSeed, this);
         if (Phase == MultiplayerRunPhase.Playing) FinishTransition();
         CheckParticipants();
@@ -460,6 +476,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void FinishTransition()
     {
+        settlementRequested = false;
         ReleasePlayer();
         if (playerSync != null) playerSync.ResumePlaying();
         ShowLoading(false, string.Empty);
@@ -579,6 +596,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     {
         StopPlayerSync();
         activeRun = ending = publicationPending = publishingFirstFloor = publishingPlaying = false;
+        readyRequestedKey = null; settlementRequested = false;
         RunId = string.Empty; BaseSeed = FloorNumber = 0; Phase = MultiplayerRunPhase.Idle;
         floorData = null; floorJson = string.Empty; runError = string.Empty;
         buildRequestedKey = localBuiltKey = reportedFailureKey = null;
