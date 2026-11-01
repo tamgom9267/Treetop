@@ -23,7 +23,7 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
     private string barrier, lastBarrier, claimRequest, claimId;
     private Action<bool> onSettled;
     private bool settlementAckSent, initialized;
-    private double nextScan, nextSnapshot, barrierDeadline;
+    private double lastScan = double.NegativeInfinity, lastSnapshot = double.NegativeInfinity, barrierDeadline;
     public bool Settling { get; private set; }
     public bool Ready => initialized && pending.Count == 0;
     public bool HasPending => pending.Count != 0;
@@ -49,14 +49,14 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
                 if (copies.TryGetValue(record.id, out var item) && item != null) world.Inventory.Revoke(item, true);
                 copies.Remove(record.id); records.Remove(record.id);
             }
-        nextScan = nextSnapshot = 0;
+        lastScan = lastSnapshot = double.NegativeInfinity;
     }
     public void Bind(PlayerController local)
     {
         bool first = player == null; player = local; Scan();
         if (first) foreach (var record in new List<MultiplayerLootRecord>(records.Values)) Reconcile(record);
     }
-    public void Resume() { Settling = false; barrier = null; settlementAckSent = false; nextScan = nextSnapshot = 0; }
+    public void Resume() { Settling = false; barrier = null; settlementAckSent = false; lastScan = lastSnapshot = double.NegativeInfinity; }
     public bool OwnedBy(string id, int actor)
     {
         var source = MultiplayerGameplayProtocol.Host ? ledger.Records : records;
@@ -233,16 +233,17 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
     {
         if (!initialized || player == null || MultiplayerRunSession.Instance == null || !MultiplayerRunSession.Instance.IsRunning || !MultiplayerRunSession.Instance.IsInMultiplayerScene) return;
         double now = Time.realtimeSinceStartupAsDouble;
-        if (now >= nextScan) { nextScan = now + 0.1d; Scan(); }
+        MultiplayerPlayers.TrafficRates traffic = world.Traffic;
+        if (now - lastScan >= 1d / traffic.lootScanHz) { lastScan = now; Scan(); }
         foreach (var pair in new List<KeyValuePair<string, MultiplayerLootMessage>>(pending))
         {
-            if (now - sentAt[pair.Key] < 3d) continue;
+            if (now - sentAt[pair.Key] < 1d / traffic.lootRetryHz) continue;
             sentAt[pair.Key] = now;
             if (!MultiplayerGameplayProtocol.Host) MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.LootRequest, pair.Value, true, MultiplayerGameplayProtocol.HostActor);
         }
-        if (!MultiplayerGameplayProtocol.Host && now >= nextSnapshot)
+        if (!MultiplayerGameplayProtocol.Host && now - lastSnapshot >= 1d / traffic.lootSnapshotRequestHz)
         {
-            nextSnapshot = now + 3d;
+            lastSnapshot = now;
             MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.LootRequest, new MultiplayerLootMessage { op = "snapshot" }, true, MultiplayerGameplayProtocol.HostActor);
         }
         if (MultiplayerGameplayProtocol.Host)

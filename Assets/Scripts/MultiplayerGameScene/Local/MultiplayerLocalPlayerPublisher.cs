@@ -16,8 +16,8 @@ public sealed class MultiplayerLocalPlayerPublisher : MonoBehaviour
     private MultiplayerPlayerProtocol.Item[] previousItems = Array.Empty<MultiplayerPlayerProtocol.Item>();
     private int nextItemId = 1;
     private int previousEquipped = -1;
-    private double nextPose;
-    private double nextInventory;
+    private double lastPose = double.NegativeInfinity;
+    private double lastInventory = double.NegativeInfinity;
     private bool attackPending;
 
     public bool Bind(MultiplayerPlayers coordinator, PlayerController localPlayer, out string error)
@@ -32,7 +32,7 @@ public sealed class MultiplayerLocalPlayerPublisher : MonoBehaviour
         }
         owner = coordinator;
         attackPending = false;
-        nextPose = nextInventory = 0d;
+        lastPose = lastInventory = double.NegativeInfinity;
         previousEquipped = -1;
         error = string.Empty;
         return true;
@@ -50,13 +50,13 @@ public sealed class MultiplayerLocalPlayerPublisher : MonoBehaviour
     private void OnDestroy() { Detach(); }
     private void QueueAttack() { attackPending = true; }
 
-    public void Tick(float frequency)
+    public void Tick(float frequency, float equipmentCheckHz = 10f)
     {
         if (player == null || owner == null) return;
         double now = Time.realtimeSinceStartupAsDouble;
-        if (now >= nextInventory)
+        if (now - lastInventory >= 1d / equipmentCheckHz)
         {
-            nextInventory = now + 0.1d;
+            lastInventory = now;
             MultiplayerPlayerProtocol.Equipment state = CaptureEquipment();
             if (Changed(state) && owner.SendEquipment(state)) Remember(state);
         }
@@ -66,9 +66,9 @@ public sealed class MultiplayerLocalPlayerPublisher : MonoBehaviour
             MultiplayerPlayerProtocol.Item item = Describe(player.weapon);
             if (owner.SendAttack(new MultiplayerPlayerProtocol.Attack { pose = CapturePose(), item = item })) attackPending = false;
         }
-        if (now >= nextPose)
+        if (now - lastPose >= 1d / Mathf.Clamp(frequency, 1f, 120f))
         {
-            nextPose = now + 1d / Mathf.Clamp(frequency, 1f, 30f);
+            lastPose = now;
             owner.SendPose(CapturePose());
         }
     }

@@ -22,10 +22,11 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     private PlayerController player;
     private string floorKey;
     private int revision, localAttack;
-    private double nextPresence, nextFrames, nextSnapshot;
+    private double lastPresence = double.NegativeInfinity, lastFrames = double.NegativeInfinity, lastSnapshot = double.NegativeInfinity;
     private bool suspended = true;
     public MultiplayerLootSession Loot { get; private set; }
     public MultiplayerInventoryAdapter Inventory { get; private set; }
+    public MultiplayerPlayers.TrafficRates Traffic => players != null ? players.Traffic : MultiplayerPlayers.TrafficRates.Defaults();
     public bool Playing => !suspended && session != null && session.IsPlaying && !Loot.Settling;
     public bool Initialize(MultiplayerRunSession run, MultiplayerPlayers sync, out string error)
     {
@@ -45,7 +46,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         string key = MultiplayerMapMath.Key(run, floor);
         if (floorKey == key) return;
         floorKey = key; rooms.Clear(); presence.Clear(); roomStates.Clear(); removed.Clear(); attacks.Clear();
-        enemies.Clear(); positions.Clear(); poseTimes.Clear(); nextPresence = nextFrames = nextSnapshot = 0;
+        enemies.Clear(); positions.Clear(); poseTimes.Clear(); lastPresence = lastFrames = lastSnapshot = double.NegativeInfinity;
         Loot.BeginFloor(floor);
     }
     public bool Bind(PlayerController local, out string error)
@@ -60,7 +61,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         return true;
     }
     public void Suspend() { suspended = true; attacks.Clear(); }
-    public void Resume() { suspended = false; Loot.Resume(); nextPresence = nextSnapshot = 0; }
+    public void Resume() { suspended = false; Loot.Resume(); lastPresence = lastSnapshot = double.NegativeInfinity; }
     public void Shutdown()
     {
         suspended = true;
@@ -106,9 +107,10 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     {
         if (!Playing || player == null) return;
         double now = Time.realtimeSinceStartupAsDouble;
-        if (now >= nextPresence)
+        MultiplayerPlayers.TrafficRates traffic = Traffic;
+        if (now - lastPresence >= 1d / traffic.roomPresenceSendHz)
         {
-            nextPresence = now + 0.25d;
+            lastPresence = now;
             foreach (var pair in rooms)
             {
                 var message = new MultiplayerWorldMessage { op = "presence", room = pair.Key,
@@ -119,9 +121,9 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         }
         if (!MultiplayerGameplayProtocol.Host)
         {
-            if (now >= nextSnapshot)
+            if (now - lastSnapshot >= 1d / traffic.worldSnapshotRequestHz)
             {
-                nextSnapshot = now + 3d;
+                lastSnapshot = now;
                 MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldRequest,
                     new MultiplayerWorldMessage { op = "snapshot" }, true, MultiplayerGameplayProtocol.HostActor);
             }
@@ -139,9 +141,9 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
                 if (!alive) CommitRoom(room, 2);
             }
         }
-        if (now >= nextFrames)
+        if (now - lastFrames >= 1d / traffic.enemyStateSendHz)
         {
-            nextFrames = now + 1d / 15d;
+            lastFrames = now;
             var frames = new List<MultiplayerWorldMessage>();
             foreach (MultiplayerEnemy enemy in enemies.Values) if (enemy != null) frames.Add(enemy.Capture(++revision));
             if (frames.Count > 0) MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.EnemyFrames,
