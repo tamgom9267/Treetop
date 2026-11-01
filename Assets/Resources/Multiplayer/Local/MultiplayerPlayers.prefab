@@ -11,6 +11,9 @@ GameObject:
   - component: {fileID: 5531703979548352729}
   - component: {fileID: 7150720673262187664}
   - component: {fileID: 1838078755987415010}
+  - component: {fileID: 4291850356998223961}
+  - component: {fileID: 8318190442623539677}
+  - component: {fileID: 3348634850341481003}
   m_Layer: 0
   m_Name: MultiplayerPlayers
   m_TagString: Untagged
@@ -64,3 +67,48 @@ MonoBehaviour:
     remotePrefab: {fileID: 3167070855819173452, guid: 39aa76a0f7621fb458177363fc5e541f, type: 3}
   poseFrequency: 15
   interpolationDelay: 0.1
+--- !u!114 &4291850356998223961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5040996542326060354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf3aad9295ff4d41b0f55c55f9ccb580, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MultiplayerLootSession
+  catalog:
+  - type: sword
+    prefab: {fileID: 6403767111067648006, guid: 93edc705b330aa049887c763bebc5ee5, type: 3}
+    weapon: {fileID: 11400000, guid: a2415408a2bb30d43b0301c3bc2a7f70, type: 2}
+    objectName: 
+    icon: {fileID: 21300000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
+--- !u!114 &8318190442623539677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5040996542326060354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a013c4b05bca45fb879b918648387800, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MultiplayerInventoryAdapter
+  itemPanelPrefab: {fileID: 6878622352990616443, guid: 7313839786c209e4f8d4eea3cfd5dd93, type: 3}
+  lootImagesPath: InventoryBackground/ChestLootImages
+  lootSlotsPath: InventoryBackground/ChestLoot
+--- !u!114 &3348634850341481003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5040996542326060354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83957ca3b1784e9880548269f5bd2481, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MultiplayerWorldSession

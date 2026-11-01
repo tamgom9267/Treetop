@@ -123,7 +123,7 @@ public sealed class MultiplayerLocalPlayerPublisher : MonoBehaviour
     private MultiplayerPlayerProtocol.Item Describe(GameObject item)
     {
         WeaponObject weapon = item != null ? item.GetComponent<WeaponObject>() : null;
-        if (weapon == null || weapon.weaponData == null) return default;
+        if (weapon == null || weapon.weaponData == null || owner.World != null && !owner.World.Loot.CanUse(item)) return default;
         if (!owner.TryGetType(weapon.weaponData, out string type))
         {
             if (warnedWeapons.Add(weapon.weaponData))

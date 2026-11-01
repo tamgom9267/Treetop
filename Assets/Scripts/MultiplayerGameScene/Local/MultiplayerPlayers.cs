@@ -6,7 +6,7 @@ using Photon.Realtime;
 using UnityEngine;
 
 /// <summary>Una copia por partida, creada por MultiplayerRunSession desde Resources.</summary>
-[RequireComponent(typeof(MultiplayerLocalPlayerPublisher))]
+[RequireComponent(typeof(MultiplayerLocalPlayerPublisher), typeof(MultiplayerWorldSession))]
 public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCallback
 {
     public const string ResourcePath = "Multiplayer/Local/MultiplayerPlayers";
@@ -26,6 +26,11 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     private bool suspended = true;
     private bool initialized;
     private float previousDispatchThreshold;
+
+    public MultiplayerWorldSession World { get; private set; }
+    public bool GameplayReady => World != null && World.Loot.Ready;
+    public void PublishLocalEquipment() { if (localReady && publisher != null) publisher.SendFullState(); }
+    public bool PrepareGameplay(PlayerController local, out string error) => World.Bind(local, out error);
 
     public bool ValidateAssets(out string error)
     {
@@ -50,6 +55,9 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
         if (!ValidateAssets(out error)) return false;
         session = runSession;
         publisher = GetComponent<MultiplayerLocalPlayerPublisher>();
+        World = GetComponent<MultiplayerWorldSession>();
+        if (World == null) { error = "Regenera el prefab MultiplayerPlayers para la fase 4."; return false; }
+        if (!World.Initialize(runSession, this, out error)) return false;
         if (!initialized)
         {
             previousDispatchThreshold = PhotonNetwork.MinimalTimeScaleToDispatchInFixedUpdate;
@@ -72,6 +80,7 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     {
         Suspend();
         if (runId == run && floorNumber == floor) return;
+        if (World != null) World.BeginFloor(run, floor);
         runId = run;
         floorNumber = floor;
         localReady = false;
@@ -82,6 +91,7 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     public void Suspend()
     {
         suspended = true;
+        if (World != null) World.Suspend();
         if (publisher != null) publisher.Suspend();
         foreach (MultiplayerRemotePlayer remote in remotes.Values) remote.SetPlaying(false);
     }
@@ -89,6 +99,7 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     public void ResumePlaying()
     {
         suspended = false;
+        if (World != null) World.Resume();
         if (localReady) publisher.SendFullState();
     }
 
@@ -127,6 +138,7 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     public void SendPose(MultiplayerPlayerProtocol.Pose pose)
     {
         pose.sequence = NextSequence();
+        if (World != null) World.ObservePose(MultiplayerGameplayProtocol.LocalActor, pose.position);
         Send(MultiplayerPlayerProtocol.PoseEvent, MultiplayerPlayerProtocol.PackPose(runId, floorNumber, pose), false);
     }
 
@@ -170,6 +182,7 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
             session.RunId, session.FloorNumber, length, out object[] data)) return;
         if (runId != session.RunId || floorNumber != session.FloorNumber) BeginFloor(session.RunId, session.FloorNumber);
         int actor = photonEvent.Sender;
+        if (World != null && MultiplayerPlayerProtocol.TryReadPose(data, out var rawPose)) World.ObservePose(actor, rawPose.position);
         if (code == MultiplayerPlayerProtocol.RequestStateEvent)
         {
             int incomingSequence = (int)data[3];
@@ -213,6 +226,7 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     public void Shutdown()
     {
         Suspend();
+        if (World != null) World.Shutdown();
         if (publisher != null) publisher.Detach();
         if (initialized)
         {

@@ -7,12 +7,12 @@ using UnityEngine.SceneManagement;
 public class HostWorldGenerator : MonoBehaviour
 {
     [SerializeField] private HostDungeonInstructionsGenerator instructionsGenerator;
-    [SerializeField] private string roomsPath = "GeneracionDeCuartos/Cuartos";
+    private const string roomsPath = "Multiplayer/Host/Cuartos";
     [SerializeField] private string wallsPath = "GeneracionDeCuartos/Paredes";
     [SerializeField] private string doorsPath = "GeneracionDeCuartos/Puertas";
     [SerializeField] private string bridgesPath = "GeneracionDeCuartos/Puentes";
     [SerializeField] private string portalPath = "GeneracionDeCuartos/Portal/Portal";
-    [SerializeField] private string enemiesPath = "GeneracionDeCuartos/Enemigos";
+    private const string enemiesPath = "Multiplayer/Host/Enemigos";
     private GameObject generatedWorld;
     private bool building;
     private string lastBuildKey;
@@ -53,7 +53,7 @@ public class HostWorldGenerator : MonoBehaviour
         {
             GameObject prefab = Resources.Load<GameObject>(roomsPath + "/" + room.roomID);
             if (prefab == null) { error = "No se encontro el cuarto: " + roomsPath + "/" + room.roomID; return false; }
-            if (prefab.GetComponent<GeneratedRoomController>() == null && prefab.GetComponent<HostGeneratedRoomController>() == null)
+            if (prefab.GetComponent<HostGeneratedRoomController>() == null)
             { error = "El cuarto " + room.roomID + " no tiene un controlador compatible."; return false; }
         }
         error = string.Empty;
@@ -109,8 +109,9 @@ public class HostWorldGenerator : MonoBehaviour
         {
             GameObject prefab = Required(roomsPath + "/" + room.roomID);
             GameObject instance = Instantiate(prefab, room.gridPosition, Quaternion.identity, root);
-            HostGeneratedRoomController controller = MultiplayerPrefabAdapter.PrepareHostRoom(instance, room.enemyType, enemiesPath);
-            if (room.roomID == "0") spawn = MultiplayerPrefabAdapter.PrepareStartingRoom(instance);
+            HostGeneratedRoomController controller = instance.GetComponent<HostGeneratedRoomController>();
+            controller.Configure(room.enemyType, enemiesPath, room.roomID);
+            if (room.roomID == "0") spawn = instance.GetComponent<MultiplayerStartingRoomSpawns>();
             MultiplayerDirection? entry = previousExit.HasValue ? MultiplayerMapMath.Opposite(previousExit.Value) : (MultiplayerDirection?)null;
             for (int direction = 0; direction < 4; direction++)
             {

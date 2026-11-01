@@ -130,7 +130,8 @@ public static class MultiplayerPlayerVerification
             var attack = new MultiplayerPlayerProtocol.Attack { pose = Pose(12, 100.25d, 2f, 1f),
                 item = new MultiplayerPlayerProtocol.Item(1, "sword") };
             Check(first.ReceiveAttack(attack) && !first.ReceiveAttack(attack), "Ataque fiable se procesa una sola vez");
-            first.RenderFrame(100.35d, 0.01f);
+            // interpolationDelay es float: avanzar mas alla del limite evita redondeo float/double.
+            first.RenderFrame(100.36d, 0.01f);
             first.Animator.Update(0.02f);
             Check(first.Animator.GetCurrentAnimatorStateInfo(1).IsName("Armature_Attack_Sword") ||
                 first.Animator.GetNextAnimatorStateInfo(1).IsName("Armature_Attack_Sword"), "Trigger activa el ataque de espada existente");

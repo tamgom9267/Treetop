@@ -6,12 +6,12 @@ using UnityEngine.SceneManagement;
 /// <summary>Generacion del cliente. Configurar rutas sin el prefijo Assets/Resources.</summary>
 public class ClientWorldGenerator : MonoBehaviour
 {
-    [SerializeField] private string roomsPath = "GeneracionDeCuartos/Cuartos";
+    private const string roomsPath = "Multiplayer/Client/Cuartos";
     [SerializeField] private string wallsPath = "GeneracionDeCuartos/Paredes";
     [SerializeField] private string doorsPath = "GeneracionDeCuartos/Puertas";
     [SerializeField] private string bridgesPath = "GeneracionDeCuartos/Puentes";
     [SerializeField] private string portalPath = "GeneracionDeCuartos/Portal/Portal";
-    [SerializeField] private string enemiesPath = "GeneracionDeCuartos/Enemigos";
+    private const string enemiesPath = "Multiplayer/Client/Enemigos";
     private GameObject generatedWorld;
     private bool building;
     private string lastBuildKey;
@@ -42,7 +42,7 @@ public class ClientWorldGenerator : MonoBehaviour
         {
             GameObject prefab = Resources.Load<GameObject>(roomsPath + "/" + room.roomID);
             if (prefab == null) { error = "No se encontro el cuarto: " + roomsPath + "/" + room.roomID; return false; }
-            if (prefab.GetComponent<GeneratedRoomController>() == null && prefab.GetComponent<ClientGeneratedRoomController>() == null)
+            if (prefab.GetComponent<ClientGeneratedRoomController>() == null)
             { error = "El cuarto " + room.roomID + " no tiene un controlador compatible."; return false; }
         }
         error = string.Empty;
@@ -98,8 +98,9 @@ public class ClientWorldGenerator : MonoBehaviour
         {
             GameObject prefab = Required(roomsPath + "/" + room.roomID);
             GameObject instance = Instantiate(prefab, room.gridPosition, Quaternion.identity, root);
-            ClientGeneratedRoomController controller = MultiplayerPrefabAdapter.PrepareClientRoom(instance, room.enemyType, enemiesPath);
-            if (room.roomID == "0") spawn = MultiplayerPrefabAdapter.PrepareStartingRoom(instance);
+            ClientGeneratedRoomController controller = instance.GetComponent<ClientGeneratedRoomController>();
+            controller.Configure(room.enemyType, enemiesPath, room.roomID);
+            if (room.roomID == "0") spawn = instance.GetComponent<MultiplayerStartingRoomSpawns>();
             MultiplayerDirection? entry = previousExit.HasValue ? MultiplayerMapMath.Opposite(previousExit.Value) : (MultiplayerDirection?)null;
             for (int direction = 0; direction < 4; direction++)
             {
