@@ -57,6 +57,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     private bool bodyWasKinematic;
     private bool pauseWasEnabled;
     private bool frozen;
+    private MultiplayerPlayers playerSync;
 
     public string RunId { get; private set; }
     public int BaseSeed { get; private set; }
@@ -66,6 +67,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     public bool IsPlaying => IsRunning && Phase == MultiplayerRunPhase.Playing && !publicationPending &&
         localBuiltKey == CurrentKey;
     public string CurrentKey => MultiplayerMapMath.Key(RunId, FloorNumber);
+    public bool IsInMultiplayerScene => SceneManager.GetActiveScene().name == multiplayerSceneName;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
@@ -108,6 +110,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
             party.PartyEnded -= OnPartyEnded;
         }
         party = null;
+        StopPlayerSync();
         ReleasePlayer();
     }
 
@@ -229,8 +232,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         // El numero local cambia con la confirmacion del servidor, igual que en los clientes.
         if (Publish(MultiplayerRunPhase.BuildingFloor, json, string.Empty, data.floorNumber)) return true;
         publicationPending = false;
-        ReleasePlayer();
-        ShowLoading(false, string.Empty);
+        FinishTransition();
         return false;
     }
 
@@ -310,6 +312,9 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     {
         if (!IsRunning || floorData == null || runId != RunId || floor != FloorNumber ||
             Phase != MultiplayerRunPhase.BuildingFloor && Phase != MultiplayerRunPhase.Playing) return;
+        if (!EnsurePlayerSync(out string syncError) ||
+            !playerSync.PrepareLocalFloor(MultiplayerStartingRoomSpawns.LocalPlayer, out syncError))
+        { ReportBuildFailed(syncError); return; }
         localBuiltKey = CurrentKey;
         if (!PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { ReadyKey, CurrentKey }, { FailureKey, string.Empty } }))
         { ReportBuildFailed("No se pudo confirmar la construccion del piso."); return; }
@@ -412,6 +417,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         if (ending) return;
         if (!activeRun || party == null || !party.IsInParty)
         { ReturnToVillage("Necesitas iniciar una party desde la aldea para entrar a MultiplayerGameScene."); return; }
+        if (!EnsurePlayerSync(out string syncError)) { ReportBuildFailed(syncError); return; }
         hostGenerator = null;
         clientGenerator = null;
         buildRequestedKey = localBuiltKey = null;
@@ -441,6 +447,13 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     private void BeginTransition(string message)
     {
         deadline = Time.realtimeSinceStartupAsDouble + transitionTimeout;
+        if (playerSync != null) playerSync.BeginFloor(RunId, FloorNumber);
+        PlayerController localPlayer = MultiplayerStartingRoomSpawns.LocalPlayer;
+        if (localPlayer != null)
+        {
+            localPlayer.EndAttack();
+            if (localPlayer.playerAnimation != null) localPlayer.playerAnimation.ResetTrigger("isAttacking");
+        }
         FreezePlayer();
         ShowLoading(true, message);
     }
@@ -448,7 +461,34 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     private void FinishTransition()
     {
         ReleasePlayer();
+        if (playerSync != null) playerSync.ResumePlaying();
         ShowLoading(false, string.Empty);
+    }
+
+    private bool EnsurePlayerSync(out string error)
+    {
+        error = string.Empty;
+        if (playerSync != null) return true;
+        GameObject resource = Resources.Load<GameObject>(MultiplayerPlayers.ResourcePath);
+        MultiplayerPlayers prefab = resource != null ? resource.GetComponent<MultiplayerPlayers>() : null;
+        if (prefab == null)
+        {
+            error = "Falta el prefab Resources/" + MultiplayerPlayers.ResourcePath + ". Ejecuta Tools > Multiplayer > Crear prefabs de jugadores.";
+            return false;
+        }
+        playerSync = Instantiate(prefab, transform);
+        if (playerSync.Initialize(this, out error)) return true;
+        StopPlayerSync();
+        return false;
+    }
+
+    private void StopPlayerSync()
+    {
+        if (playerSync == null) return;
+        playerSync.Shutdown();
+        playerSync.gameObject.SetActive(false);
+        Destroy(playerSync.gameObject);
+        playerSync = null;
     }
 
     private void FreezePlayer()
@@ -495,6 +535,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         if (!string.IsNullOrEmpty(message)) pendingVillageNotice = message;
         if (returnRoutine != null) return;
         ending = true;
+        StopPlayerSync();
         FreezePlayer();
         ShowLoading(true, "Regresando a la aldea...");
         returnRoutine = StartCoroutine(ReturnRoutine());
@@ -536,6 +577,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void ResetRunState()
     {
+        StopPlayerSync();
         activeRun = ending = publicationPending = publishingFirstFloor = publishingPlaying = false;
         RunId = string.Empty; BaseSeed = FloorNumber = 0; Phase = MultiplayerRunPhase.Idle;
         floorData = null; floorJson = string.Empty; runError = string.Empty;
