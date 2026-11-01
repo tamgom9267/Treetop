@@ -9,10 +9,40 @@ using UnityEngine;
 [RequireComponent(typeof(MultiplayerLocalPlayerPublisher), typeof(MultiplayerWorldSession))]
 public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCallback
 {
+    // Frecuencias permanentes. No serializar: un prefab antiguo no debe sobrescribirlas.
+    // [Serializable]
+    public readonly struct TrafficRates
+    {
+        public float playerStateSendHz => 90f;
+        public float enemyStateSendHz => 90f;
+        public float equipmentCheckHz => 10f;
+        public float roomPresenceSendHz => 4f;
+        public float worldSnapshotRequestHz => 1f / 3f;
+        public float lootScanHz => 10f;
+        public float lootSnapshotRequestHz => 1f / 3f;
+        public float lootRetryHz => 1f / 3f;
+        public static TrafficRates Defaults() => new TrafficRates();
+    }
+
+    // Conserva la fase entre frames y descarta vencimientos atrasados, sin rafagas.
+    public struct TrafficClock
+    {
+        private double next;
+        private bool started;
+        public bool Tick(double now, float frequency)
+        {
+            if (!started) { next = now; started = true; }
+            if (now + 1e-9d < next) return false;
+            double interval = 1d / frequency;
+            next += (Math.Floor(Math.Max(0d, now - next) / interval) + 1d) * interval;
+            return true;
+        }
+    }
+
+    public const int PhotonSendRateHz = 120;
     public const string ResourcePath = "Multiplayer/Local/MultiplayerPlayers";
     [SerializeField] private MultiplayerRemotePlayer remotePlayerPrefab;
     [SerializeField] private MultiplayerVisualDefinition[] catalog = Array.Empty<MultiplayerVisualDefinition>();
-    [SerializeField, Range(1f, 30f)] private float poseFrequency = 15f;
     [SerializeField, Range(0f, 0.3f)] private float interpolationDelay = 0.1f;
     private readonly Dictionary<int, MultiplayerRemotePlayer> remotes = new Dictionary<int, MultiplayerRemotePlayer>();
     private readonly Dictionary<int, int> requestSequences = new Dictionary<int, int>();
@@ -26,8 +56,10 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     private bool suspended = true;
     private bool initialized;
     private float previousDispatchThreshold;
+    private int previousSendRate;
 
     public MultiplayerWorldSession World { get; private set; }
+    public TrafficRates Traffic => TrafficRates.Defaults();
     public bool GameplayReady => World != null && World.Loot.Ready;
     public void PublishLocalEquipment() { if (localReady && publisher != null) publisher.SendFullState(); }
     public bool PrepareGameplay(PlayerController local, out string error) => World.Bind(local, out error);
@@ -60,6 +92,8 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
         if (!World.Initialize(runSession, this, out error)) return false;
         if (!initialized)
         {
+            previousSendRate = PhotonNetwork.SendRate;
+            PhotonNetwork.SendRate = PhotonSendRateHz;
             previousDispatchThreshold = PhotonNetwork.MinimalTimeScaleToDispatchInFixedUpdate;
             PhotonNetwork.MinimalTimeScaleToDispatchInFixedUpdate = Mathf.Max(0f, previousDispatchThreshold);
             initialized = true;
@@ -157,7 +191,11 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
         foreach (int actor in remotes.Keys) if (!IsParticipant(actor)) departedActors.Add(actor);
         foreach (int actor in departedActors) RemoveRemote(actor);
         bool playing = localReady && !suspended && session.IsPlaying;
-        if (playing) publisher.Tick(poseFrequency);
+        if (playing)
+        {
+            TrafficRates traffic = Traffic;
+            publisher.Tick(traffic.playerStateSendHz, traffic.equipmentCheckHz);
+        }
         foreach (MultiplayerRemotePlayer remote in remotes.Values) remote.SetPlaying(playing);
     }
 
@@ -230,6 +268,7 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
         if (publisher != null) publisher.Detach();
         if (initialized)
         {
+            PhotonNetwork.SendRate = previousSendRate;
             PhotonNetwork.MinimalTimeScaleToDispatchInFixedUpdate = previousDispatchThreshold;
             initialized = false;
         }

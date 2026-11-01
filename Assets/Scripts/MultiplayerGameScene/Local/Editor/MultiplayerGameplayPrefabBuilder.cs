@@ -45,6 +45,7 @@ public static class MultiplayerGameplayPrefabBuilder
                 if (!File.Exists(destination)) BuildEnemy(type, role == "Host", destination);
             }
         }
+        UpgradeClientEnemyVisuals();
         var definitions = BuildLoot();
         ConfigureCoordinator(definitions);
         ValidatePrefabs();
@@ -94,10 +95,43 @@ public static class MultiplayerGameplayPrefabBuilder
             if (host) Copy(movement, root.AddComponent<HostSlimeMovement>(), "minJumpCooldown", "maxJumpCooldown", "horizontalJumpForce", "verticalJumpForce", "turnSpeed", "navMeshCheckDistance");
             if (combat != null) Object.DestroyImmediate(combat); if (movement != null) Object.DestroyImmediate(movement);
             var body = root.GetComponent<Rigidbody>(); body.isKinematic = !host; body.useGravity = host;
-            if (!host) root.GetComponent<Animator>().updateMode = AnimatorUpdateMode.UnscaledTime;
+            if (!host)
+            {
+                root.GetComponent<Animator>().updateMode = AnimatorUpdateMode.UnscaledTime;
+                EnsureCombatVisual(root);
+            }
             Save(root, destination);
         }
         finally { PrefabUtility.UnloadPrefabContents(root); }
+    }
+    [MenuItem("Tools/Multiplayer/Preparar visuales de combate cliente")]
+    public static void UpgradeClientEnemyVisuals()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Sal de Play para preparar los prefabs.");
+        for (int type = 1; type <= 2; type++)
+        {
+            string destination = Root + "/Client/Enemigos/Enemigo" + type + ".prefab";
+            GameObject root = PrefabUtility.LoadPrefabContents(destination);
+            try { if (EnsureCombatVisual(root)) Save(root, destination); }
+            finally { PrefabUtility.UnloadPrefabContents(root); }
+        }
+    }
+    private static bool EnsureCombatVisual(GameObject root)
+    {
+        MeshRenderer renderer = root.GetComponent<MeshRenderer>();
+        if (renderer == null) return false;
+        MeshFilter mesh = root.GetComponent<MeshFilter>();
+        if (mesh == null) throw new InvalidOperationException("Falta la malla del slime cliente.");
+        var visual = new GameObject("CombatVisual", typeof(MeshFilter), typeof(MeshRenderer));
+        visual.layer = root.layer;
+        visual.transform.SetParent(root.transform, false);
+        EditorUtility.CopySerialized(mesh, visual.GetComponent<MeshFilter>());
+        EditorUtility.CopySerialized(renderer, visual.GetComponent<MeshRenderer>());
+        var settings = new SerializedObject(root.GetComponent<MultiplayerEnemy>());
+        settings.FindProperty("rend").objectReferenceValue = visual.GetComponent<MeshRenderer>();
+        settings.ApplyModifiedPropertiesWithoutUndo();
+        Object.DestroyImmediate(renderer); Object.DestroyImmediate(mesh);
+        return true;
     }
     private static List<MultiplayerLootDefinition> BuildLoot()
     {
@@ -211,6 +245,8 @@ public static class MultiplayerGameplayPrefabBuilder
             if (root == null || root.GetComponent<MultiplayerEnemy>() == null || root.GetComponent<EnemyCombat>() != null || root.GetComponent<SlimeEnemyMovementProcedural>() != null ||
                 (root.GetComponent<HostSlimeMovement>() != null) != (role == "Host") || root.GetComponent<Rigidbody>().isKinematic != (role == "Client"))
                 throw new InvalidOperationException("Slime mal configurado: " + role + "/" + type);
+            if (role == "Client" && (root.transform.Find("CombatVisual") == null || root.GetComponent<MeshRenderer>() != null))
+                throw new InvalidOperationException("Falta separar el visual de combate: Client/" + type);
         }
         var coordinator = AssetDatabase.LoadAssetAtPath<GameObject>(Root + "/Local/MultiplayerPlayers.prefab");
         if (coordinator.GetComponent<MultiplayerWorldSession>() == null || coordinator.GetComponent<MultiplayerLootSession>() == null ||

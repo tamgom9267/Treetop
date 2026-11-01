@@ -6,6 +6,9 @@ using UnityEngine;
 // Reemplaza EnemyCombat solamente en las copias nuevas.
 public sealed class MultiplayerEnemy : MonoBehaviour
 {
+    private static readonly int DeathAnimation = Animator.StringToHash("Base Layer.SlimeDeath");
+    private const float RecoilDuration = 0.20f, ReconcileDuration = 0.10f;
+    private const float RecoilDistance = 0.5f, RecoilHeight = 0.15f;
     [SerializeField] private int maxHealth = 10, contactDamage = 5;
     [SerializeField] private float knockbackForce = 5f, knockbackUpForce = 2f, weaponKnockbackMultiplier = 1f;
     [SerializeField] private Renderer rend;
@@ -17,7 +20,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     [SerializeField] private GameObject deathEffectPrefab;
     [SerializeField] private Vector3 deathEffectOffset = Vector3.zero;
 
-    private bool deathEffectSpawned;
+    private bool deathEffectSpawned, deathStarted;
 
     [SerializeField] private bool authority;
     private Rigidbody body;
@@ -26,8 +29,17 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     private Material[] materials;
     private Color[] colors;
     private Coroutine flash;
-    private int frameRevision, effectRevision, lastAnimation;
+    private int frameRevision, lastAnimation, lastHitActor, lastHitAttack;
     private float deathAge;
+    // La instancia del enemigo aporta el tercer elemento de la clave (actor, ataque, enemigo).
+    // Se conservan las claves resueltas para reconocer confirmaciones fiables tardias.
+    private readonly Dictionary<long, bool> predictedHits = new Dictionary<long, bool>();
+    private readonly HashSet<int> presentedHits = new HashSet<int>();
+    private Transform combatVisual;
+    private Vector3 visualRestPosition, recoilDirection, visualOffset, reconcileOffset;
+    private double recoilStartedAt, reconcileStartedAt;
+    private long activePrediction;
+    private bool recoiling, reconciling;
     private readonly List<MultiplayerWorldMessage> frames = new List<MultiplayerWorldMessage>();
     public string Id { get; private set; }
     public string RoomId { get; private set; }
@@ -43,6 +55,8 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (!authority) { body.useGravity = false; animator.updateMode = AnimatorUpdateMode.UnscaledTime; }
         if (rend != null)
         {
+            if (!authority && rend.transform != transform)
+            { combatVisual = rend.transform; visualRestPosition = combatVisual.localPosition; }
             materials = rend.materials; colors = new Color[materials.Length];
             for (int i = 0; i < colors.Length; i++) colors[i] = materials[i].color;
         }
@@ -63,10 +77,11 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         target.playerClass.TakeDamage(contactDamage);
         target.ReceiveHit(gameObject);
     }
-    public void TakeAuthoritativeHit(int damage, Vector3 origin)
+    public void TakeAuthoritativeHit(int damage, Vector3 origin, int actor = 0, int attack = 0)
     {
         if (!authority || Health <= 0 || damage <= 0) return;
         Health = Mathf.Max(0, Health - damage); HitRevision++;
+        lastHitActor = actor; lastHitAttack = attack;
         ShowFlash();
         
         Collider enemyCollider = GetComponent<Collider>();
@@ -78,12 +93,9 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         SpawnHitEffect(hitPosition);
 
 
-        // if (Health == 0) { animator.SetTrigger("Die"); body.linearVelocity = Vector3.zero; return; }
         if (Health == 0)
         {
-            SpawnDeathEffect();
-            
-            animator.SetTrigger("Die");
+            BeginConfirmedDeath();
             body.linearVelocity = Vector3.zero;
             return;
         }
@@ -98,25 +110,25 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     {
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
         return new MultiplayerWorldMessage { op = "enemy", id = Id, room = RoomId, type = Type, revision = revision,
-            health = Health, hit = HitRevision, position = transform.position, rotation = transform.rotation,
-            velocity = body.linearVelocity, animation = state.fullPathHash, normalizedTime = state.normalizedTime, time = PhotonNetwork.Time };
+            health = Health, hit = HitRevision, actor = lastHitActor, attack = lastHitAttack,
+            position = transform.position, rotation = transform.rotation, velocity = body.linearVelocity,
+            animation = Health == 0 ? DeathAnimation : state.fullPathHash,
+            normalizedTime = Health == 0 && state.fullPathHash != DeathAnimation ? 0f : state.normalizedTime, time = PhotonNetwork.Time };
     }
     public void Receive(MultiplayerWorldMessage state)
     {
         if (authority || state.revision <= 0 || state.health < 0 || !MultiplayerGameplayProtocol.Finite(state.normalizedTime)) return;
-        // Un frame no fiable adelantado no puede ocultar el feedback del evento fiable.
-        if (state.hit > effectRevision)
+        // Resolver antes de filtrar revisiones: otro golpe puede haber adelantado el estado.
+        bool anticipated = ResolvePrediction(state.actor, state.attack);
+        if (state.hit > 0 && presentedHits.Add(state.hit) && !anticipated && !deathStarted)
         {
-            effectRevision = state.hit; ShowFlash();
+            ShowFlash();
             SpawnHitEffect(transform.position);
         }
-        // if (state.health == 0 && Health > 0) { Health = 0; animator.SetTrigger("Die"); }
-        if (state.health == 0 && Health > 0)
+        if (state.health == 0 && !deathStarted)
         {
             Health = 0;
-
-            SpawnDeathEffect();
-            animator.SetTrigger("Die");
+            BeginConfirmedDeath();
         }
         if (state.revision <= frameRevision) return;
         frameRevision = state.revision; Health = Mathf.Min(Health, state.health);
@@ -138,8 +150,81 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         float fraction = to.time > from.time ? Mathf.Clamp01((float)((render - from.time)/(to.time - from.time))) : 1f;
         transform.SetPositionAndRotation(Vector3.Lerp(from.position, to.position, fraction), Quaternion.Slerp(from.rotation, to.rotation, fraction));
         var state = fraction < 1f ? from : to;
-        if (state.animation != 0 && (lastAnimation != state.animation || Mathf.Abs(animator.GetCurrentAnimatorStateInfo(0).normalizedTime - state.normalizedTime) > 0.3f))
+        if (!deathStarted && state.animation != 0 && (lastAnimation != state.animation || Mathf.Abs(animator.GetCurrentAnimatorStateInfo(0).normalizedTime - state.normalizedTime) > 0.3f))
         { animator.Play(state.animation, 0, state.normalizedTime); lastAnimation = state.animation; }
+    }
+    public bool PredictHit(int actor, int attack, Vector3 origin)
+    {
+        if (authority || Health <= 0 || actor <= 0 || attack <= 0 || !MultiplayerGameplayProtocol.Finite(origin)) return false;
+        long key = PredictionKey(actor, attack);
+        if (predictedHits.ContainsKey(key)) return false;
+        predictedHits.Add(key, false);
+        ShowFlash();
+        Collider enemyCollider = GetComponent<Collider>();
+        SpawnHitEffect(enemyCollider != null ? enemyCollider.ClosestPoint(origin) : transform.position);
+        recoilDirection = transform.position - origin; recoilDirection.y = 0f;
+        recoilDirection.Normalize();
+        activePrediction = key;
+        recoilStartedAt = Time.realtimeSinceStartupAsDouble;
+        recoiling = true; reconciling = false;
+        return true;
+    }
+    public void RejectPredictedHit(int actor, int attack) { ResolvePrediction(actor, attack); }
+    private static long PredictionKey(int actor, int attack) => ((long)actor << 32) | (uint)attack;
+    private bool ResolvePrediction(int actor, int attack)
+    {
+        if (actor <= 0 || attack <= 0) return false;
+        long key = PredictionKey(actor, attack);
+        if (!predictedHits.TryGetValue(key, out bool resolved)) return false;
+        if (!resolved)
+        {
+            predictedHits[key] = true;
+            if (activePrediction == key) ReconcileVisual();
+        }
+        return true;
+    }
+    private void ReconcileVisual()
+    {
+        if (!recoiling && !reconciling) return;
+        reconcileOffset = visualOffset;
+        reconcileStartedAt = Time.realtimeSinceStartupAsDouble;
+        recoiling = false; reconciling = true;
+    }
+    private void LateUpdate()
+    {
+        if (combatVisual == null) return;
+        double now = Time.realtimeSinceStartupAsDouble;
+        if (reconciling)
+        {
+            float t = Mathf.Clamp01((float)(now - reconcileStartedAt) / ReconcileDuration);
+            visualOffset = Vector3.Lerp(reconcileOffset, Vector3.zero, t);
+            if (t >= 1f) reconciling = false;
+        }
+        else if (recoiling)
+        {
+            float t = Mathf.Clamp01((float)(now - recoilStartedAt) / RecoilDuration);
+            visualOffset = (recoilDirection * RecoilDistance + Vector3.up * RecoilHeight) * Mathf.Sin(t * Mathf.PI);
+            if (t >= 1f) { recoiling = false; visualOffset = Vector3.zero; }
+        }
+        // Convertir cada frame: el Animator puede cambiar la escala de la raiz.
+        Vector3 localOffset = transform.InverseTransformVector(visualOffset);
+        combatVisual.localPosition = visualRestPosition + (MultiplayerGameplayProtocol.Finite(localOffset) ? localOffset : Vector3.zero);
+    }
+    public void ClearPredictedHits()
+    {
+        predictedHits.Clear(); recoiling = reconciling = false;
+        visualOffset = reconcileOffset = Vector3.zero;
+        if (combatVisual != null) combatVisual.localPosition = visualRestPosition;
+    }
+    private void BeginConfirmedDeath()
+    {
+        if (deathStarted) return;
+        deathStarted = true;
+        ReconcileVisual();
+        SpawnDeathEffect();
+        animator.ResetTrigger("StartJump"); animator.ResetTrigger("Land"); animator.ResetTrigger("Die");
+        animator.Play(DeathAnimation, 0, 0f);
+        lastAnimation = DeathAnimation;
     }
     // Animation Events de los clips originales. La replica no ejecuta fuerzas ni despawns.
     public void ApplyJumpForce()
@@ -155,7 +240,8 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         for (int i = 0; i < materials.Length; i++) materials[i].color = colors[i];
         flash = null;
     }
-    private void OnDestroy() { if (materials != null) foreach (Material material in materials) Destroy(material); }
+    private void OnDisable() { ClearPredictedHits(); }
+    private void OnDestroy() { ClearPredictedHits(); if (materials != null) foreach (Material material in materials) Destroy(material); }
 
     private void SpawnHitEffect(Vector3 position)
     {

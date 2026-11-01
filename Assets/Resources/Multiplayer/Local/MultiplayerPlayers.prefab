@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4291850356998223961}
   - component: {fileID: 8318190442623539677}
   - component: {fileID: 3348634850341481003}
+  - component: {fileID: -4426290563701834245}
   m_Layer: 0
   m_Name: MultiplayerPlayers
   m_TagString: Untagged
@@ -65,7 +66,6 @@ MonoBehaviour:
   - typeId: sword
     localWeapon: {fileID: 11400000, guid: a2415408a2bb30d43b0301c3bc2a7f70, type: 2}
     remotePrefab: {fileID: 3167070855819173452, guid: 39aa76a0f7621fb458177363fc5e541f, type: 3}
-  poseFrequency: 15
   interpolationDelay: 0.1
 --- !u!114 &4291850356998223961
 MonoBehaviour:
@@ -112,3 +112,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83957ca3b1784e9880548269f5bd2481, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MultiplayerWorldSession
+--- !u!114 &-4426290563701834245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5040996542326060354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d02b36ea0c754678babcfe93f4178dd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MultiplayerTrafficTuner
+  measureTraffic: 1
