@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.VisualScripting;
+using System.Runtime.CompilerServices;
 
 public class EnemyCombat : MonoBehaviour
 {
@@ -25,7 +27,7 @@ public class EnemyCombat : MonoBehaviour
     [SerializeField] private float flashDuration = 0.1f;
 
     private Material[] enemyMaterials;
-    private Color[] originalColors;
+    private Color[] originalEmissionColors;
     private Coroutine flashCoroutine;
 
     [Header("HitStop")]
@@ -33,6 +35,13 @@ public class EnemyCombat : MonoBehaviour
 
     [Header("Estado")]
     [SerializeField] private bool startsActive = true;
+
+    [Header("Particulas de Golpe")]
+    [SerializeField] private ParticleSystem hitEffectPrefab;
+
+    [Header("Particulas de Muerte")]
+    [SerializeField] private GameObject deathEffectPrefab;
+    private bool deathEffectSpawned = false;
 
     private bool isActive;
 
@@ -52,11 +61,13 @@ public class EnemyCombat : MonoBehaviour
         if (rend != null)
         {
             enemyMaterials = rend.materials;
-            originalColors = new Color[enemyMaterials.Length];
+            originalEmissionColors = new Color[enemyMaterials.Length];
 
             for (int i = 0; i < enemyMaterials.Length; i++)
             {
-                originalColors[i] = enemyMaterials[i].color;
+                enemyMaterials[i].EnableKeyword("_EMISSION");
+                originalEmissionColors[i] =
+                    enemyMaterials[i].GetColor("_EmissionColor");
             }
         }
     }
@@ -98,6 +109,9 @@ public class EnemyCombat : MonoBehaviour
             // evita recibir daño varias veces
             if (!weaponObject.player.RegisterEnemyHit(gameObject)) return;
 
+            // efectos de golpe
+            SpawnHitEffect(other);
+
             //Hitstop del jugador
             weaponObject.player.TriggerHitStop(hitStopDuration);
 
@@ -112,6 +126,9 @@ public class EnemyCombat : MonoBehaviour
         else if (other.CompareTag("Projectile"))
         {
             if (playerClass == null) return;
+
+            // efectos de golpe
+            SpawnHitEffect(other);
 
             TakeDamage(playerClass.PD);
 
@@ -179,6 +196,8 @@ public class EnemyCombat : MonoBehaviour
     // llamar desde animation event al terminar la animación de muerte
     public void DestroyEnemy()
     {
+        SpawnDeathEffect();
+
         Destroy(gameObject);
     }
 
@@ -199,12 +218,49 @@ public class EnemyCombat : MonoBehaviour
     // feedback visual
     private IEnumerator DoFlash()
     {
-        for (int i = 0; i < enemyMaterials.Length; i++) enemyMaterials[i].color = flashColor;
+        for (int i = 0; i <enemyMaterials.Length; i++)
+        {
+            enemyMaterials[i].SetColor(
+                "_EmissionColor", flashColor);
+        }
 
         yield return new WaitForSeconds(flashDuration);
 
-        for (int i = 0; i < enemyMaterials.Length; i++) enemyMaterials[i].color = originalColors[i];
+        for (int i = 0; i < enemyMaterials.Length; i++)
+        {
+            enemyMaterials[i].SetColor(
+                "_EmissionColor", originalEmissionColors[i]);
+        }
 
         flashCoroutine = null;
+    }
+
+    private void SpawnHitEffect(Collider attackerCollider)
+    {
+        if (hitEffectPrefab == null) return;
+
+        Collider enemyCollider = GetComponent<Collider>();
+
+        Vector3 contactPoint = transform.position;
+
+        if (enemyCollider != null && attackerCollider != null)
+        {
+            Vector3 pointOnEnemy = enemyCollider.ClosestPoint(attackerCollider.bounds.center);
+
+            Vector3 pointOnAttacker = attackerCollider.ClosestPoint(pointOnEnemy);
+
+            contactPoint = (pointOnEnemy + pointOnAttacker) * 0.5f;
+        }
+        
+        Instantiate(hitEffectPrefab, contactPoint, Quaternion.identity);
+    }
+
+    private void SpawnDeathEffect()
+    {
+        if (deathEffectPrefab == null || deathEffectSpawned) return;
+
+        deathEffectSpawned = true;
+
+        GameObject effect = Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
     }
 }

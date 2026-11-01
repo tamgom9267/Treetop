@@ -209,4 +209,7 @@ MonoBehaviour:
   rend: {fileID: 3035156714737064210}
   flashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.1
+  hitEffectPrefab: {fileID: 1411124451260305489, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
+  deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
+  deathEffectOffset: {x: 0, y: 0, z: 0}
   authority: 0

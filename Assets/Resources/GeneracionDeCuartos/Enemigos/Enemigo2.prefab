@@ -231,3 +231,5 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 1
+  hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
+  deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
