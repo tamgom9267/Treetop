@@ -142,7 +142,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
             var frames = new List<MultiplayerWorldMessage>();
             foreach (MultiplayerEnemy enemy in enemies.Values) if (enemy != null) frames.Add(enemy.Capture(++revision));
             if (frames.Count > 0) MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.EnemyFrames,
-                new MultiplayerWorldMessage { op = "frames", entries = frames.ToArray() }, false);
+                new MultiplayerWorldBatch { op = "frames", entries = frames.ToArray() }, false);
         }
     }
     private void Activate(MultiplayerRoomController room)
@@ -226,7 +226,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         foreach (MultiplayerEnemy enemy in enemies.Values) if (enemy != null) entries.Add(enemy.Capture(++revision));
         foreach (string id in removed) entries.Add(new MultiplayerWorldMessage { op = "remove", id = id, revision = ++revision });
         MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldSnapshot,
-            new MultiplayerWorldMessage { op = "snapshot", entries = entries.ToArray() }, true, actor);
+            new MultiplayerWorldBatch { op = "snapshot", entries = entries.ToArray() }, true, actor);
     }
     private void Apply(MultiplayerWorldMessage message)
     {
@@ -256,13 +256,15 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         if (session == null || !session.IsRunning) return;
         if (ev.Code == MultiplayerGameplayProtocol.WorldRequest && MultiplayerGameplayProtocol.Host &&
             MultiplayerGameplayProtocol.Read(ev, out MultiplayerWorldMessage request)) ReceiveRequest(ev.Sender, request);
-        else if ((ev.Code == MultiplayerGameplayProtocol.WorldState || ev.Code == MultiplayerGameplayProtocol.EnemyFrames ||
-            ev.Code == MultiplayerGameplayProtocol.WorldSnapshot) && ev.Sender == MultiplayerGameplayProtocol.HostActor &&
-            !MultiplayerGameplayProtocol.Host && MultiplayerGameplayProtocol.Read(ev, out MultiplayerWorldMessage state))
+        else if (ev.Sender == MultiplayerGameplayProtocol.HostActor && !MultiplayerGameplayProtocol.Host)
         {
-            if (state.entries != null)
-            { if (state.entries.Length <= 512) foreach (var entry in state.entries) if (entry != null) Apply(entry); }
-            else Apply(state);
+            if (ev.Code == MultiplayerGameplayProtocol.WorldState &&
+                MultiplayerGameplayProtocol.Read(ev, out MultiplayerWorldMessage state)) Apply(state);
+            else if ((ev.Code == MultiplayerGameplayProtocol.EnemyFrames || ev.Code == MultiplayerGameplayProtocol.WorldSnapshot) &&
+                MultiplayerGameplayProtocol.Read(ev, out MultiplayerWorldBatch batch) && batch.entries != null && batch.entries.Length <= 512)
+            {
+                foreach (var entry in batch.entries) if (entry != null) Apply(entry);
+            }
         }
     }
 }

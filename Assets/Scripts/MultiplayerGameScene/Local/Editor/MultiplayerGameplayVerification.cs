@@ -19,11 +19,44 @@ public static class MultiplayerGameplayVerification
         try
         {
             MultiplayerGameplayPrefabBuilder.ValidatePrefabs(); Check(true, "22 cuartos y 4 slimes configurados por rol");
-            CheckPresence(); CheckAttacks(); CheckLoot(); CheckRooms(); CheckInventory();
+            CheckWorldSerialization(); CheckPresence(); CheckAttacks(); CheckLoot(); CheckRooms(); CheckInventory();
             MultiplayerPlayerVerification.RunChecks(); Check(true, "Regresion de las pruebas nativas de fase 3");
             Write(true, null); Debug.Log("FASE 4: " + passed.Count + " comprobaciones correctas. Temp/phase4-verification/editor-tests.json");
         }
         catch (Exception error) { Write(false, error.ToString()); throw; }
+    }
+    private static void CheckWorldSerialization()
+    {
+        bool depthWarning = false;
+        Application.LogCallback capture = (message, trace, type) =>
+        { if (message.IndexOf("Serialization depth limit", StringComparison.OrdinalIgnoreCase) >= 0) depthWarning = true; };
+        Application.logMessageReceived += capture;
+        try
+        {
+            var presence = new MultiplayerWorldMessage { op = "presence", room = "2", inside = true, position = new Vector3(1,2,3) };
+            var decoded = JsonUtility.FromJson<MultiplayerWorldMessage>(JsonUtility.ToJson(presence));
+            Check(decoded.op == "presence" && decoded.room == "2" && decoded.inside && decoded.position == presence.position,
+                "Mensaje individual conserva presencia y posicion al serializar");
+            var enemy = new MultiplayerWorldMessage { op = "enemy", id = "2:0", room = "2", type = 1,
+                revision = 7, health = 5, hit = 1, position = new Vector3(4,5,6), velocity = Vector3.up, rotation = Quaternion.Euler(0,90,0) };
+            var frames = JsonUtility.FromJson<MultiplayerWorldBatch>(JsonUtility.ToJson(
+                new MultiplayerWorldBatch { op = "frames", entries = new[] { enemy } }));
+            Check(frames.op == "frames" && frames.entries.Length == 1 && frames.entries[0].id == enemy.id &&
+                frames.entries[0].health == 5 && frames.entries[0].position == enemy.position &&
+                frames.entries[0].velocity == enemy.velocity && Quaternion.Angle(frames.entries[0].rotation, enemy.rotation) < 0.01f,
+                "Grupo de movimiento conserva identidad, salud y transformacion del slime");
+            var snapshot = JsonUtility.FromJson<MultiplayerWorldBatch>(JsonUtility.ToJson(new MultiplayerWorldBatch
+            { op = "snapshot", entries = new[] { new MultiplayerWorldMessage { op = "room", room = "2", stage = 2, revision = 8 },
+                enemy, new MultiplayerWorldMessage { op = "remove", id = "2:1", revision = 9 } } }));
+            Check(snapshot.entries.Length == 3 && snapshot.entries[0].stage == 2 && snapshot.entries[1].hit == 1 &&
+                snapshot.entries[2].op == "remove" && snapshot.entries[2].id == "2:1",
+                "Snapshot conserva cuartos, enemigos y eliminaciones en un solo nivel");
+            var empty = JsonUtility.FromJson<MultiplayerWorldBatch>(JsonUtility.ToJson(
+                new MultiplayerWorldBatch { op = "snapshot", entries = Array.Empty<MultiplayerWorldMessage>() }));
+            Check(empty.entries != null && empty.entries.Length == 0, "Snapshot vacio conserva un grupo vacio");
+            Check(!depthWarning, "Serializacion de mensajes y grupos no excede el limite de profundidad de Unity");
+        }
+        finally { Application.logMessageReceived -= capture; }
     }
     private static void CheckPresence()
     {

@@ -18,7 +18,15 @@ public sealed class HostSlimeMovement : MonoBehaviour
     private void Update()
     {
         MultiplayerWorldSession world = MultiplayerWorldSession.Instance;
-        if (!enemy.Authority || enemy.Health <= 0 || world == null || !world.Playing || jumping || Time.time < nextJump) return;
+        if (!enemy.Authority || enemy.Health <= 0 || world == null || !world.Playing) return;
+        // Como en solitario, actualizar la direccion y el giro en cada frame,
+        // incluso durante la espera y la animacion de salto.
+        UpdateJumpDirection(world);
+        if (jumping || Time.time < nextJump || direction == Vector3.zero) return;
+        jumping = true; animator.SetTrigger("StartJump");
+    }
+    private void UpdateJumpDirection(MultiplayerWorldSession world)
+    {
         direction = Vector3.zero;
         if (!world.TryNearest(enemy.RoomId, transform.position, out Vector3 target) ||
             !NavMesh.SamplePosition(transform.position, out NavMeshHit start, navMeshCheckDistance, NavMesh.AllAreas) ||
@@ -28,7 +36,6 @@ public sealed class HostSlimeMovement : MonoBehaviour
         if (direction.sqrMagnitude < 0.0001f) return;
         direction.Normalize();
         transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), turnSpeed * Time.deltaTime);
-        jumping = true; animator.SetTrigger("StartJump");
     }
     public void Launch()
     {

@@ -64,6 +64,13 @@ public sealed class MultiplayerWorldMessage
     public Vector3 position, velocity;
     public Quaternion rotation = Quaternion.identity;
     public bool inside;
+}
+
+// Los grupos contienen mensajes individuales que no pueden contener otros grupos.
+[Serializable]
+public sealed class MultiplayerWorldBatch
+{
+    public string op;
     public MultiplayerWorldMessage[] entries;
 }
 // Logica pura: una presencia vigente por actor, independientemente de sus colliders.
