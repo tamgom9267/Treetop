@@ -63,13 +63,15 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     private bool settlementRequested;
     private bool completedRun;
     private bool completionClearRequested;
+    private bool initialized;
+    private bool sceneExitPrepared;
 
     public string RunId { get; private set; }
     public int BaseSeed { get; private set; }
     public int FloorNumber { get; private set; }
     public MultiplayerRunPhase Phase { get; private set; }
     // Los menus siguen bloqueados hasta que toda la party termine de regresar.
-    public bool IsRunning => activeRun && (!ending || completedRun);
+    public bool IsRunning => !sceneExitPrepared && activeRun && (!ending || completedRun);
     public bool IsPlaying => IsRunning && Phase == MultiplayerRunPhase.Playing && !publicationPending &&
         localBuiltKey == CurrentKey;
     public string CurrentKey => MultiplayerMapMath.Key(RunId, FloorNumber);
@@ -92,17 +94,38 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) { enabled = false; Destroy(this); return; }
+        InitializeSingleton();
+    }
+
+    internal bool InitializeSingleton()
+    {
+        if (initialized) return Instance == this && !sceneExitPrepared;
+        ShowLoading(false, string.Empty);
+        PhotonPartyService owner = GetComponent<PhotonPartyService>();
+        if (owner != null)
+        {
+            if (!owner.InitializeSingleton()) return false;
+        }
+        else if (!PersistentScenePolicy.IsAllowed(gameObject.scene))
+        {
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+            return false;
+        }
+        if (Instance != null && Instance != this && !Instance.sceneExitPrepared)
+        { enabled = false; Destroy(this); return false; }
+        initialized = true;
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        ShowLoading(false, string.Empty);
+        return true;
     }
 
     public override void OnEnable()
     {
-        if (Instance != this) return;
+        if (Instance != this || sceneExitPrepared) return;
         base.OnEnable();
         SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
         AttachParty();
     }
 
@@ -110,6 +133,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     {
         base.OnDisable();
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
         if (party != null)
         {
             party.PartyChanged -= OnPartyChanged;
@@ -123,10 +147,43 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void OnDestroy() { if (Instance == this) Instance = null; }
 
+    private void Start()
+    {
+        if (Instance == this) OnActiveSceneChanged(default, SceneManager.GetActiveScene());
+    }
+
+    private void OnActiveSceneChanged(Scene previous, Scene current)
+    {
+        if (PersistentScenePolicy.IsAllowed(current)) return;
+        PhotonPartyService owner = GetComponent<PhotonPartyService>();
+        if (owner != null) owner.BeginSceneExitShutdown();
+        else
+        {
+            PrepareForSceneExit();
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+        }
+    }
+
+    public void PrepareForSceneExit()
+    {
+        if (sceneExitPrepared) return;
+        sceneExitPrepared = true;
+        StopAllCoroutines();
+        returnRoutine = null;
+        pendingVillageNotice = null;
+        invalidRedirectPending = false;
+        NewestSingleton.CancelVillagePlayerReset();
+        ReleasePlayer();
+        ShowLoading(false, string.Empty);
+        ResetRunState();
+        enabled = false;
+    }
+
     private void AttachParty()
     {
-        if (party != null || PhotonPartyService.Instance == null) return;
-        party = PhotonPartyService.Instance;
+        if (sceneExitPrepared || party != null || PhotonPartyService.AvailableInstance == null) return;
+        party = PhotonPartyService.AvailableInstance;
         party.PartyChanged += OnPartyChanged;
         party.PartyEnded += OnPartyEnded;
         OnPartyChanged();
@@ -134,6 +191,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void Update()
     {
+        if (sceneExitPrepared) return;
         AttachParty();
         if (!activeRun || ending) return;
         if (party == null || !party.IsInParty)
@@ -153,7 +211,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     {
         AttachParty();
         error = "Solo el host de una party bloqueada con al menos 2 jugadores puede iniciar.";
-        if (activeRun || ending || !RunSeedSettings.IsValid(seed) || party == null || !party.IsHost ||
+        if (sceneExitPrepared || PhotonPartyService.IsSceneExitInProgress || activeRun || ending || !RunSeedSettings.IsValid(seed) || party == null || !party.IsHost ||
             !PhotonNetwork.IsMasterClient || party.IsBusy || !party.IsPartyLocked || party.Members.Count < 2) return false;
         foreach (PartyMember member in party.Members) if (member.Role == PartyRole.None) return false;
         if (!Application.CanStreamedLevelBeLoaded(multiplayerSceneName))
@@ -278,7 +336,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void ReadNetworkState()
     {
-        if (ending || party == null || !party.IsInParty || PhotonNetwork.CurrentRoom == null) return;
+        if (sceneExitPrepared || PhotonPartyService.IsSceneExitInProgress || ending || party == null || !party.IsInParty || PhotonNetwork.CurrentRoom == null) return;
         Hashtable properties = PhotonNetwork.CurrentRoom.CustomProperties;
         string id = properties[RunKey] as string;
         if (string.IsNullOrEmpty(id)) return;
@@ -394,6 +452,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     public void ReportBuildFailed(string message)
     {
+        if (sceneExitPrepared) return;
         Debug.LogError(message, this);
         if (party != null && party.IsHost) { FailRun(message); return; }
         if (reportedFailureKey == CurrentKey) return;
@@ -409,6 +468,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void FailRun(string message)
     {
+        if (sceneExitPrepared) return;
         if (ending && !completedRun) return;
         completedRun = false;
         runError = message;
@@ -427,6 +487,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void OnPartyChanged()
     {
+        if (sceneExitPrepared || PhotonPartyService.IsSceneExitInProgress) return;
         // Cubre una entrada que ya estaba en transito al bloquear la sala y el JSON
         // almacenado antes de que esta instancia recibiera su rol.
         if (!activeRun && !ending && party != null && party.IsInParty && party.IsPartyLocked &&
@@ -437,6 +498,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void OnPartyEnded(PartyEndReason reason)
     {
+        if (sceneExitPrepared) return;
         if (!activeRun && !ending) return;
         completedRun = false;
         if (string.IsNullOrEmpty(runError)) runError = PartyRules.EndMessage(reason);
@@ -446,6 +508,8 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        if (sceneExitPrepared || scene != SceneManager.GetActiveScene()) return;
+        if (!PersistentScenePolicy.IsAllowed(scene)) { OnActiveSceneChanged(default, scene); return; }
         if (scene.name == villageSceneName) invalidRedirectPending = false;
         if (scene.name != villageSceneName && scene.name != multiplayerSceneName && (activeRun || ending))
         {
@@ -472,6 +536,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     public static void ReturnInvalidSceneToVillage()
     {
+        if (PhotonPartyService.IsSceneExitInProgress || Instance != null && Instance.sceneExitPrepared) return;
         if (Instance != null)
         {
             if (!Instance.ending) Instance.ReturnToVillage("Inicia la partida desde el portal de la aldea.");
@@ -515,6 +580,8 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     private bool EnsurePlayerSync(out string error)
     {
         error = string.Empty;
+        if (sceneExitPrepared || PhotonPartyService.IsSceneExitInProgress)
+        { error = "La sesion multijugador se esta cerrando."; return false; }
         if (playerSync != null) return true;
         GameObject resource = Resources.Load<GameObject>(MultiplayerPlayers.ResourcePath);
         MultiplayerPlayers prefab = resource != null ? resource.GetComponent<MultiplayerPlayers>() : null;
@@ -579,6 +646,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void ReturnToVillage(string message)
     {
+        if (sceneExitPrepared || PhotonPartyService.IsSceneExitInProgress) return;
         if (!string.IsNullOrEmpty(message)) pendingVillageNotice = message;
         if (returnRoutine != null) return;
         ending = true;

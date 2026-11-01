@@ -33,11 +33,16 @@ public class VillagePartyAccessController : MonoBehaviour
         SetCollidersBlocked(false);
     }
 
+    private void Update() { AttachService(); }
+
     private void AttachService()
     {
-        if (service != null || PhotonPartyService.Instance == null) return;
-        service = PhotonPartyService.Instance;
-        service.PartyChanged += ApplyAccess;
+        PhotonPartyService available = PhotonPartyService.AvailableInstance;
+        if (service == available) return;
+        if (service != null) service.PartyChanged -= ApplyAccess;
+        service = available;
+        if (service != null) service.PartyChanged += ApplyAccess;
+        ApplyAccess();
     }
 
     private void ApplyAccess()

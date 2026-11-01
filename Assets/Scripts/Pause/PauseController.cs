@@ -97,8 +97,6 @@ public class PauseController : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        if (PhotonPartyService.Instance != null)
-            PhotonPartyService.Instance.LeaveParty();
         Time.timeScale = 1f;
         SceneManager.LoadScene("StartMenuScene");
     }

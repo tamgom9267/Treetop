@@ -1,10 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 /// <summary>
@@ -15,6 +17,14 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class PhotonPartyService : MonoBehaviourPunCallbacks, IOnEventCallback
 {
     public static PhotonPartyService Instance { get; private set; }
+    public static PhotonPartyService AvailableInstance => Instance != null && !Instance.IsShuttingDown ? Instance : null;
+    public static bool IsSceneExitInProgress => Instance != null && Instance.IsShuttingDown;
+    public bool IsShuttingDown { get; private set; }
+    internal bool IsWaitingForPreviousSession { get; private set; }
+    private bool initialized;
+    private PhotonPartyService pendingReplacement;
+    private float previousDispatchThreshold;
+    private bool dispatchOverrideApplied;
 
     [Header("Conexion (iguales en todas las instancias)")]
     [SerializeField] private string fixedRegion = "us";
@@ -57,7 +67,7 @@ public class PhotonPartyService : MonoBehaviourPunCallbacks, IOnEventCallback
     public bool IsHost => IsInParty && LocalRole == PartyRole.Host;
     public bool IsConnected => PhotonNetwork.IsConnectedAndReady;
     public PartyOperation Operation { get; private set; }
-    public bool IsBusy => Operation != PartyOperation.None;
+    public bool IsBusy => IsShuttingDown || Operation != PartyOperation.None;
     public string RoomCode { get; private set; } = string.Empty;
     public string RoomDisplayName { get; private set; } = string.Empty;
     public IReadOnlyList<PartyMember> Members => readOnlyMembers ?? (readOnlyMembers = members.AsReadOnly());
@@ -69,33 +79,142 @@ public class PhotonPartyService : MonoBehaviourPunCallbacks, IOnEventCallback
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        InitializeSingleton();
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics() { Instance = null; }
+
+    internal bool InitializeSingleton()
+    {
+        if (initialized) return Instance == this && !IsShuttingDown;
+        if (!PersistentScenePolicy.IsAllowed(gameObject.scene))
         {
             gameObject.SetActive(false);
             Destroy(gameObject);
-            return;
+            return false;
+        }
+        if (Instance != null && Instance != this)
+        {
+            if (Instance.IsShuttingDown)
+            {
+                IsWaitingForPreviousSession = true;
+                if (Instance.pendingReplacement != null && Instance.pendingReplacement != this)
+                    Destroy(Instance.pendingReplacement.gameObject);
+                Instance.pendingReplacement = this;
+                gameObject.SetActive(false);
+                return false;
+            }
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+            return false;
         }
 
+        initialized = true;
+        IsWaitingForPreviousSession = false;
         Instance = this;
         DontDestroyOnLoad(gameObject);
         PhotonNetwork.AutomaticallySyncScene = false;
+        return true;
     }
 
     public override void OnEnable()
     {
         if (Instance == this)
+        {
             base.OnEnable();
+            SceneManager.activeSceneChanged += OnActiveSceneChanged;
+        }
+    }
+
+    public override void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+        base.OnDisable();
+    }
+
+    private void Start()
+    {
+        OnActiveSceneChanged(default, SceneManager.GetActiveScene());
+    }
+
+    private void OnActiveSceneChanged(Scene previous, Scene current)
+    {
+        if (Instance == this && !PersistentScenePolicy.IsAllowed(current)) BeginSceneExitShutdown();
+    }
+
+    public void BeginSceneExitShutdown()
+    {
+        if (Instance != this || IsShuttingDown) return;
+        IsShuttingDown = true;
+        MultiplayerRunSession run = GetComponent<MultiplayerRunSession>();
+        if (run != null) run.PrepareForSceneExit();
+        // PUN debe despachar OnLeftRoom/OnDisconnected aunque Time.timeScale sea cero.
+        previousDispatchThreshold = PhotonNetwork.MinimalTimeScaleToDispatchInFixedUpdate;
+        PhotonNetwork.MinimalTimeScaleToDispatchInFixedUpdate = Mathf.Max(0f, previousDispatchThreshold);
+        dispatchOverrideApplied = true;
+        LeaveParty();
+        StartCoroutine(SceneExitShutdown());
+    }
+
+    private IEnumerator SceneExitShutdown()
+    {
+        // Tiempo real: salir del menu de pausa tambien debe completar la desconexion.
+        double until = Time.realtimeSinceStartupAsDouble + 5d;
+        while (PhotonNetwork.IsConnected && Time.realtimeSinceStartupAsDouble < until &&
+            (PhotonNetwork.InRoom || leaving || Operation == PartyOperation.Joining || Operation == PartyOperation.Creating))
+            yield return null;
+
+        PhotonNetwork.Disconnect();
+        double warningAt = Time.realtimeSinceStartupAsDouble + 10d;
+        bool warned = false;
+        while (PhotonNetwork.IsConnected)
+        {
+            if (!warned && Time.realtimeSinceStartupAsDouble >= warningAt)
+            {
+                warned = true;
+                Debug.LogWarning("Photon sigue cerrando la conexion. El multijugador esperara su confirmacion.", this);
+            }
+            yield return null;
+        }
+
+        PhotonPartyService replacement = pendingReplacement;
+        pendingReplacement = null;
+        RestoreDispatchThreshold();
+        if (Instance == this) Instance = null;
+        gameObject.SetActive(false);
+        Destroy(gameObject);
+
+        if (replacement == null) yield break;
+        if (!replacement.gameObject.scene.isLoaded || !PersistentScenePolicy.IsAllowed(replacement.gameObject.scene) ||
+            !PersistentScenePolicy.IsAllowed(SceneManager.GetActiveScene()))
+        {
+            Destroy(replacement.gameObject);
+            yield break;
+        }
+        if (!replacement.InitializeSingleton()) yield break;
+        MultiplayerRunSession replacementRun = replacement.GetComponent<MultiplayerRunSession>();
+        if (replacementRun != null) replacementRun.InitializeSingleton();
+        replacement.gameObject.SetActive(true);
     }
 
     private void OnDestroy()
     {
+        RestoreDispatchThreshold();
         if (Instance == this)
             Instance = null;
     }
 
+    private void RestoreDispatchThreshold()
+    {
+        if (!dispatchOverrideApplied) return;
+        PhotonNetwork.MinimalTimeScaleToDispatchInFixedUpdate = previousDispatchThreshold;
+        dispatchOverrideApplied = false;
+    }
+
     private void Update()
     {
-        if (!IsBusy || Time.realtimeSinceStartupAsDouble < operationDeadline)
+        if (IsShuttingDown || !IsBusy || Time.realtimeSinceStartupAsDouble < operationDeadline)
             return;
 
         // Desconectar evita que una respuesta tardia cree una party fantasma despues del timeout.
@@ -316,6 +435,11 @@ public class PhotonPartyService : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         roomJoined = true;
         RoomCode = PhotonNetwork.CurrentRoom.Name;
+        if (IsShuttingDown)
+        {
+            BeginLeave(createdByUs ? PartyEndReason.HostCancelled : PartyEndReason.Left);
+            return;
+        }
         if (ReadInt(SchemaKey) != 1)
         {
             BeginLeave(PartyEndReason.InvalidRoom);
@@ -334,6 +458,7 @@ public class PhotonPartyService : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
+        if (IsShuttingDown) { SetOperation(PartyOperation.None); return; }
         if (cancelPendingEntry)
         {
             cancelPendingEntry = false;
@@ -513,7 +638,7 @@ public class PhotonPartyService : MonoBehaviourPunCallbacks, IOnEventCallback
         PartyEndReason reason = leaving ? leaveReason : PartyEndReason.Disconnected;
         if (hadParty)
             FinishLeaving(reason, false);
-        else
+        else if (!IsShuttingDown)
             Fail("No se pudo conectar con Photon (" + cause + "). Revisa tu conexion y App ID.");
     }
 
@@ -530,7 +655,7 @@ public class PhotonPartyService : MonoBehaviourPunCallbacks, IOnEventCallback
         RoomCode = RoomDisplayName = string.Empty;
         members.Clear();
         SetOperation(returningToMaster ? PartyOperation.Leaving : PartyOperation.None);
-        if (notify) PartyEnded?.Invoke(reason);
+        if (notify && !IsShuttingDown) PartyEnded?.Invoke(reason);
     }
 
     private int ReadInt(string key)
@@ -555,6 +680,6 @@ public class PhotonPartyService : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         requestedLock = null;
         SetOperation(PartyOperation.None);
-        OperationFailed?.Invoke(message);
+        if (!IsShuttingDown) OperationFailed?.Invoke(message);
     }
 }

@@ -37,7 +37,7 @@ public class SeedSelectionMenu : MonoBehaviour
     public bool TryOpen(VillageDungeonPortal source)
     {
         if (source == null || IsOpen || Time.timeScale <= 0f) return false;
-        party = PhotonPartyService.Instance;
+        party = PhotonPartyService.AvailableInstance;
         if (party != null && party.IsBusy) return false;
         if (party != null && party.IsInParty && (!party.IsHost || !party.IsPartyLocked || party.Members.Count < 2))
         {

@@ -26,11 +26,16 @@ public class PartyRosterView : MonoBehaviour
         service = null;
     }
 
+    private void Update() { AttachService(); }
+
     private void AttachService()
     {
-        if (service != null || PhotonPartyService.Instance == null) return;
-        service = PhotonPartyService.Instance;
-        service.PartyChanged += Render;
+        PhotonPartyService available = PhotonPartyService.AvailableInstance;
+        if (service == available) return;
+        if (service != null) service.PartyChanged -= Render;
+        service = available;
+        if (service != null) service.PartyChanged += Render;
+        Render();
     }
 
     private void Render()
