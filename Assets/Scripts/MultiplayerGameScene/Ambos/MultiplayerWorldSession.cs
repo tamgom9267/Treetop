@@ -29,6 +29,9 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     public bool Playing => !suspended && session != null && session.IsPlaying && !Loot.Settling;
     public bool Initialize(MultiplayerRunSession run, MultiplayerPlayers sync, out string error)
     {
+        if (Application.isPlaying && (!PersistentScenePolicy.IsAllowed(UnityEngine.SceneManagement.SceneManager.GetActiveScene()) ||
+            PhotonPartyService.IsSceneExitInProgress))
+        { error = "La escena actual no admite una sesion multijugador."; return false; }
         Instance = this; session = run; players = sync;
         Loot = GetComponent<MultiplayerLootSession>(); Inventory = GetComponent<MultiplayerInventoryAdapter>();
         if (!Inventory.Validate(out error) || !Loot.Initialize(this, out error)) return false;

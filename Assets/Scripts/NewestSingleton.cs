@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NewestSingleton : MonoBehaviour
 {
@@ -17,6 +18,13 @@ public class NewestSingleton : MonoBehaviour
 
     private void Awake()
     {
+        if (!PersistentScenePolicy.IsAllowed(gameObject.scene))
+        {
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+            return;
+        }
+
         if (resetOnVillageLoad && gameObject.scene.name == "VillageMenuScene")
         {
             resetOnVillageLoad = false;
@@ -45,6 +53,30 @@ public class NewestSingleton : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    private void OnEnable()
+    {
+        if (Instance == this) SceneManager.activeSceneChanged += OnActiveSceneChanged;
+    }
+
+    private void Start()
+    {
+        OnActiveSceneChanged(default, SceneManager.GetActiveScene());
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+    }
+
+    private void OnActiveSceneChanged(Scene previous, Scene current)
+    {
+        if (Instance != this || PersistentScenePolicy.IsAllowed(current)) return;
+        CancelVillagePlayerReset();
+        Instance = null;
+        gameObject.SetActive(false);
+        Destroy(gameObject);
     }
 
     private void OnDestroy()

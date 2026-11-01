@@ -48,6 +48,7 @@ public class VillageMultiplayerMenu : MonoBehaviour
 
     public bool TryOpenExternalMenu()
     {
+        AttachService();
         PlayerController player = MultiplayerStartingRoomSpawns.LocalPlayer;
         if (IsRunActive || IsModalOpen || Time.timeScale <= 0f || player != null && player.IsInventoryOpen ||
             service != null && service.IsBusy) return false;
@@ -116,7 +117,7 @@ public class VillageMultiplayerMenu : MonoBehaviour
 
     private void Update()
     {
-        if (service == null) AttachService();
+        AttachService();
         RefreshControls(); // El cooldown avanza en tiempo real aunque no haya callbacks.
         if (IsModalOpen && blockedPlayer == null)
             UpdateInputBlock();
@@ -124,9 +125,21 @@ public class VillageMultiplayerMenu : MonoBehaviour
 
     private void AttachService()
     {
-        if (service != null || PhotonPartyService.Instance == null)
+        PhotonPartyService available = PhotonPartyService.AvailableInstance;
+        if (service == available) return;
+        if (service != null)
+        {
+            service.PartyChanged -= OnPartyChanged;
+            service.OperationFailed -= ShowNotice;
+            service.PartyEnded -= OnPartyEnded;
+        }
+        service = available;
+        wasInParty = wasLocked = false;
+        if (service == null)
+        {
+            SetScreen(Screen.None);
             return;
-        service = PhotonPartyService.Instance;
+        }
         service.PartyChanged += OnPartyChanged;
         service.OperationFailed += ShowNotice;
         service.PartyEnded += OnPartyEnded;
@@ -135,7 +148,7 @@ public class VillageMultiplayerMenu : MonoBehaviour
 
     public void OpenFromInteraction()
     {
-        if (IsModalOpen || IsRunActive) return;
+        if (IsModalOpen || IsRunActive || PhotonPartyService.IsSceneExitInProgress) return;
         AttachService();
         if (service == null)
         {
@@ -240,6 +253,7 @@ public class VillageMultiplayerMenu : MonoBehaviour
 
     private void OnPartyChanged()
     {
+        if (service == null || service.IsShuttingDown) { AttachService(); return; }
         bool inParty = service.IsInParty;
         bool locked = inParty && service.IsPartyLocked;
         if (inParty && !wasInParty)
