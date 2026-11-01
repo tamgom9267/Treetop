@@ -31,13 +31,15 @@ public static class MultiplayerGameplayProtocol
         PhotonNetwork.IsMasterClient && PhotonNetwork.LocalPlayer.ActorNumber == PhotonPartyService.Instance.OriginalHostActorNumber;
     public static int LocalActor => PhotonNetwork.LocalPlayer != null ? PhotonNetwork.LocalPlayer.ActorNumber : 0;
     public static int HostActor => PhotonPartyService.Instance != null ? PhotonPartyService.Instance.OriginalHostActorNumber : 0;
-    public static bool Send<T>(byte code, T message, bool reliable, int target = 0)
+    public static bool Send<T>(byte code, T message, bool reliable, int target = 0, bool flush = false)
     {
         MultiplayerRunSession session = MultiplayerRunSession.Instance;
         if (session == null || !session.IsRunning || !PhotonNetwork.InRoom) return false;
-        return PhotonNetwork.RaiseEvent(code, new object[] { Version, session.RunId, session.FloorNumber, JsonUtility.ToJson(message) },
+        bool sent = PhotonNetwork.RaiseEvent(code, new object[] { Version, session.RunId, session.FloorNumber, JsonUtility.ToJson(message) },
             target > 0 ? new RaiseEventOptions { TargetActors = new[] { target } } : new RaiseEventOptions { Receivers = ReceiverGroup.Others },
             new SendOptions { Reliability = reliable });
+        if (sent && flush) PhotonNetwork.SendAllOutgoingCommands();
+        return sent;
     }
     public static bool Read<T>(EventData ev, out T message) where T : class
     {
@@ -58,7 +60,7 @@ public static class MultiplayerGameplayProtocol
 public sealed class MultiplayerWorldMessage
 {
     public string op, room, id, item;
-    public int revision, stage, type, health, hit, animation, attack, damage;
+    public int revision, stage, type, health, hit, animation, attack, damage, actor;
     public float normalizedTime;
     public double time;
     public Vector3 position, velocity;

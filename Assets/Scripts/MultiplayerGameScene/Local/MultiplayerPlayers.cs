@@ -9,80 +9,40 @@ using UnityEngine;
 [RequireComponent(typeof(MultiplayerLocalPlayerPublisher), typeof(MultiplayerWorldSession))]
 public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCallback
 {
-    // Perfil permanente: el juego no depende del componente temporal que lo ajusta.
-    [Serializable]
-    public struct TrafficRates : IEquatable<TrafficRates>
+    // Frecuencias permanentes. No serializar: un prefab antiguo no debe sobrescribirlas.
+    // [Serializable]
+    public readonly struct TrafficRates
     {
-        [InspectorName("Estado de jugadores (Hz)"), Range(1f, 120f)]
-        [Tooltip("Cada jugador publica posicion, giro y animacion a los demas. Genera trafico incluso sin moverse; limitado por los frames de esta instancia.")]
-        public float playerStateSendHz;
-        [InspectorName("Estados de enemigos (Hz)"), Range(1f, 120f)]
-        [Tooltip("Solo el host: envia a los clientes un lote con todos los enemigos. Genera trafico mientras existan enemigos.")]
-        public float enemyStateSendHz;
-        [InspectorName("Comprobar equipo (Hz)"), Range(1f, 60f)]
-        [Tooltip("Comprobacion local del equipo. Solo envia a los demas si cambia; las publicaciones iniciales o solicitadas siguen siendo inmediatas.")]
-        public float equipmentCheckHz;
-        [InspectorName("Presencia por cuarto (Hz)"), Range(1f, 20f)]
-        [Tooltip("Clientes al host: un mensaje por cuarto en cada comprobacion. En el host se procesa localmente. La presencia caduca a los 1,5 segundos.")]
-        public float roomPresenceSendHz;
-        [InspectorName("Solicitar mundo completo (Hz)"), Range(0.05f, 5f)]
-        [Tooltip("Cada cliente solicita un snapshot al host, que responde a ese cliente. 0,333 Hz equivale aproximadamente a una solicitud cada 3 segundos.")]
-        public float worldSnapshotRequestHz;
-        [InspectorName("Escanear loot (Hz)"), Range(1f, 60f)]
-        [Tooltip("Comprobacion local de objetos. Solo genera solicitudes cliente al host si detecta registros, guardados o drops; el host los procesa localmente.")]
-        public float lootScanHz;
-        [InspectorName("Solicitar loot completo (Hz)"), Range(0.05f, 5f)]
-        [Tooltip("Cada cliente solicita el estado completo del loot al host, que responde a ese cliente. No controla las confirmaciones normales de transacciones.")]
-        public float lootSnapshotRequestHz;
-        [InspectorName("Reintentar loot pendiente (Hz)"), Range(0.1f, 2f)]
-        [Tooltip("Cliente al host: reenvia cada transaccion que sigue sin confirmacion. Solo genera trafico con solicitudes pendientes; no cambia las retransmisiones internas de Photon.")]
-        public float lootRetryHz;
-
-        // Al terminar las pruebas, fijar aqui los valores elegidos.
-        public static TrafficRates Defaults(float playerHz = 15f) => new TrafficRates
-        {
-            playerStateSendHz = ValidHz(playerHz, 1f, 120f, 15f),
-            enemyStateSendHz = 15f,
-            equipmentCheckHz = 10f,
-            roomPresenceSendHz = 4f,
-            worldSnapshotRequestHz = 1f / 3f,
-            lootScanHz = 10f,
-            lootSnapshotRequestHz = 1f / 3f,
-            lootRetryHz = 1f / 3f
-        };
-
-        public TrafficRates Validated(float defaultPlayerHz = 15f)
-        {
-            TrafficRates defaults = Defaults(defaultPlayerHz);
-            return new TrafficRates
-            {
-                playerStateSendHz = ValidHz(playerStateSendHz, 1f, 120f, defaults.playerStateSendHz),
-                enemyStateSendHz = ValidHz(enemyStateSendHz, 1f, 120f, defaults.enemyStateSendHz),
-                equipmentCheckHz = ValidHz(equipmentCheckHz, 1f, 60f, defaults.equipmentCheckHz),
-                roomPresenceSendHz = ValidHz(roomPresenceSendHz, 1f, 20f, defaults.roomPresenceSendHz),
-                worldSnapshotRequestHz = ValidHz(worldSnapshotRequestHz, 0.05f, 5f, defaults.worldSnapshotRequestHz),
-                lootScanHz = ValidHz(lootScanHz, 1f, 60f, defaults.lootScanHz),
-                lootSnapshotRequestHz = ValidHz(lootSnapshotRequestHz, 0.05f, 5f, defaults.lootSnapshotRequestHz),
-                lootRetryHz = ValidHz(lootRetryHz, 0.1f, 2f, defaults.lootRetryHz)
-            };
-        }
-
-        private static float ValidHz(float value, float min, float max, float fallback) =>
-            float.IsNaN(value) || float.IsInfinity(value) || value <= 0f ? fallback : Mathf.Clamp(value, min, max);
-
-        public bool Equals(TrafficRates other) => playerStateSendHz == other.playerStateSendHz &&
-            enemyStateSendHz == other.enemyStateSendHz && equipmentCheckHz == other.equipmentCheckHz &&
-            roomPresenceSendHz == other.roomPresenceSendHz && worldSnapshotRequestHz == other.worldSnapshotRequestHz &&
-            lootScanHz == other.lootScanHz && lootSnapshotRequestHz == other.lootSnapshotRequestHz && lootRetryHz == other.lootRetryHz;
-        public override bool Equals(object obj) => obj is TrafficRates other && Equals(other);
-        public override int GetHashCode() => HashCode.Combine(playerStateSendHz, enemyStateSendHz, equipmentCheckHz,
-            roomPresenceSendHz, worldSnapshotRequestHz, lootScanHz, lootSnapshotRequestHz, lootRetryHz);
+        public float playerStateSendHz => 90f;
+        public float enemyStateSendHz => 90f;
+        public float equipmentCheckHz => 10f;
+        public float roomPresenceSendHz => 4f;
+        public float worldSnapshotRequestHz => 1f / 3f;
+        public float lootScanHz => 10f;
+        public float lootSnapshotRequestHz => 1f / 3f;
+        public float lootRetryHz => 1f / 3f;
+        public static TrafficRates Defaults() => new TrafficRates();
     }
 
+    // Conserva la fase entre frames y descarta vencimientos atrasados, sin rafagas.
+    public struct TrafficClock
+    {
+        private double next;
+        private bool started;
+        public bool Tick(double now, float frequency)
+        {
+            if (!started) { next = now; started = true; }
+            if (now + 1e-9d < next) return false;
+            double interval = 1d / frequency;
+            next += (Math.Floor(Math.Max(0d, now - next) / interval) + 1d) * interval;
+            return true;
+        }
+    }
+
+    public const int PhotonSendRateHz = 120;
     public const string ResourcePath = "Multiplayer/Local/MultiplayerPlayers";
     [SerializeField] private MultiplayerRemotePlayer remotePlayerPrefab;
     [SerializeField] private MultiplayerVisualDefinition[] catalog = Array.Empty<MultiplayerVisualDefinition>();
-    [SerializeField, Range(1f, 30f)] private float poseFrequency = 15f;
     [SerializeField, Range(0f, 0.3f)] private float interpolationDelay = 0.1f;
     private readonly Dictionary<int, MultiplayerRemotePlayer> remotes = new Dictionary<int, MultiplayerRemotePlayer>();
     private readonly Dictionary<int, int> requestSequences = new Dictionary<int, int>();
@@ -96,12 +56,10 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     private bool suspended = true;
     private bool initialized;
     private float previousDispatchThreshold;
-    private TrafficRates? trafficOverride;
+    private int previousSendRate;
 
     public MultiplayerWorldSession World { get; private set; }
-    public TrafficRates Traffic => trafficOverride ?? TrafficRates.Defaults(poseFrequency);
-    public void ApplyTrafficRates(TrafficRates rates) { trafficOverride = rates.Validated(poseFrequency); }
-    public void ResetTrafficRates() { trafficOverride = null; }
+    public TrafficRates Traffic => TrafficRates.Defaults();
     public bool GameplayReady => World != null && World.Loot.Ready;
     public void PublishLocalEquipment() { if (localReady && publisher != null) publisher.SendFullState(); }
     public bool PrepareGameplay(PlayerController local, out string error) => World.Bind(local, out error);
@@ -134,6 +92,8 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
         if (!World.Initialize(runSession, this, out error)) return false;
         if (!initialized)
         {
+            previousSendRate = PhotonNetwork.SendRate;
+            PhotonNetwork.SendRate = PhotonSendRateHz;
             previousDispatchThreshold = PhotonNetwork.MinimalTimeScaleToDispatchInFixedUpdate;
             PhotonNetwork.MinimalTimeScaleToDispatchInFixedUpdate = Mathf.Max(0f, previousDispatchThreshold);
             initialized = true;
@@ -308,6 +268,7 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
         if (publisher != null) publisher.Detach();
         if (initialized)
         {
+            PhotonNetwork.SendRate = previousSendRate;
             PhotonNetwork.MinimalTimeScaleToDispatchInFixedUpdate = previousDispatchThreshold;
             initialized = false;
         }

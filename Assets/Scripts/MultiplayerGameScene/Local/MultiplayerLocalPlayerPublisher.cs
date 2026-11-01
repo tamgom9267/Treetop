@@ -16,7 +16,7 @@ public sealed class MultiplayerLocalPlayerPublisher : MonoBehaviour
     private MultiplayerPlayerProtocol.Item[] previousItems = Array.Empty<MultiplayerPlayerProtocol.Item>();
     private int nextItemId = 1;
     private int previousEquipped = -1;
-    private double lastPose = double.NegativeInfinity;
+    private MultiplayerPlayers.TrafficClock poseClock;
     private double lastInventory = double.NegativeInfinity;
     private bool attackPending;
 
@@ -32,7 +32,8 @@ public sealed class MultiplayerLocalPlayerPublisher : MonoBehaviour
         }
         owner = coordinator;
         attackPending = false;
-        lastPose = lastInventory = double.NegativeInfinity;
+        poseClock = default;
+        lastInventory = double.NegativeInfinity;
         previousEquipped = -1;
         error = string.Empty;
         return true;
@@ -66,9 +67,8 @@ public sealed class MultiplayerLocalPlayerPublisher : MonoBehaviour
             MultiplayerPlayerProtocol.Item item = Describe(player.weapon);
             if (owner.SendAttack(new MultiplayerPlayerProtocol.Attack { pose = CapturePose(), item = item })) attackPending = false;
         }
-        if (now - lastPose >= 1d / Mathf.Clamp(frequency, 1f, 120f))
+        if (poseClock.Tick(now, frequency))
         {
-            lastPose = now;
             owner.SendPose(CapturePose());
         }
     }
