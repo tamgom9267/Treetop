@@ -680,7 +680,8 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
             string networkRun = PhotonNetwork.CurrentRoom.CustomProperties[RunKey] as string;
             if (!string.IsNullOrEmpty(networkRun) && networkRun != RunId) yield break;
             bool cleared = string.IsNullOrEmpty(networkRun);
-            if (cleared && !party.IsPartyLocked && !party.IsBusy) yield break;
+            // Conservar la party bloqueada; solo el menu del host puede reabrirla.
+            if (cleared && !party.IsBusy) yield break;
             if (party.IsHost && PhotonNetwork.IsMasterClient)
             {
                 if (!cleared && !completionClearRequested && AllPlayersReturned())
@@ -694,8 +695,6 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
                         yield break;
                     }
                 }
-                // Esperar el eco de Photon antes de reabrir evita reactivar el dungeon anterior.
-                if (cleared && party.IsPartyLocked && !party.IsBusy) party.ReopenParty();
             }
             yield return null;
         }
