@@ -270,9 +270,9 @@ public class PlayerInventory : MonoBehaviour
         //Agregar el objecto al chestloot grid
         if(canFit)
         {
-            for(int column = 0; column < lootgrid.Count; column++)
+            for(int column = 0; column < worldObject.GetComponent<WeaponObject>().requieredCells.Count; column++)
             {
-                for(int row = 0; row < lootgrid[column].Count; row++)
+                for(int row = 0; row < worldObject.GetComponent<WeaponObject>().requieredCells[column].Count; row++)
                 {
                     if(worldObject.GetComponent<WeaponObject>().requieredCells[column][row] == 1 && lootgrid[column][row] == 0)
                     {
@@ -283,31 +283,36 @@ public class PlayerInventory : MonoBehaviour
         }
 
         //Reflejar el cambio en la UI
-        GameObject InvObj = Instantiate(ObjectImagePanel, ChestLootImages.transform);
-       
-        InvObj.GetComponent<PanelManager>().WeaponID = worldObject.GetComponent<InventoryObject>().ID;
-        InvObj.GetComponent<PanelManager>().itemObj = worldObject;
+GameObject InvObj = Instantiate(ObjectImagePanel, ChestLootImages.transform);
 
-        BoxCollider2D InvObjCollider = InvObj.GetComponent<BoxCollider2D>();
-        InvObjCollider.size = new Vector2(120 * (scalewidth+1), 150*(scaleheight+1));
-        InvObjCollider.offset = new Vector2(InvObjCollider.size.x *0.66f  , InvObjCollider.size.y/-2 + (-5*scaleheight) );
+InvObj.GetComponent<PanelManager>().WeaponID = worldObject.GetComponent<InventoryObject>().ID;
+InvObj.GetComponent<PanelManager>().itemObj = worldObject;
 
-        foreach(Transform obj in ChestLoot.transform)
-        {
-            if(obj.GetComponent<PanelManager>().location == ObjImagePosition[0])
-            {
-                RectTransform rect = obj.GetComponent<RectTransform>();
-                RectTransform rectInv = InvObj.GetComponent<RectTransform>();
-                rectInv.anchoredPosition = rect.anchoredPosition;
-            }
-        }
-      
-        if(worldObject.CompareTag("Weapon"))
-        {
-            InvObj.GetComponent<Image>().sprite = worldObject.GetComponent<WeaponObject>().weaponData.UIsprite;    
-            RectTransform rect = InvObj.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(rect.sizeDelta.x *(scalewidth+1-ObjImagePosition[0].x), rect.sizeDelta.y * (scaleheight+1 - -ObjImagePosition[0].y));
-        }
+(int maxRow, int maxColumn, int minRow, int minColumn) = GetShapeSize(worldObject);
+
+RectTransform rectPanel = InvObj.GetComponent<RectTransform>();
+rectPanel.sizeDelta = new Vector2(rectPanel.sizeDelta.x * (maxRow - minRow + 1), rectPanel.sizeDelta.y * (maxColumn - minColumn + 1));
+
+float margin = 10f;
+
+BoxCollider2D InvObjCollider = InvObj.GetComponent<BoxCollider2D>();
+InvObjCollider.size = new Vector2(rectPanel.sizeDelta.x - margin * 2, rectPanel.sizeDelta.y - margin * 2);
+InvObjCollider.offset = new Vector2((0.5f - rectPanel.pivot.x) * rectPanel.sizeDelta.x, (0.5f - rectPanel.pivot.y) * rectPanel.sizeDelta.y);
+
+foreach(Transform obj in ChestLoot.transform)
+{
+    if(obj.GetComponent<PanelManager>().location == ObjImagePosition[0])
+    {
+        RectTransform rect = obj.GetComponent<RectTransform>();
+        RectTransform rectInv = InvObj.GetComponent<RectTransform>();
+        rectInv.anchoredPosition = rect.anchoredPosition;
+    }
+}
+
+if(worldObject.CompareTag("Weapon"))
+{
+    InvObj.GetComponent<Image>().sprite = worldObject.GetComponent<WeaponObject>().weaponData.UIsprite;
+}
     }
 
     
@@ -422,7 +427,7 @@ public class PlayerInventory : MonoBehaviour
             if(isMoving == false)
             {
                 cursor.GetComponent<CursorObject>().ResetCursor();
-                shapeMaxRow = 0;
+                shapeMaxRow = 0; 
                 shapeMaxColumn = 0;
             }
 
@@ -441,21 +446,49 @@ public class PlayerInventory : MonoBehaviour
         //Derecha
         else if(direction == new Vector2(1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x < limitRow)
         {
+            if(isMoving == false && cursor.GetComponent<CursorObject>().InventoryItemObj != null)
+            {
+                (int maxRow, int maxColumn, int minRow, int minColumn) = GetShapeSize(cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj);
+                cursor.GetComponent<CursorObject>().CurrentPosition.x += maxRow;
+                cursor.GetComponent<CursorObject>().ResetCursor();
+            }
+
             cursor.GetComponent<CursorObject>().CurrentPosition.x += 1;
         }
         //Izquierda
         else if(direction == new Vector2(-1,0) && cursor.GetComponent<CursorObject>().CurrentPosition.x > 0)
         {
+            if(isMoving == false && cursor.GetComponent<CursorObject>().InventoryItemObj != null)
+            {
+                (int maxRow, int maxColumn, int minRow, int minColumn) = GetShapeSize(cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj);
+                cursor.GetComponent<CursorObject>().CurrentPosition.x += minRow;
+                cursor.GetComponent<CursorObject>().ResetCursor();
+            }
+
             cursor.GetComponent<CursorObject>().CurrentPosition.x -= 1;
         }
         //Abajo
         else if(direction == new Vector2(0,-1) && cursor.GetComponent<CursorObject>().CurrentPosition.y < limitColumn)
         {
+            if(isMoving == false && cursor.GetComponent<CursorObject>().InventoryItemObj != null)
+            {
+                (int maxRow, int maxColumn, int minRow, int minColumn) = GetShapeSize(cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj);
+                cursor.GetComponent<CursorObject>().CurrentPosition.y += maxColumn;
+                cursor.GetComponent<CursorObject>().ResetCursor();
+            }
+
             cursor.GetComponent<CursorObject>().CurrentPosition.y += 1;
         }
         //Arriba
         else if(direction == new Vector2(0,1) && cursor.GetComponent<CursorObject>().CurrentPosition.y > 0)
         {
+            if(isMoving == false && cursor.GetComponent<CursorObject>().InventoryItemObj != null)
+            {
+                (int maxRow, int maxColumn, int minRow, int minColumn) = GetShapeSize(cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj);
+                cursor.GetComponent<CursorObject>().CurrentPosition.y += minColumn;
+                cursor.GetComponent<CursorObject>().ResetCursor();
+            }
+
             cursor.GetComponent<CursorObject>().CurrentPosition.y -= 1;
         }
 
@@ -560,7 +593,29 @@ public class PlayerInventory : MonoBehaviour
         if (targetPanel != null)
         {
             PanelManager targetPanelManager = targetPanel.GetComponent<PanelManager>();
-            
+
+            var result = CheckIfFit(targetPanelManager.itemObj);
+
+            if (!result.canFit)
+            {
+                return false;
+            }
+
+            int offsetX = (int)cursor.GetComponent<CursorObject>().CurrentPosition.x;
+            int offsetY = (int)cursor.GetComponent<CursorObject>().CurrentPosition.y;
+            List<List<int>> cells = targetPanelManager.itemObj.GetComponent<InventoryObject>().requieredCells;
+
+            for(int column = 0; column < cells.Count; column++)
+            {
+                for(int row = 0; row < cells[column].Count; row++)
+                {
+                    if(cells[column][row] == 1)
+                    {
+                        lootgrid[offsetY + column][offsetX + row] = ID;
+                    }
+                }
+            }
+
             if (targetPanelManager.itemObj != null && !Loot.Contains(targetPanelManager.itemObj))
             {
                 Loot.Add(targetPanelManager.itemObj);

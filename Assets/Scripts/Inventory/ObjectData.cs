@@ -4,8 +4,8 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-[CreateAssetMenu(fileName = "WeaponData", menuName = "Scriptable Objects/Weapon")]
-public class WeaponData : ScriptableObject
+[CreateAssetMenu(fileName = "ObjectData", menuName = "Scriptable Objects/Weapon")]
+public class ObjectData : ScriptableObject
 {
     public string Name;
 

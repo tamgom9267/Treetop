@@ -11,7 +11,7 @@ public class WeaponObject : InventoryObject
     public PlayerController player;
 
     [SerializeField]
-    public WeaponData weaponData;
+    public ObjectData weaponData;
 
     [Header("Trail/Smear de Arma")]
     [SerializeField]
