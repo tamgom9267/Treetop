@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using System.Runtime.CompilerServices;
 
 public class PlayerController : MonoBehaviour
 {
@@ -32,9 +33,13 @@ public class PlayerController : MonoBehaviour
 
     [Header("Rotacion")]
     [SerializeField] private float turnSpeed = 720f;
+    [SerializeField] private float attackTurnSpeed = 1440f;
+    [SerializeField] private float attackRotationThreshold = 2f;
 
     private Quaternion targetRotation;
     private bool hasTargetRotation;
+
+    private bool waitingForAttackRotation = false;
 
     // Collider que detecta el golpe de la espada.
     private BoxCollider equippedWeaponCollider;
@@ -146,34 +151,47 @@ public class PlayerController : MonoBehaviour
 
             if (!inAir)
                 {
-                    if (!isAttacking)
+                    if (!isAttacking && !waitingForAttackRotation)
                     {
                         RotatePlayer(_moveDirection);    
                     }
                     rb.linearVelocity = new Vector3(_moveDirection.x * playerClass.speed, rb.linearVelocity.y ,_moveDirection.y * playerClass.speed);
                 }
 
-                if (attack.action.WasPressedThisFrame() && !isAttacking)
+                if (attack.action.WasPressedThisFrame() && !isAttacking && !waitingForAttackRotation)
             {
-                // leer teclas - ijkl
+                // leer flechas
                 Vector2 attackInput = attack.action.ReadValue<Vector2>();
 
                 // Definir direccion de ataque - arriba, abajo, isquierda, derecha 
                 // (no es posible hacer ataques diagonales una de las direcciones va a tomar prioridad)
                 Vector2 attackDirection = GetAttackDirections(attackInput);
 
+                if (attackDirection != Vector2.zero)
+                {
+                    // establecer la dirección del ataque
+                    RotatePlayer(attackDirection);
+
+                    // esperar a que termine de girar
+                    waitingForAttackRotation = true;
+                } else
+                {
+                    // si no se pone una direccion diferente solo atacar
+                    StartAttack();
+                }
+
                 // se rota el personaje a la direccion assignada
-                RotatePlayer(attackDirection);
+                // RotatePlayer(attackDirection);
 
-                Debug.Log("Attaque: " + attackDirection);
+                // Debug.Log("Attaque: " + attackDirection);
 
-                // Un nuevo ataque puede volver a golpear a los slimes.
-                enemiesHitThisAttack.Clear();
+                // // Un nuevo ataque puede volver a golpear a los slimes.
+                // enemiesHitThisAttack.Clear();
                 
-                isAttacking = true;
+                // isAttacking = true;
 
-                playerAnimation.SetTrigger("isAttacking");
-                AttackStarted?.Invoke();
+                // playerAnimation.SetTrigger("isAttacking");
+                // AttackStarted?.Invoke();
             }
 
 
@@ -190,13 +208,38 @@ public class PlayerController : MonoBehaviour
         
 
             // Gira hacia la direccion indicada.
+            // if (hasTargetRotation)
+            // {
+            //     transform.rotation = Quaternion.RotateTowards(
+            //         transform.rotation,
+            //         targetRotation,
+            //         turnSpeed * Time.deltaTime
+            //     );
+            // }
+
             if (hasTargetRotation)
             {
+                // float currentTurnSpeed;
+
+                // if (waitingForAttackRotation) currentTurnSpeed = attackTurnSpeed;
+                // else currentTurnSpeed = turnSpeed;
+
+                // forma corta
+                float currentTurnSpeed = waitingForAttackRotation ? attackTurnSpeed : turnSpeed;
+
                 transform.rotation = Quaternion.RotateTowards(
                     transform.rotation,
                     targetRotation,
-                    turnSpeed * Time.deltaTime
+                    currentTurnSpeed * Time.deltaTime
                 );
+            }
+
+            // comparar si el jugador ya esta viendo hacía donde va a ser el ataque
+            if (waitingForAttackRotation)
+            {
+                float angle = Quaternion.Angle(transform.rotation, targetRotation);
+
+                if (angle <= attackRotationThreshold) StartAttack();
             }
         }
 
@@ -214,6 +257,15 @@ public class PlayerController : MonoBehaviour
                 }
                 InventoryUI.SetActive(!InventoryUI.activeSelf);
             }
+    }
+
+    private void StartAttack()
+    {
+        waitingForAttackRotation = false;
+        enemiesHitThisAttack.Clear();
+        isAttacking = true;
+        playerAnimation.SetTrigger("isAttacking");
+        AttackStarted?.Invoke();
     }
     
     private void RotatePlayer(Vector2 direction)
