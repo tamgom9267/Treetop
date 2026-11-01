@@ -4,6 +4,8 @@ public partial class WorldGenerator : MonoBehaviour
 {
     [SerializeField] private DungeonInstructionsGenerator instructionsGenerator;
 
+    public int FloorNumber => instructionsGenerator != null ? instructionsGenerator.FloorNumber : 0;
+
     // El objeto padre de el mundo, aqui se van a generar los objetos de el mundo para eliminarlo con mayor facilidad
     private GameObject generatedWorld;
 

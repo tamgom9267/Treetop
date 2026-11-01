@@ -3,9 +3,34 @@ using UnityEngine;
 public class NewestSingleton : MonoBehaviour
 {
     public static NewestSingleton Instance { get; private set; }
+    private static bool resetOnVillageLoad;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        Instance = null;
+        resetOnVillageLoad = false;
+    }
+
+    public static void RequestVillagePlayerReset() { resetOnVillageLoad = true; }
+    public static void CancelVillagePlayerReset() { resetOnVillageLoad = false; }
 
     private void Awake()
     {
+        if (resetOnVillageLoad && gameObject.scene.name == "VillageMenuScene")
+        {
+            resetOnVillageLoad = false;
+            NewestSingleton previous = Instance;
+            Instance = this;
+            if (previous != null && previous != this)
+            {
+                previous.gameObject.SetActive(false);
+                Destroy(previous.gameObject);
+            }
+            DontDestroyOnLoad(gameObject);
+            return;
+        }
+
         // Conserva al personaje y su inventario al cargar otra escena.
         if (Instance != null && Instance != this)
         {

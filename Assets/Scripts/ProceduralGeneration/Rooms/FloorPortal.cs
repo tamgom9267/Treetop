@@ -1,7 +1,10 @@
+using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class FloorPortal : MonoBehaviour
 {
+    private const string VillageSceneName = "VillageMenuScene";
     private bool activated;
 
     private void OnTriggerEnter(Collider other)
@@ -13,6 +16,26 @@ public class FloorPortal : MonoBehaviour
         if (generator == null)
         {
             Debug.LogWarning("No se encontro el generador para crear el siguiente piso.", this);
+            return;
+        }
+
+        if (generator.FloorNumber >= 5)
+        {
+            if (!Application.CanStreamedLevelBeLoaded(VillageSceneName))
+            {
+                Debug.LogError("Falta VillageMenuScene en el perfil de compilacion.", this);
+                return;
+            }
+
+            activated = true;
+            NewestSingleton.RequestVillagePlayerReset();
+            try { SceneManager.LoadScene(VillageSceneName); }
+            catch (Exception exception)
+            {
+                NewestSingleton.CancelVillagePlayerReset();
+                activated = false;
+                Debug.LogError("No se pudo regresar a la aldea: " + exception.Message, this);
+            }
             return;
         }
 
