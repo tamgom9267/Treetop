@@ -1233,6 +1233,8 @@ MonoBehaviour:
   player: {fileID: 1408362003}
   offset: {x: 0, y: 10, z: -8}
   cameraRotation: {x: 45, y: 0, z: 0}
+  shakeDuration: 0.15
+  shakeMagnitude: 0.15
 --- !u!4 &224549682
 Transform:
   m_ObjectHideFlags: 0
@@ -7440,8 +7442,11 @@ MonoBehaviour:
   enemyKnockbackForce: 8
   enemyKnockbackUpForce: 3
   playerRenderer: {fileID: 1662720469}
-  flashColor: {r: 0, g: 1, b: 0.95873094, a: 1}
-  flashDuration: 0.1
+  cameraFollow: {fileID: 224549681}
+  damageEmissionColor: {r: 0.972549, g: 0.44313726, b: 0.44313726, a: 0.5411765}
+  damageFlashDuration: 0.1
+  healingEmissionColor: {r: 0.2188279, g: 1, b: 0.19999999, a: 0.3137255}
+  healingFlashDuration: 0.6
 --- !u!114 &1408362007
 MonoBehaviour:
   m_ObjectHideFlags: 0

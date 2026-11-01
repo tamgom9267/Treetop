@@ -37,14 +37,44 @@ public class PlayerClass : MonoBehaviour
     // Patron observer - cuando cambia la vida notifica al HUD
     public event Action<int, int, int, int> OnStatsChanged;
 
-    [Header("Hit Feedback")]
-    [SerializeField] private Renderer playerRenderer;
-    [SerializeField] public Color flashColor = Color.red;
-    [SerializeField] private float flashDuration = 0.1f;
+    [Header("Feedback Visual")]
+    // [SerializeField] private Renderer playerRenderer;
+    // [SerializeField] public Color flashColor = Color.red;
+    // [SerializeField] private float flashDuration = 0.1f;
 
-    private Material[] playerMaterials;
-    private Color[] originalColors;
-    private Coroutine flashCoroutine;
+    // private Material[] playerMaterials;
+    // private Color[] originalColors;
+    // private Coroutine flashCoroutine;
+
+    [SerializeField] private Renderer playerRenderer;
+    
+    [Header("Camera Feedback")]
+    [SerializeField] private FollowPlayerNoRotation cameraFollow;
+    
+    // Use mejor el MaterialPropertyBlock y no el otro metodo para no hacer tantas copias de materiales
+    [Header("Feedback de daño")]
+    [SerializeField, ColorUsage(true, true)]
+    private Color damageEmissionColor = Color.white;
+    [SerializeField] private float damageFlashDuration = 0.1f;
+
+    [Header("Feedback de curación")]
+    [SerializeField, ColorUsage(true, true)]
+    private Color healingEmissionColor = new Color(0.7f, 1f, 0.2f, 1f);
+    [SerializeField] private float healingFlashDuration = 0.6f;
+
+    private MaterialPropertyBlock[] originalPropertyBlocks;
+    private MaterialPropertyBlock emissionPropertyBlock;
+
+    private bool[] supportsEmission;
+    private Coroutine emissionCoroutine;
+
+    private float emissionEndTime;
+    private int currentFeedbackPriority;
+    
+    private Color currentEmissionColor;
+
+    private static readonly int EmissionColorID = Shader.PropertyToID("_EmissionColor");
+
 
 
     private PlayerController playerController;
@@ -55,18 +85,21 @@ public class PlayerClass : MonoBehaviour
        assignClass();
 
        playerController = GetComponent<PlayerController>();
+
+       InitializeEmissionFeedback();
     }
 
-    void Start()
-    {
-        playerMaterials = playerRenderer.materials;
-        originalColors = new Color[playerMaterials.Length];
+    // void Start()
+    // {
+    //     playerMaterials = playerRenderer.materials;
+    //     originalColors = new Color[playerMaterials.Length];
 
-        for (int i = 0; i < playerMaterials.Length; i++)
-        {
-            originalColors[i] = playerMaterials[i].color;
-        }
-    }
+    //     for (int i = 0; i < playerMaterials.Length; i++)
+    //     {
+    //         originalColors[i] = playerMaterials[i].color;
+    //     }
+    // }
+
 
 
     public void assignClass()
@@ -118,7 +151,11 @@ public class PlayerClass : MonoBehaviour
         Debug.Log("Player took " + damage + " damage. Current health: " + health);
 
         // feedback visual
-        TriggerHitFeedback();
+        // TriggerHitFeedback();
+        TriggerEmissionFeedback(damageEmissionColor, damageFlashDuration, 2);
+
+        //Screen Shake
+        if (cameraFollow != null) cameraFollow.Shake();
 
         //hit stop
         if (playerController != null)
@@ -132,10 +169,16 @@ public class PlayerClass : MonoBehaviour
 
     public void Heal(int cantidad)
     {
-        if (cantidad <= 0) { return; }
+        if (cantidad <= 0) return;
+
+        int previousHealth = health;
 
         // Math.f.Min para que no puedas tener más de la vida máxima.
         health = Mathf.Min(maxHealth, health + cantidad);
+
+        // solo cambiar color si se recupera vida en verdad
+        // asi no sale si ya pasaste de 100 de vida
+        if (health > previousHealth) TriggerEmissionFeedback(healingEmissionColor, healingFlashDuration, 1);
 
         // para observer
         NotifyStatsChanged();
@@ -168,30 +211,111 @@ public class PlayerClass : MonoBehaviour
         }
     }
     
-    public void TriggerHitFeedback()
-    {
-        if (flashCoroutine != null)
-            StopCoroutine(flashCoroutine);
+    // public void TriggerHitFeedback()
+    // {
+    //     if (flashCoroutine != null)
+    //         StopCoroutine(flashCoroutine);
 
-        flashCoroutine = StartCoroutine(DoFlash());
+    //     flashCoroutine = StartCoroutine(DoFlash());
+    // }
+
+    // private IEnumerator DoFlash()
+    // {
+    //     // Aplica el color del flash a todos los materiales
+    //     for (int i = 0; i < playerMaterials.Length; i++)
+    //     {
+    //         playerMaterials[i].color = flashColor;
+    //     }
+
+    //     yield return new WaitForSeconds(flashDuration);
+
+    //     // Restaura los colores originales
+    //     for (int i = 0; i < playerMaterials.Length; i++)
+    //     {
+    //         playerMaterials[i].color = originalColors[i];
+    //     }
+
+    //     flashCoroutine = null;
+    // }
+
+        // lo del feedback nuevo :D
+    private void InitializeEmissionFeedback()
+    {
+        if (playerRenderer == null) return;
+
+        Material[] materials = playerRenderer.sharedMaterials;
+
+        originalPropertyBlocks = new MaterialPropertyBlock[materials.Length];
+        supportsEmission = new bool[materials.Length];
+
+        emissionPropertyBlock = new MaterialPropertyBlock();
+
+        for (int i = 0; i < materials.Length; i++)
+        {
+            originalPropertyBlocks[i] = new MaterialPropertyBlock();
+
+            playerRenderer.GetPropertyBlock(originalPropertyBlocks[i], i);
+
+            supportsEmission[i] =
+                materials[i] != null &&
+                materials[i].HasProperty(EmissionColorID);
+        }
     }
 
-    private IEnumerator DoFlash()
+    private void TriggerEmissionFeedback(Color color, float duration, int priority)
     {
-        // Aplica el color del flash a todos los materiales
-        for (int i = 0; i < playerMaterials.Length; i++)
+        if (playerRenderer == null || duration <= 0f) return;
+
+        // que los efectos con menor prioridad no afecten a los demas
+        if (emissionCoroutine != null && priority < currentFeedbackPriority) return;
+
+        // si llega un efecto de mayor prioridad que cambie
+        if (priority > currentFeedbackPriority) emissionEndTime = Time.unscaledTime + duration;
+        else
         {
-            playerMaterials[i].color = flashColor;
+            // efectos de igual prioridad
+            emissionEndTime = Mathf.Max(emissionEndTime, Time.unscaledTime + duration);
         }
 
-        yield return new WaitForSeconds(flashDuration);
+        currentFeedbackPriority = priority;
+        currentEmissionColor = color;
 
-        // Restaura los colores originales
-        for (int i = 0; i < playerMaterials.Length; i++)
+        ApplyEmissionColor(color);
+
+        if (emissionCoroutine == null)
         {
-            playerMaterials[i].color = originalColors[i];
+            emissionCoroutine = StartCoroutine(EmissionFeedbackRoutine());
+        }
+    }
+
+    private void ApplyEmissionColor(Color color)
+    {
+        if (playerRenderer == null || supportsEmission == null) return;
+
+        for (int i = 0; i < supportsEmission.Length; i++)
+        {
+            if (!supportsEmission[i]) continue;
+
+            playerRenderer.GetPropertyBlock(emissionPropertyBlock, i);
+            emissionPropertyBlock.SetColor(EmissionColorID, color);
+            playerRenderer.SetPropertyBlock(emissionPropertyBlock, i);
+        }
+    }
+
+    private IEnumerator EmissionFeedbackRoutine()
+    {
+        while (Time.unscaledTime < emissionEndTime)
+        {
+            yield return null;
         }
 
-        flashCoroutine = null;
+        // restaurar al brillo normal
+        for (int i = 0; i < originalPropertyBlocks.Length; i++)
+        {
+            playerRenderer.SetPropertyBlock(originalPropertyBlocks[i], i);
+        }
+
+        currentFeedbackPriority = 0;
+        emissionCoroutine = null;
     }
 }

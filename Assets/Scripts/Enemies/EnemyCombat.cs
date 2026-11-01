@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.VisualScripting;
 
 public class EnemyCombat : MonoBehaviour
 {
@@ -25,7 +26,7 @@ public class EnemyCombat : MonoBehaviour
     [SerializeField] private float flashDuration = 0.1f;
 
     private Material[] enemyMaterials;
-    private Color[] originalColors;
+    private Color[] originalEmissionColors;
     private Coroutine flashCoroutine;
 
     [Header("HitStop")]
@@ -52,11 +53,13 @@ public class EnemyCombat : MonoBehaviour
         if (rend != null)
         {
             enemyMaterials = rend.materials;
-            originalColors = new Color[enemyMaterials.Length];
+            originalEmissionColors = new Color[enemyMaterials.Length];
 
             for (int i = 0; i < enemyMaterials.Length; i++)
             {
-                originalColors[i] = enemyMaterials[i].color;
+                enemyMaterials[i].EnableKeyword("_EMISSION");
+                originalEmissionColors[i] =
+                    enemyMaterials[i].GetColor("_EmissionColor");
             }
         }
     }
@@ -199,12 +202,22 @@ public class EnemyCombat : MonoBehaviour
     // feedback visual
     private IEnumerator DoFlash()
     {
-        for (int i = 0; i < enemyMaterials.Length; i++) enemyMaterials[i].color = flashColor;
+        for (int i = 0; i <enemyMaterials.Length; i++)
+        {
+            enemyMaterials[i].SetColor(
+                "_EmissionColor", flashColor);
+        }
 
         yield return new WaitForSeconds(flashDuration);
 
-        for (int i = 0; i < enemyMaterials.Length; i++) enemyMaterials[i].color = originalColors[i];
-
+        for (int i = 0; i < enemyMaterials.Length; i++)
+        {
+            enemyMaterials[i].SetColor(
+                "_EmissionColor", originalEmissionColors[i]);
+        }
+        
         flashCoroutine = null;
     }
+
+    
 }
