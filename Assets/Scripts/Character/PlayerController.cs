@@ -7,6 +7,9 @@ using Unity.VisualScripting;
 
 public class PlayerController : MonoBehaviour
 {
+    // Observadores opcionales; el control local no depende de Photon.
+    public event System.Action AttackStarted;
+    public WeaponObject EquippedWeaponInstance => equippedWeapon;
     public Rigidbody rb;
 
     [SerializeField]
@@ -170,6 +173,7 @@ public class PlayerController : MonoBehaviour
                 isAttacking = true;
 
                 playerAnimation.SetTrigger("isAttacking");
+                AttackStarted?.Invoke();
             }
 
 
@@ -313,7 +317,7 @@ public class PlayerController : MonoBehaviour
     // Se llama en Animation Event cuando inicia el ataque.
     public void EnableWeaponCollider()
     {
-        if (weapon)
+        if (equippedWeapon != null && equippedWeaponCollider != null)
         {
             equippedWeaponCollider.enabled = true;
             equippedWeapon.EnableTrail();  
@@ -326,7 +330,7 @@ public class PlayerController : MonoBehaviour
     {
         // Desactiva el collider al terminar el ataque.
 
-        if (weapon)
+        if (equippedWeapon != null && equippedWeaponCollider != null)
         {
             equippedWeaponCollider.enabled = false;
             equippedWeapon.DisableTrail();
@@ -387,31 +391,52 @@ public class PlayerController : MonoBehaviour
 
     public void equipWeapon()
     {
-     
+        WeaponObject item = weapon != null ? weapon.GetComponent<WeaponObject>() : null;
+        if (item == null || item.weaponData == null || item.weaponData.prefab == null || handObj == null) return;
 
-       //    handObj = transform.Find("Hand");
-       GameObject WeaponObj = Instantiate(weapon.GetComponent<WeaponObject>().weaponData.prefab,handObj);
-       WeaponObj.transform.localPosition = new Vector3(0,0,0);
-       WeaponObj.GetComponent<WeaponObject>().inHand = true;
+        ClearEquippedInstance();
+        // UIDisplay elimina su imagen anterior cuando no hay arma seleccionada.
+        GameObject selected = weapon;
+        weapon = null;
+        RefreshEquippedWeaponUI();
+        weapon = selected;
 
-       equippedWeapon = WeaponObj.GetComponent<WeaponObject>();
-
-       WeaponObj.GetComponent<WeaponObject>().player = this;
-       WeaponObj.GetComponent<SphereCollider>().enabled = false;
-
-       // La espada no puede hacer damage si el jugador no esta atacando.
-        equippedWeaponCollider = WeaponObj.GetComponent<BoxCollider>();
-        equippedWeaponCollider.enabled = false;
-
-        Inventory.gameObject.GetComponent<UIDisplay>().UIEquippedWeaponDisplay();
+        GameObject instance = Instantiate(item.weaponData.prefab, handObj);
+        instance.transform.localPosition = Vector3.zero;
+        equippedWeapon = instance.GetComponent<WeaponObject>();
+        equippedWeapon.inHand = true;
+        equippedWeapon.player = this;
+        SphereCollider pickup = instance.GetComponent<SphereCollider>();
+        if (pickup != null) pickup.enabled = false;
+        equippedWeaponCollider = instance.GetComponent<BoxCollider>();
+        if (equippedWeaponCollider != null) equippedWeaponCollider.enabled = false;
+        RefreshEquippedWeaponUI();
     }
 
     public void UnequipWeapon()
     {
+        ClearEquippedInstance();
         weapon = null;
+        RefreshEquippedWeaponUI();
+    }
+
+    private void ClearEquippedInstance()
+    {
+        if (equippedWeaponCollider != null) equippedWeaponCollider.enabled = false;
+        if (equippedWeapon != null)
+        {
+            // Nunca destruir el objeto almacenado ni depender del orden de los huesos de Hand.
+            equippedWeapon.gameObject.SetActive(false);
+            Destroy(equippedWeapon.gameObject);
+        }
         equippedWeapon = null;
-        Destroy(handObj.GetChild(1).gameObject);
-        Inventory.gameObject.GetComponent<UIDisplay>().UIEquippedWeaponDisplay();
+        equippedWeaponCollider = null;
+    }
+
+    private void RefreshEquippedWeaponUI()
+    {
+        UIDisplay display = Inventory != null ? Inventory.GetComponent<UIDisplay>() : null;
+        if (display != null) display.UIEquippedWeaponDisplay();
     }
 
     private void OnCollisionEnter(Collision collision)
