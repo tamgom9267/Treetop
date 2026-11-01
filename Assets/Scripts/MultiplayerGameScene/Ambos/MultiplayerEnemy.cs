@@ -11,6 +11,14 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     [SerializeField] private Renderer rend;
     [SerializeField] private Color flashColor = Color.red;
     [SerializeField] private float flashDuration = 0.1f;
+
+    [Header("Visual Effects")]
+    [SerializeField] private GameObject hitEffectPrefab;
+    [SerializeField] private GameObject deathEffectPrefab;
+    [SerializeField] private Vector3 deathEffectOffset = Vector3.zero;
+
+    private bool deathEffectSpawned;
+
     [SerializeField] private bool authority;
     private Rigidbody body;
     private Animator animator;
@@ -60,7 +68,25 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (!authority || Health <= 0 || damage <= 0) return;
         Health = Mathf.Max(0, Health - damage); HitRevision++;
         ShowFlash();
-        if (Health == 0) { animator.SetTrigger("Die"); body.linearVelocity = Vector3.zero; return; }
+        
+        Collider enemyCollider = GetComponent<Collider>();
+
+        Vector3 hitPosition = enemyCollider != null
+            ? enemyCollider.ClosestPoint(origin)
+            : transform.position;
+
+        SpawnHitEffect(hitPosition);
+
+
+        // if (Health == 0) { animator.SetTrigger("Die"); body.linearVelocity = Vector3.zero; return; }
+        if (Health == 0)
+        {
+            SpawnDeathEffect();
+            
+            animator.SetTrigger("Die");
+            body.linearVelocity = Vector3.zero;
+            return;
+        }
         Vector3 direction = transform.position - origin; direction.y = 0;
         if (direction.sqrMagnitude > 0.0001f)
         {
@@ -82,8 +108,16 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (state.hit > effectRevision)
         {
             effectRevision = state.hit; ShowFlash();
+            SpawnHitEffect(transform.position);
         }
-        if (state.health == 0 && Health > 0) { Health = 0; animator.SetTrigger("Die"); }
+        // if (state.health == 0 && Health > 0) { Health = 0; animator.SetTrigger("Die"); }
+        if (state.health == 0 && Health > 0)
+        {
+            Health = 0;
+
+            SpawnDeathEffect();
+            animator.SetTrigger("Die");
+        }
         if (state.revision <= frameRevision) return;
         frameRevision = state.revision; Health = Mathf.Min(Health, state.health);
         if (frames.Count == 0) transform.SetPositionAndRotation(state.position, state.rotation);
@@ -122,4 +156,30 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         flash = null;
     }
     private void OnDestroy() { if (materials != null) foreach (Material material in materials) Destroy(material); }
+
+    private void SpawnHitEffect(Vector3 position)
+    {
+        if (hitEffectPrefab == null)
+            return;
+
+        Instantiate(
+            hitEffectPrefab,
+            position,
+            Quaternion.identity
+        );
+    }
+
+    private void SpawnDeathEffect()
+    {
+        if (deathEffectPrefab == null || deathEffectSpawned)
+            return;
+
+        deathEffectSpawned = true;
+
+        Instantiate(
+            deathEffectPrefab,
+            transform.position + deathEffectOffset,
+            Quaternion.identity
+        );
+    }
 }

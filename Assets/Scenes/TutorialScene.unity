@@ -27304,6 +27304,8 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 0
+  hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
+  deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
 --- !u!33 &3469287836679994221
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -27359,6 +27361,8 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 0
+  hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
+  deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
 --- !u!33 &3469287837315990319
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -27406,6 +27410,8 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 1
+  hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
+  deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
 --- !u!33 &3469287837520323133
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -27469,6 +27475,8 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 0
+  hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
+  deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
 --- !u!33 &3469287838068554643
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -27548,6 +27556,8 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 0
+  hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
+  deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
 --- !u!1 &3471701395223937985
 GameObject:
   m_ObjectHideFlags: 0
@@ -52450,6 +52460,8 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 0
+  hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
+  deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
 --- !u!23 &6995960347033874681
 MeshRenderer:
   m_ObjectHideFlags: 0

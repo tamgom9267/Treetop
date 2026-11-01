@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
+using System.Runtime.CompilerServices;
 
 public class EnemyCombat : MonoBehaviour
 {
@@ -34,6 +35,13 @@ public class EnemyCombat : MonoBehaviour
 
     [Header("Estado")]
     [SerializeField] private bool startsActive = true;
+
+    [Header("Particulas de Golpe")]
+    [SerializeField] private ParticleSystem hitEffectPrefab;
+
+    [Header("Particulas de Muerte")]
+    [SerializeField] private GameObject deathEffectPrefab;
+    private bool deathEffectSpawned = false;
 
     private bool isActive;
 
@@ -101,6 +109,9 @@ public class EnemyCombat : MonoBehaviour
             // evita recibir daño varias veces
             if (!weaponObject.player.RegisterEnemyHit(gameObject)) return;
 
+            // efectos de golpe
+            SpawnHitEffect(other);
+
             //Hitstop del jugador
             weaponObject.player.TriggerHitStop(hitStopDuration);
 
@@ -115,6 +126,9 @@ public class EnemyCombat : MonoBehaviour
         else if (other.CompareTag("Projectile"))
         {
             if (playerClass == null) return;
+
+            // efectos de golpe
+            SpawnHitEffect(other);
 
             TakeDamage(playerClass.PD);
 
@@ -182,6 +196,8 @@ public class EnemyCombat : MonoBehaviour
     // llamar desde animation event al terminar la animación de muerte
     public void DestroyEnemy()
     {
+        SpawnDeathEffect();
+
         Destroy(gameObject);
     }
 
@@ -215,9 +231,36 @@ public class EnemyCombat : MonoBehaviour
             enemyMaterials[i].SetColor(
                 "_EmissionColor", originalEmissionColors[i]);
         }
-        
+
         flashCoroutine = null;
     }
 
-    
+    private void SpawnHitEffect(Collider attackerCollider)
+    {
+        if (hitEffectPrefab == null) return;
+
+        Collider enemyCollider = GetComponent<Collider>();
+
+        Vector3 contactPoint = transform.position;
+
+        if (enemyCollider != null && attackerCollider != null)
+        {
+            Vector3 pointOnEnemy = enemyCollider.ClosestPoint(attackerCollider.bounds.center);
+
+            Vector3 pointOnAttacker = attackerCollider.ClosestPoint(pointOnEnemy);
+
+            contactPoint = (pointOnEnemy + pointOnAttacker) * 0.5f;
+        }
+        
+        Instantiate(hitEffectPrefab, contactPoint, Quaternion.identity);
+    }
+
+    private void SpawnDeathEffect()
+    {
+        if (deathEffectPrefab == null || deathEffectSpawned) return;
+
+        deathEffectSpawned = true;
+
+        GameObject effect = Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
+    }
 }
