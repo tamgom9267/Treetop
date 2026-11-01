@@ -27,6 +27,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     private const string ErrorKey = "world.error";
     private const string ReadyKey = "world.ready";
     private const string FailureKey = "world.failed";
+    private const string ReturnedKey = "world.returned";
 
     private static string pendingVillageNotice;
     private static bool invalidRedirectPending;
@@ -60,12 +61,15 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     private MultiplayerPlayers playerSync;
     private string readyRequestedKey;
     private bool settlementRequested;
+    private bool completedRun;
+    private bool completionClearRequested;
 
     public string RunId { get; private set; }
     public int BaseSeed { get; private set; }
     public int FloorNumber { get; private set; }
     public MultiplayerRunPhase Phase { get; private set; }
-    public bool IsRunning => activeRun && !ending;
+    // Los menus siguen bloqueados hasta que toda la party termine de regresar.
+    public bool IsRunning => activeRun && (!ending || completedRun);
     public bool IsPlaying => IsRunning && Phase == MultiplayerRunPhase.Playing && !publicationPending &&
         localBuiltKey == CurrentKey;
     public string CurrentKey => MultiplayerMapMath.Key(RunId, FloorNumber);
@@ -114,6 +118,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         party = null;
         StopPlayerSync();
         ReleasePlayer();
+        if (completedRun) NewestSingleton.CancelVillagePlayerReset();
     }
 
     private void OnDestroy() { if (Instance == this) Instance = null; }
@@ -218,10 +223,16 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     public bool RequestNextFloor()
     {
         if (!IsPlaying || settlementRequested || party == null || !party.IsHost || !PhotonNetwork.IsMasterClient || hostGenerator == null) return false;
-        if (FloorNumber == int.MaxValue)
+        if (FloorNumber >= 5)
         {
-            Debug.LogError("Se alcanzo el limite de pisos.", this);
-            return false;
+            if (!Application.CanStreamedLevelBeLoaded(villageSceneName))
+            {
+                Debug.LogError("Falta VillageMenuScene en el perfil de compilacion.", this);
+                return false;
+            }
+            settlementRequested = true;
+            playerSync.World.Loot.Settle(success => { if (success && IsRunning) PublishCompletion(); });
+            return true;
         }
         if (!hostGenerator.TryCreateFloor(BaseSeed, FloorNumber + 1, RunId, out MultiplayerFloorData data, out string error))
         {
@@ -231,6 +242,14 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         settlementRequested = true;
         playerSync.World.Loot.Settle(success => { if (success && IsRunning) PublishNextFloor(data); });
         return true;
+    }
+
+    private void PublishCompletion()
+    {
+        publicationPending = true;
+        BeginTransition("Partida completada. Regresando a la aldea...");
+        if (!Publish(MultiplayerRunPhase.Completed, string.Empty, string.Empty))
+            FailRun("No se pudo publicar el final de la partida.");
     }
 
     private void PublishNextFloor(MultiplayerFloorData data)
@@ -265,8 +284,10 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         if (string.IsNullOrEmpty(id)) return;
         if (!Guid.TryParse(id, out _) || !(properties[SeedKey] is int seed) || !RunSeedSettings.IsValid(seed) ||
             !(properties[FloorKey] is int number) || number < 1 || !(properties[PhaseKey] is int state) ||
-            state < 1 || state > (int)MultiplayerRunPhase.Ending)
+            state < 1 || state > (int)MultiplayerRunPhase.Completed)
         { ReportBuildFailed("El estado de la partida recibido no es valido."); return; }
+        // Una partida ya terminada nunca debe iniciar otra carga desde la aldea.
+        if (!activeRun && state >= (int)MultiplayerRunPhase.Ending) return;
         if (activeRun && (id != RunId || number < FloorNumber)) return;
         if (!activeRun && SceneManager.GetActiveScene().name != villageSceneName) return;
         if (activeRun && number == FloorNumber && state < (int)Phase) return;
@@ -286,6 +307,12 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         {
             if (newFloor) { buildRequestedKey = localBuiltKey = reportedFailureKey = null; publishingPlaying = false; }
             BeginTransition("Cargando el piso " + FloorNumber + "...");
+        }
+        if (Phase == MultiplayerRunPhase.Completed)
+        {
+            completedRun = true;
+            ReturnToVillage(string.Empty);
+            return;
         }
         if (Phase == MultiplayerRunPhase.Ending)
         {
@@ -348,7 +375,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void CheckParticipants()
     {
-        if (!IsRunning || party == null || !party.IsHost || !party.IsInParty || PhotonNetwork.CurrentRoom == null) return;
+        if (!IsRunning || ending || party == null || !party.IsHost || !party.IsInParty || PhotonNetwork.CurrentRoom == null) return;
         bool allReady = PhotonNetwork.CurrentRoom.PlayerCount >= 2;
         foreach (Player player in PhotonNetwork.CurrentRoom.Players.Values)
         {
@@ -382,7 +409,8 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void FailRun(string message)
     {
-        if (ending) return;
+        if (ending && !completedRun) return;
+        completedRun = false;
         runError = message;
         if (party != null && party.IsHost)
         {
@@ -410,6 +438,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     private void OnPartyEnded(PartyEndReason reason)
     {
         if (!activeRun && !ending) return;
+        completedRun = false;
         if (string.IsNullOrEmpty(runError)) runError = PartyRules.EndMessage(reason);
         pendingVillageNotice = runError;
         ReturnToVillage(runError);
@@ -423,6 +452,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
             // Respetar el boton existente para regresar al menu principal.
             if (returnRoutine != null) StopCoroutine(returnRoutine);
             returnRoutine = null;
+            NewestSingleton.CancelVillagePlayerReset();
             ReleasePlayer();
             ShowLoading(false, string.Empty);
             pendingVillageNotice = null;
@@ -560,20 +590,39 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private IEnumerator ReturnRoutine()
     {
+        yield return null; // Registrar returnRoutine antes de procesar posibles errores.
         if (sceneLoad != null && !sceneLoad.isDone) yield return sceneLoad;
         double until = Time.realtimeSinceStartupAsDouble + transitionTimeout;
         while (party != null && party.IsBusy && Time.realtimeSinceStartupAsDouble < until) yield return null;
+        bool resetPlayer = completedRun;
+        NewestSingleton previousPlayer = NewestSingleton.Instance;
         if (SceneManager.GetActiveScene().name != villageSceneName)
         {
             if (!Application.CanStreamedLevelBeLoaded(villageSceneName))
             {
-                Debug.LogError("Falta VillageMenuScene en el perfil de compilacion.", this);
-                ReleasePlayer(); ShowLoading(false, string.Empty); returnRoutine = null; yield break;
+                FailReturn("Falta VillageMenuScene en el perfil de compilacion.");
+                yield break;
             }
-            yield return SceneManager.LoadSceneAsync(villageSceneName);
+            if (resetPlayer) NewestSingleton.RequestVillagePlayerReset();
+            AsyncOperation villageLoad = null;
+            string loadError = null;
+            try { villageLoad = SceneManager.LoadSceneAsync(villageSceneName); }
+            catch (Exception exception) { loadError = exception.Message; }
+            if (villageLoad == null)
+            {
+                FailReturn("No se pudo regresar a la aldea: " + loadError);
+                yield break;
+            }
+            yield return villageLoad;
         }
         yield return null; // Dejar que termine el descarte del personaje duplicado de la aldea.
+        if (resetPlayer) NewestSingleton.CancelVillagePlayerReset();
         PlayerController player = MultiplayerStartingRoomSpawns.LocalPlayer;
+        if (resetPlayer && (player == null || ReferenceEquals(previousPlayer, NewestSingleton.Instance)))
+        {
+            FailReturn("No se encontro el personaje nuevo al regresar a la aldea.");
+            yield break;
+        }
         if (hasReturnPose && player != null)
         {
             NewestSingleton.Instance.transform.position += returnPosition - player.transform.position;
@@ -582,12 +631,89 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
             Physics.SyncTransforms();
         }
         ReleasePlayer();
+        if (completedRun)
+        {
+            // Las referencias congeladas pertenecian al personaje que acaba de destruirse.
+            FreezePlayer();
+            ShowLoading(true, "Esperando a la party en la aldea...");
+            yield return ConfirmVillageReturn();
+            ReleasePlayer();
+        }
+        if (resetPlayer && PhotonNetwork.InRoom)
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { ReturnedKey, null } });
         ShowLoading(false, string.Empty);
         if (TryConsumeVillageNotice(out string notice))
         {
             VillageMultiplayerMenu menu = FindFirstObjectByType<VillageMultiplayerMenu>();
             if (menu != null) menu.ShowExternalNotice(notice);
         }
+        ResetRunState();
+        returnRoutine = null;
+        // El host pudo iniciar otra partida mientras esta instancia terminaba el regreso.
+        if (resetPlayer) OnPartyChanged();
+    }
+
+    private IEnumerator ConfirmVillageReturn()
+    {
+        if (!PhotonNetwork.InRoom || !PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable
+            { { ReturnedKey, RunId }, { ReadyKey, null }, { FailureKey, null } }))
+        {
+            FailRun("No se pudo confirmar el regreso a la aldea.");
+            yield break;
+        }
+        double until = Time.realtimeSinceStartupAsDouble + transitionTimeout;
+        while (completedRun)
+        {
+            if (Time.realtimeSinceStartupAsDouble >= until)
+            {
+                FailRun("Se agoto la espera de regreso de la party a la aldea.");
+                yield break;
+            }
+            if (party == null || !party.IsInParty || PhotonNetwork.CurrentRoom == null)
+            {
+                // OnPartyEnded conserva el motivo original cuando termina la salida de Photon.
+                if (party != null && party.IsBusy) { yield return null; continue; }
+                FailRun("La party termino durante el regreso a la aldea.");
+                yield break;
+            }
+
+            string networkRun = PhotonNetwork.CurrentRoom.CustomProperties[RunKey] as string;
+            if (!string.IsNullOrEmpty(networkRun) && networkRun != RunId) yield break;
+            bool cleared = string.IsNullOrEmpty(networkRun);
+            // Conservar la party bloqueada; solo el menu del host puede reabrirla.
+            if (cleared && !party.IsBusy) yield break;
+            if (party.IsHost && PhotonNetwork.IsMasterClient)
+            {
+                if (!cleared && !completionClearRequested && AllPlayersReturned())
+                {
+                    completionClearRequested = true;
+                    if (!PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable
+                        { { RunKey, null }, { SeedKey, null }, { FloorKey, null },
+                          { PhaseKey, null }, { JsonKey, null }, { ErrorKey, null } }))
+                    {
+                        FailRun("No se pudo limpiar el estado de la partida completada.");
+                        yield break;
+                    }
+                }
+            }
+            yield return null;
+        }
+    }
+
+    private bool AllPlayersReturned()
+    {
+        foreach (Player player in PhotonNetwork.CurrentRoom.Players.Values)
+            if (!player.IsInactive && (player.CustomProperties[ReturnedKey] as string) != RunId) return false;
+        return true;
+    }
+
+    private void FailReturn(string message)
+    {
+        Debug.LogError(message, this);
+        NewestSingleton.CancelVillagePlayerReset();
+        if (completedRun) FailRun(message);
+        ReleasePlayer();
+        ShowLoading(false, string.Empty);
         ResetRunState();
         returnRoutine = null;
     }
@@ -597,6 +723,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         StopPlayerSync();
         activeRun = ending = publicationPending = publishingFirstFloor = publishingPlaying = false;
         readyRequestedKey = null; settlementRequested = false;
+        completedRun = completionClearRequested = false;
         RunId = string.Empty; BaseSeed = FloorNumber = 0; Phase = MultiplayerRunPhase.Idle;
         floorData = null; floorJson = string.Empty; runError = string.Empty;
         buildRequestedKey = localBuiltKey = reportedFailureKey = null;

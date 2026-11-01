@@ -9,6 +9,8 @@ public class DungeonInstructionsGenerator : MonoBehaviour
     private int floorNumber = 0;
     private int finalSeed;
 
+    public int FloorNumber => floorNumber;
+
     private int roomCount = 6; // Number of rooms to generate
     private int numberOfRoomPrefabs  = 8; // Number of room prefabs available
 
