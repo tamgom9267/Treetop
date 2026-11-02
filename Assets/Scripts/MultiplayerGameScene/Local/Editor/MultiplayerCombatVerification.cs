@@ -123,6 +123,7 @@ public static class MultiplayerCombatVerification
         Check(players.Initialize(run, out error), "Reinicializar coordinador es seguro");
         var world = players.World;
         world.Resume();
+        MultiplayerWeaponVerification.CheckPlayMode(world);
         var slimeChecks = MultiplayerSlimeVerification.CheckSlimes(world);
         while (slimeChecks.MoveNext()) yield return slimeChecks.Current;
         Property(run, "FloorNumber", 2); players.BeginFloor(run.RunId, 2);

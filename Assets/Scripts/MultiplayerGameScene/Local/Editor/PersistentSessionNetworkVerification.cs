@@ -42,6 +42,7 @@ public static class PersistentSessionNetworkVerification
             yield return Wait(() => peer.InRoom && service.Members.Count == 2, "Confirmar los dos integrantes");
             Require(service.IsHost, "El servicio conserva el rol host con dos clientes reales");
             yield return MultiplayerSlimeVerification.CheckNetwork(peer, service);
+            yield return MultiplayerWeaponVerification.CheckNetwork(peer);
 
             SceneManager.SetActiveScene(menu);
             yield return Wait(() => peer.InRoom && peer.CurrentRoom.CustomProperties["party.closing"] is bool closing && closing,

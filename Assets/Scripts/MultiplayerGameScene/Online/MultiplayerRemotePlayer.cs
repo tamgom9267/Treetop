@@ -18,7 +18,9 @@ public sealed class MultiplayerRemotePlayer : MonoBehaviour
     private bool actionPlaying;
     private float actionElapsed;
     private static readonly int Speed = Animator.StringToHash("Speed");
-    private static readonly int Attack = Animator.StringToHash("isAttacking");
+    private static readonly int SwordAttack = Animator.StringToHash("isAttackingSword");
+    private static readonly int SpearAttack = Animator.StringToHash("isAttackingSpear");
+    private static readonly int HammerAttack = Animator.StringToHash("isAttackingHammer");
 
     public Animator Animator => animator;
     public MultiplayerRemoteEquipment Equipment => equipment;
@@ -62,7 +64,7 @@ public sealed class MultiplayerRemotePlayer : MonoBehaviour
         if (visible)
         {
             animator.Rebind();
-            animator.ResetTrigger(Attack);
+            ResetAttackTriggers();
         }
     }
 
@@ -124,9 +126,17 @@ public sealed class MultiplayerRemotePlayer : MonoBehaviour
         {
             MultiplayerPlayerProtocol.Attack next = attacks.Dequeue();
             if (renderTime - next.pose.time > 0.75d) continue;
+            int trigger;
+            switch (next.item.id == 0 ? "sword" : next.item.type)
+            {
+                case "sword": trigger = SwordAttack; break;
+                case "spear": trigger = SpearAttack; break;
+                case "hammer": trigger = HammerAttack; break;
+                default: continue;
+            }
             equipment.BeginAction(next.item);
-            animator.ResetTrigger(Attack);
-            animator.SetTrigger(Attack);
+            ResetAttackTriggers();
+            animator.SetTrigger(trigger);
             actionPlaying = true;
             actionElapsed = 0f;
         }
@@ -135,6 +145,13 @@ public sealed class MultiplayerRemotePlayer : MonoBehaviour
             actionElapsed += deltaTime * animator.speed;
             if (actionElapsed > 1f) EndAttack(); // Respaldo si un clip no entrega su evento final.
         }
+    }
+
+    private void ResetAttackTriggers()
+    {
+        animator.ResetTrigger(SwordAttack);
+        animator.ResetTrigger(SpearAttack);
+        animator.ResetTrigger(HammerAttack);
     }
 
     // Nombres conservados para los Animation Events de los clips originales.

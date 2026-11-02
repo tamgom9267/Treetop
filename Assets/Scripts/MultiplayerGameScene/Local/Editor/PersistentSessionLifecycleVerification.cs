@@ -21,6 +21,7 @@ public static class PersistentSessionLifecycleVerification
     private const string RunningKey = "Treetop.LifecycleVerification.Running";
     private const string SetupKey = "Treetop.LifecycleVerification.Setup";
     private const string NetworkKey = "Treetop.LifecycleVerification.Network";
+    private const string NetworkOnlyKey = "Treetop.LifecycleVerification.NetworkOnly";
     private const string VillageReturnKey = "Treetop.LifecycleVerification.VillageReturn";
     private static string ReportPath => Path.GetFullPath(Path.Combine(Application.dataPath, "../Temp/lifecycle-verification/results.json"));
     private static readonly List<string> passed = new List<string>();
@@ -50,6 +51,7 @@ public static class PersistentSessionLifecycleVerification
         SessionState.SetString(SetupKey, JsonUtility.ToJson(new Setup { scenes = EditorSceneManager.GetSceneManagerSetup() }));
         SessionState.SetBool(RunningKey, true);
         SessionState.SetBool(NetworkKey, false);
+        SessionState.SetBool(NetworkOnlyKey, false);
         SessionState.SetBool(VillageReturnKey, false);
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         EditorApplication.isPlaying = true;
@@ -71,6 +73,23 @@ public static class PersistentSessionLifecycleVerification
         SessionState.SetBool(NetworkKey, true);
     }
 
+    [MenuItem("Tools/Multiplayer/Probar red y transferencia de armas")]
+    public static void RunNetworkOnly()
+    {
+        MultiplayerWeaponVerification.RunChecks();
+        RunChecks();
+        SessionState.SetBool(NetworkKey, true);
+        SessionState.SetBool(NetworkOnlyKey, true);
+    }
+
+    private static IEnumerator CheckNetworkOnly()
+    {
+        Scene village = SceneManager.CreateScene("VillageMenuScene");
+        SceneManager.CreateScene("StartMenuScene");
+        SceneManager.SetActiveScene(village);
+        yield return PersistentSessionNetworkVerification.RunChecks();
+    }
+
     private static void OnPlayModeChanged(PlayModeStateChange state)
     {
         if (!SessionState.GetBool(RunningKey, false)) return;
@@ -81,7 +100,8 @@ public static class PersistentSessionLifecycleVerification
             EditorApplication.isPaused = Application.isBatchMode;
             passed.Clear(); failure = null; routines.Clear(); lastFrame = -1;
             startedAt = EditorApplication.timeSinceStartup;
-            routines.Push(SessionState.GetBool(VillageReturnKey, false) ? CheckProjectScenes() : CheckLifecycle());
+            routines.Push(SessionState.GetBool(NetworkOnlyKey, false) ? CheckNetworkOnly() :
+                SessionState.GetBool(VillageReturnKey, false) ? CheckProjectScenes() : CheckLifecycle());
             EditorApplication.update += Tick;
         }
         if (state != PlayModeStateChange.EnteredEditMode) return;

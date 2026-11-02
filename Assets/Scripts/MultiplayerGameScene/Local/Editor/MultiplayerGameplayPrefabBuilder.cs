@@ -31,6 +31,7 @@ public static class MultiplayerGameplayPrefabBuilder
     public static void CreatePrefabs()
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Sal de Play para preparar los prefabs.");
+        MultiplayerPlayerPrefabBuilder.CreateMissingPrefabs();
         foreach (string role in new[] { "Host", "Client" })
         {
             Folder(Root + "/" + role + "/Cuartos"); Folder(Root + "/" + role + "/Enemigos");
@@ -73,6 +74,7 @@ public static class MultiplayerGameplayPrefabBuilder
             }
             foreach (InventoryObject item in root.GetComponentsInChildren<InventoryObject>(true))
             {
+                if (!MultiplayerLootSession.IsRootItem(item)) continue;
                 var identity = item.gameObject.AddComponent<MultiplayerItemIdentity>();
                 var serialized = new SerializedObject(identity);
                 serialized.FindProperty("embeddedId").stringValue = id + ":loot:" + AnimationUtility.CalculateTransformPath(item.transform, root.transform);
@@ -167,7 +169,7 @@ public static class MultiplayerGameplayPrefabBuilder
             InventoryObject item = source != null ? source.GetComponent<InventoryObject>() : null; if (item == null) continue;
             WeaponObject weapon = item as WeaponObject;
             if (weapon != null ? weapon.weaponData == null || !weapons.Add(weapon.weaponData) : !generic.Add(item.Objectname ?? item.Name)) continue;
-            string type = weapon != null && weapon.weaponData.name == "Sword" ? "sword" : AssetDatabase.AssetPathToGUID(path);
+            string type = (weapon != null ? MultiplayerPlayerPrefabBuilder.WeaponType(weapon.weaponData) : null) ?? AssetDatabase.AssetPathToGUID(path);
             string destination = Root + "/Local/Loot/" + type + ".prefab";
             if (!File.Exists(destination))
             {
@@ -186,6 +188,40 @@ public static class MultiplayerGameplayPrefabBuilder
         }
         if (result.Count == 0) throw new InvalidOperationException("No se encontraron prefabs de objetos de inventario.");
         return result;
+    }
+
+    // Actualiza solo el loot; conserva las referencias de UI y del resto del coordinador.
+    public static void UpdateLootCatalog()
+    {
+        string path = MultiplayerPlayerPrefabBuilder.LocalPath;
+        var definitions = BuildLoot();
+        GameObject root = PrefabUtility.LoadPrefabContents(path);
+        try { if (MergeLootCatalog(root, definitions)) Save(root, path); }
+        finally { PrefabUtility.UnloadPrefabContents(root); }
+    }
+
+    private static bool MergeLootCatalog(GameObject root, List<MultiplayerLootDefinition> definitions)
+    {
+        var loot = new SerializedObject(root.GetComponent<MultiplayerLootSession>());
+        var entries = loot.FindProperty("catalog");
+        foreach (var definition in definitions)
+        {
+            SerializedProperty entry = null;
+            for (int i = 0; i < entries.arraySize; i++)
+            {
+                var candidate = entries.GetArrayElementAtIndex(i);
+                if (candidate.FindPropertyRelative("type").stringValue == definition.type ||
+                    definition.weapon != null && candidate.FindPropertyRelative("weapon").objectReferenceValue == definition.weapon)
+                { entry = candidate; break; }
+            }
+            if (entry == null) { entries.arraySize++; entry = entries.GetArrayElementAtIndex(entries.arraySize - 1); }
+            entry.FindPropertyRelative("type").stringValue = definition.type;
+            entry.FindPropertyRelative("prefab").objectReferenceValue = definition.prefab;
+            entry.FindPropertyRelative("weapon").objectReferenceValue = definition.weapon;
+            entry.FindPropertyRelative("objectName").stringValue = definition.objectName;
+            entry.FindPropertyRelative("icon").objectReferenceValue = definition.icon;
+        }
+        return loot.ApplyModifiedPropertiesWithoutUndo();
     }
     private static void ConfigureCoordinator(List<MultiplayerLootDefinition> definitions)
     {
@@ -210,18 +246,7 @@ public static class MultiplayerGameplayPrefabBuilder
                 adapter.FindProperty(mapping[0]).stringValue = AnimationUtility.CalculateTransformPath(target.transform, inventory.transform);
             }
             adapter.ApplyModifiedPropertiesWithoutUndo();
-            var loot = new SerializedObject(root.GetComponent<MultiplayerLootSession>());
-            var entries = loot.FindProperty("catalog"); entries.arraySize = definitions.Count;
-            for (int i = 0; i < definitions.Count; i++)
-            {
-                var entry = entries.GetArrayElementAtIndex(i); var definition = definitions[i];
-                entry.FindPropertyRelative("type").stringValue = definition.type;
-                entry.FindPropertyRelative("prefab").objectReferenceValue = definition.prefab;
-                entry.FindPropertyRelative("weapon").objectReferenceValue = definition.weapon;
-                entry.FindPropertyRelative("objectName").stringValue = definition.objectName;
-                entry.FindPropertyRelative("icon").objectReferenceValue = definition.icon;
-            }
-            loot.ApplyModifiedPropertiesWithoutUndo(); Save(root, path);
+            MergeLootCatalog(root, definitions); Save(root, path);
         }
         finally { if (root != null) PrefabUtility.UnloadPrefabContents(root); EditorSceneManager.ClosePreviewScene(preview); }
     }

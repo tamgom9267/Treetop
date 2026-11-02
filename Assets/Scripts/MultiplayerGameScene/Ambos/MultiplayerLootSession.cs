@@ -79,12 +79,16 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
     private MultiplayerLootDefinition Definition(string type)
     { foreach (var entry in catalog) if (entry.type == type) return entry; return null; }
     private bool LocalHeld(InventoryObject item) => player.Inventory.Inventory.Contains(item.gameObject) || player.Inventory.Loot.Contains(item.gameObject) || player.weapon == item.gameObject;
+    // Algunos modelos contienen un WeaponObject deshabilitado, ademas del objeto raiz.
+    // No son objetos independientes ni deben recibir identidad o propiedad de red.
+    public static bool IsRootItem(InventoryObject item) => item != null &&
+        (item.transform.parent == null || item.transform.parent.GetComponentInParent<InventoryObject>(true) == null);
     private void Scan()
     {
         if (!initialized || player == null) return;
         foreach (var item in FindObjectsByType<InventoryObject>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            if (item == null || item is WeaponObject equipped && equipped.inHand || item.gameObject == (player.EquippedWeaponInstance != null ? player.EquippedWeaponInstance.gameObject : null)) continue;
+            if (!IsRootItem(item) || item is WeaponObject equipped && equipped.inHand || item.gameObject == (player.EquippedWeaponInstance != null ? player.EquippedWeaponInstance.gameObject : null)) continue;
             bool held = LocalHeld(item);
             bool inWorld = item.gameObject.scene == SceneManager.GetActiveScene() && item.gameObject.activeInHierarchy && !item.transform.IsChildOf(player.transform);
             if (!held && !inWorld) continue;

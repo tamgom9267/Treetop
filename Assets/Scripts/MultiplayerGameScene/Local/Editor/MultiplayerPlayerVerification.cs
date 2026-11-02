@@ -24,6 +24,7 @@ public static class MultiplayerPlayerVerification
             Check(true, "Prefabs completos, sin fisica, scripts de gameplay ni tags Player/Weapon");
             CheckProtocol();
             CheckReplicas();
+            CheckWeaponReplicas();
             WriteReport(true, string.Empty);
             Debug.Log("FASE 3: " + passed.Count + " pruebas nativas correctas. Informe: Temp/phase3-verification/editor-tests.json");
         }
@@ -136,10 +137,10 @@ public static class MultiplayerPlayerVerification
             Check(first.Animator.GetCurrentAnimatorStateInfo(1).IsName("Armature_Attack_Sword") ||
                 first.Animator.GetNextAnimatorStateInfo(1).IsName("Armature_Attack_Sword"), "Trigger activa el ataque de espada existente");
             first.EnableWeaponCollider();
-            Check(Array.Exists(first.Equipment.Hand.GetComponentsInChildren<TrailRenderer>(true), trail => trail.emitting),
+            Check(HasActiveEffect(first),
                 "Evento de ataque activa la estela visual");
             first.EndAttack();
-            Check(!Array.Exists(first.Equipment.Hand.GetComponentsInChildren<TrailRenderer>(true), trail => trail.emitting),
+            Check(!HasActiveEffect(first),
                 "Fin de ataque limpia todas las estelas");
             first.SetPlaying(false);
             Check(!first.gameObject.activeSelf, "Transicion oculta la replica");
@@ -154,6 +155,57 @@ public static class MultiplayerPlayerVerification
         foreach (MultiplayerWeaponVisual visual in remote.Equipment.Hand.GetComponentsInChildren<MultiplayerWeaponVisual>(true))
             if (visual.gameObject.activeSelf) count++;
         return count;
+    }
+
+    private static bool HasActiveEffect(MultiplayerRemotePlayer remote) =>
+        Array.Exists(remote.Equipment.Hand.GetComponentsInChildren<TrailRenderer>(true), trail => trail.emitting) ||
+        Array.Exists(remote.Equipment.Hand.GetComponentsInChildren<ParticleSystem>(true), particle => particle.isEmitting);
+
+    private static void CheckWeaponReplicas()
+    {
+        Scene preview = EditorSceneManager.NewPreviewScene();
+        try
+        {
+            var types = MultiplayerPlayerPrefabBuilder.WeaponTypes;
+            var catalog = new MultiplayerVisualDefinition[types.Length];
+            for (int i = 0; i < types.Length; i++) catalog[i] = new MultiplayerVisualDefinition
+            {
+                typeId = types[i], localWeapon = MultiplayerPlayerPrefabBuilder.WeaponData(types[i]),
+                remotePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(MultiplayerPlayerPrefabBuilder.VisualPath(types[i])).GetComponent<MultiplayerWeaponVisual>()
+            };
+            foreach (string type in types)
+            {
+                var remote = ((GameObject)PrefabUtility.InstantiatePrefab(
+                    AssetDatabase.LoadAssetAtPath<GameObject>(MultiplayerPlayerPrefabBuilder.RemotePath), preview)).GetComponent<MultiplayerRemotePlayer>();
+                remote.Initialize(catalog, 0.1f);
+                remote.ReceiveEquipment(new MultiplayerPlayerProtocol.Equipment { pose = Pose(), equippedId = 1,
+                    items = new[] { new MultiplayerPlayerProtocol.Item(1, type) } });
+                remote.SetPlaying(true);
+                remote.Animator.Update(0f);
+                var action = new MultiplayerPlayerProtocol.Attack { pose = Pose(2, 100.1d), item = new MultiplayerPlayerProtocol.Item(2, type) };
+                Check(remote.ReceiveAttack(action) && !remote.ReceiveAttack(action), type + ": ataque unico antes del estado de equipo");
+                remote.RenderFrame(100.21d, 0f);
+                remote.Animator.Update(0.02f);
+                string state = "Armature_Attack_" + char.ToUpperInvariant(type[0]) + type.Substring(1);
+                Check(remote.Animator.GetCurrentAnimatorStateInfo(1).IsName(state) || remote.Animator.GetNextAnimatorStateInfo(1).IsName(state),
+                    type + ": reproduce su propia animacion");
+                Check(VisibleWeapons(remote) == 1 && remote.Equipment.CachedCount == 2, type + ": el ataque conserva su modelo independiente");
+                // Soltar el arma durante la accion no elimina su visual antes del evento final.
+                remote.ReceiveEquipment(new MultiplayerPlayerProtocol.Equipment { pose = Pose(3, 100.2d) });
+                Check(VisibleWeapons(remote) == 1 && remote.Equipment.CachedCount == 1, type + ": soltar durante ataque conserva solo la accion");
+                var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>("Assets/Animation/Player/" + state + ".anim");
+                Check(Array.Exists(AnimationUtility.GetAnimationEvents(clip), ev => ev.functionName == "EndAttack") &&
+                    Array.Exists(AnimationUtility.GetAnimationEvents(clip), ev => ev.functionName == "EnableWeaponCollider"),
+                    type + ": clip conserva ambos eventos de ataque");
+                // Unity no despacha Animation Events de gameplay en una escena preview de Edit Mode.
+                remote.EndAttack();
+                Check(VisibleWeapons(remote) == 0 && remote.Equipment.CachedCount == 0, type + ": evento final limpia el arma soltada");
+                remote.ResetForFloor();
+                Check(!remote.HasInitialState && !remote.gameObject.activeSelf, type + ": cambio de piso descarta la replica anterior");
+                UnityEngine.Object.DestroyImmediate(remote.gameObject);
+            }
+        }
+        finally { EditorSceneManager.ClosePreviewScene(preview); }
     }
 
     private static void Check(bool condition, string message)

@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -14,6 +15,9 @@ public static class MultiplayerPlayerPrefabBuilder
     public const string LocalPath = Root + "/Local/MultiplayerPlayers.prefab";
     public const string RemotePath = Root + "/Online/RemotePlayer.prefab";
     public const string SwordPath = Root + "/Online/Weapons/SwordVisual.prefab";
+    public const string SpearPath = Root + "/Online/Weapons/SpearVisual.prefab";
+    public const string HammerPath = Root + "/Online/Weapons/HammerVisual.prefab";
+    public static readonly string[] WeaponTypes = { "sword", "spear", "hammer" };
     private const string SourceScene = "Assets/Scenes/VillageMenuScene.unity";
     private const string SwordDataPath = "Assets/Scripts/Inventory/Sword.asset";
 
@@ -21,8 +25,8 @@ public static class MultiplayerPlayerPrefabBuilder
     private static void ScheduleMissingPrefabs()
     {
         // La primera importacion deja lista la integracion sin agregar componentes a escenas.
-        if (!File.Exists(LocalPath) || !File.Exists(RemotePath) || !File.Exists(SwordPath))
-            EditorApplication.delayCall += CreateWhenIdle;
+        // Tambien completa catalogos de proyectos que ya tenian los prefabs de espada.
+        EditorApplication.delayCall += CreateWhenIdle;
     }
 
     private static void CreateWhenIdle()
@@ -48,19 +52,71 @@ public static class MultiplayerPlayerPrefabBuilder
         Scene preview = EditorSceneManager.OpenPreviewScene(SourceScene);
         try
         {
-            if (!File.Exists(SwordPath)) CreateSword(swordData, preview);
+            foreach (string type in WeaponTypes)
+            {
+                if (!File.Exists(VisualPath(type))) CreateWeaponVisual(WeaponData(type), type, preview);
+                else CleanWeaponVisual(VisualPath(type));
+            }
             if (!File.Exists(RemotePath)) CreateRemote(preview);
             if (!File.Exists(LocalPath)) CreateCoordinator(swordData, preview);
+            UpdateVisualCatalog();
+            MultiplayerGameplayPrefabBuilder.UpdateLootCatalog();
         }
         finally { EditorSceneManager.ClosePreviewScene(preview); }
         ValidatePrefabs();
         Debug.Log("FASE 3: prefabs de jugadores creados y validados. No se guardaron escenas ni se modificaron prefabs originales.");
     }
 
-    private static void CreateSword(ObjectData data, Scene preview)
+    public static ObjectData WeaponData(string type)
+    {
+        string name = char.ToUpperInvariant(type[0]) + type.Substring(1);
+        ObjectData data = AssetDatabase.LoadAssetAtPath<ObjectData>("Assets/Scripts/Inventory/" + name + ".asset");
+        if (data == null || data.prefab == null) throw new InvalidOperationException("Falta el arma: " + type);
+        return data;
+    }
+
+    public static string VisualPath(string type) => Root + "/Online/Weapons/" +
+        char.ToUpperInvariant(type[0]) + type.Substring(1) + "Visual.prefab";
+
+    public static string WeaponType(ObjectData data)
+    {
+        foreach (string type in WeaponTypes) if (WeaponData(type) == data) return type;
+        return null;
+    }
+
+    private static void UpdateVisualCatalog()
+    {
+        GameObject root = PrefabUtility.LoadPrefabContents(LocalPath);
+        try
+        {
+            var serialized = new SerializedObject(root.GetComponent<MultiplayerPlayers>());
+            var catalog = serialized.FindProperty("catalog");
+            foreach (string type in WeaponTypes)
+            {
+                ObjectData data = WeaponData(type);
+                SerializedProperty entry = null;
+                for (int i = 0; i < catalog.arraySize; i++)
+                {
+                    var candidate = catalog.GetArrayElementAtIndex(i);
+                    if (candidate.FindPropertyRelative("typeId").stringValue == type ||
+                        candidate.FindPropertyRelative("localWeapon").objectReferenceValue == data)
+                    { entry = candidate; break; }
+                }
+                if (entry == null) { catalog.arraySize++; entry = catalog.GetArrayElementAtIndex(catalog.arraySize - 1); }
+                entry.FindPropertyRelative("typeId").stringValue = type;
+                entry.FindPropertyRelative("localWeapon").objectReferenceValue = data;
+                entry.FindPropertyRelative("remotePrefab").objectReferenceValue =
+                    AssetDatabase.LoadAssetAtPath<GameObject>(VisualPath(type)).GetComponent<MultiplayerWeaponVisual>();
+            }
+            if (serialized.ApplyModifiedPropertiesWithoutUndo()) PrefabUtility.SaveAsPrefabAsset(root, LocalPath);
+        }
+        finally { PrefabUtility.UnloadPrefabContents(root); }
+    }
+
+    private static void CreateWeaponVisual(ObjectData data, string type, Scene preview)
     {
         GameObject copy = (GameObject)PrefabUtility.InstantiatePrefab(data.prefab, preview);
-        copy.name = "SwordVisual";
+        copy.name = char.ToUpperInvariant(type[0]) + type.Substring(1) + "Visual";
         copy.SetActive(false);
         if (PrefabUtility.IsPartOfPrefabInstance(copy))
             PrefabUtility.UnpackPrefabInstance(copy, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
@@ -70,7 +126,24 @@ public static class MultiplayerPlayerPrefabBuilder
         MultiplayerWeaponVisual visual = copy.AddComponent<MultiplayerWeaponVisual>();
         visual.SetTrail(false);
         copy.SetActive(true);
-        Save(copy, SwordPath);
+        Save(copy, VisualPath(type));
+    }
+
+    private static void CleanWeaponVisual(string path)
+    {
+        GameObject root = PrefabUtility.LoadPrefabContents(path);
+        try
+        {
+            bool dirty = root.GetComponentsInChildren<Canvas>(true).Length != 0 ||
+                root.GetComponentsInChildren<MonoBehaviour>(true).Any(component => !(component is MultiplayerWeaponVisual)) ||
+                root.GetComponentsInChildren<Collider>(true).Length != 0 || root.GetComponentsInChildren<Rigidbody>(true).Length != 0;
+            if (!dirty) return;
+            foreach (Canvas canvas in root.GetComponentsInChildren<Canvas>(true)) Object.DestroyImmediate(canvas.gameObject);
+            StripGameplay(root, true);
+            if (root.GetComponent<MultiplayerWeaponVisual>() == null) root.AddComponent<MultiplayerWeaponVisual>();
+            PrefabUtility.SaveAsPrefabAsset(root, path);
+        }
+        finally { PrefabUtility.UnloadPrefabContents(root); }
     }
 
     private static void CreateRemote(Scene preview)
@@ -127,9 +200,10 @@ public static class MultiplayerPlayerPrefabBuilder
         Save(root, LocalPath);
     }
 
-    private static void StripGameplay(GameObject root)
+    private static void StripGameplay(GameObject root, bool keepWeaponVisual = false)
     {
-        foreach (MonoBehaviour behaviour in root.GetComponentsInChildren<MonoBehaviour>(true)) Object.DestroyImmediate(behaviour);
+        foreach (MonoBehaviour behaviour in root.GetComponentsInChildren<MonoBehaviour>(true))
+            if (!(keepWeaponVisual && behaviour is MultiplayerWeaponVisual)) Object.DestroyImmediate(behaviour);
         foreach (Collider collider in root.GetComponentsInChildren<Collider>(true)) Object.DestroyImmediate(collider);
         foreach (Rigidbody body in root.GetComponentsInChildren<Rigidbody>(true)) Object.DestroyImmediate(body);
         foreach (Camera camera in root.GetComponentsInChildren<Camera>(true)) Object.DestroyImmediate(camera);
@@ -161,7 +235,12 @@ public static class MultiplayerPlayerPrefabBuilder
             !local.GetComponent<MultiplayerPlayers>().ValidateAssets(out string error))
             throw new InvalidOperationException("Prefab Local incompleto. Revisa RemotePlayer y el catalogo visual.");
         ValidateVisual(RemotePath, true);
-        ValidateVisual(SwordPath, false);
+        foreach (string type in WeaponTypes)
+        {
+            ValidateVisual(VisualPath(type), false);
+            if (!local.GetComponent<MultiplayerPlayers>().TryGetType(WeaponData(type), out string registered) || registered != type)
+                throw new InvalidOperationException("Arma ausente del catalogo visual: " + type);
+        }
     }
 
     private static void ValidateVisual(string path, bool player)
