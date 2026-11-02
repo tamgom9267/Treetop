@@ -402,7 +402,7 @@ public static class PersistentSessionLifecycleVerification
         }
         NewestSingleton previous = NewestSingleton.Instance;
         PlayerController controller = MultiplayerStartingRoomSpawns.LocalPlayer;
-        WeaponData data = AssetDatabase.LoadAssetAtPath<WeaponData>("Assets/Scripts/Inventory/Sword.asset");
+        ObjectData data = AssetDatabase.LoadAssetAtPath<ObjectData>("Assets/Scripts/Inventory/Sword.asset");
         GameObject storedWeapon = Object.Instantiate(data.prefab, controller.transform);
         storedWeapon.SetActive(false);
         controller.Inventory.Inventory.Add(storedWeapon);

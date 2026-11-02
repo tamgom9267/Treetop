@@ -133,7 +133,7 @@ public static class MultiplayerGameplayPrefabBuilder
     private static List<MultiplayerLootDefinition> BuildLoot()
     {
         Folder(Root + "/Local/Loot");
-        var result = new List<MultiplayerLootDefinition>(); var weapons = new HashSet<WeaponData>(); var generic = new HashSet<string>();
+        var result = new List<MultiplayerLootDefinition>(); var weapons = new HashSet<ObjectData>(); var generic = new HashSet<string>();
         var candidates = new List<string>();
         foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { Source + "/Armas", "Assets/Prefab" })) candidates.Add(AssetDatabase.GUIDToAssetPath(guid));
         candidates.Sort((a,b) => { int order = b.StartsWith(Source, StringComparison.Ordinal).CompareTo(a.StartsWith(Source, StringComparison.Ordinal)); return order != 0 ? order : string.CompareOrdinal(a,b); });

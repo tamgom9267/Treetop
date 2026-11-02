@@ -63,7 +63,7 @@ public sealed class MultiplayerLootDefinition
 {
     public string type;
     public GameObject prefab;
-    public WeaponData weapon;
+    public ObjectData weapon;
     public string objectName;
     public Sprite icon;
 }

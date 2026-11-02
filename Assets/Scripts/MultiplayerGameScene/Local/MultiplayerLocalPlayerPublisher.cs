@@ -9,7 +9,7 @@ public sealed class MultiplayerLocalPlayerPublisher : MonoBehaviour
     private MultiplayerPlayers owner;
     private PlayerController player;
     private readonly Dictionary<GameObject, int> itemIds = new Dictionary<GameObject, int>();
-    private readonly HashSet<WeaponData> warnedWeapons = new HashSet<WeaponData>();
+    private readonly HashSet<ObjectData> warnedWeapons = new HashSet<ObjectData>();
     private readonly List<GameObject> deadItems = new List<GameObject>();
     private readonly List<MultiplayerPlayerProtocol.Item> inventory = new List<MultiplayerPlayerProtocol.Item>();
     private readonly HashSet<int> scannedIds = new HashSet<int>();
