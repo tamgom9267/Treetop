@@ -13,7 +13,6 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     [SerializeField] private Renderer rend;
     [SerializeField] private Color flashColor = Color.red;
     [SerializeField] private float flashDuration = 0.1f;
-    [SerializeField] private float hitStopDuration = 0.08f;
     [Header("Visual Effects")]
     [SerializeField] private GameObject hitEffectPrefab, deathEffectPrefab;
     [SerializeField] private Vector3 deathEffectOffset = Vector3.zero;
@@ -25,8 +24,6 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     private Material[] materials;
     private Color[] colors;
     private Coroutine flash;
-    private Coroutine delayedImpulse;
-    public float HitStopDuration => hitStopDuration;
     private int localActor, hostActor, frameRevision, lastAnimation, lastHitActor, lastHitAttack;
     private int motionActor, motionAttack, motionVersion, receivedSequence, localSequence;
     private int pendingAttack, pendingBaseVersion;
@@ -71,11 +68,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (rend != null)
         {
             materials = rend.materials; colors = new Color[materials.Length];
-            for (int i = 0; i < colors.Length; i++)
-            {
-                materials[i].EnableKeyword("_EMISSION");
-                colors[i] = materials[i].GetColor("_EmissionColor");
-            }
+            for (int i = 0; i < colors.Length; i++) colors[i] = materials[i].color;
         }
     }
     public void Initialize(MultiplayerWorldSession owner, string id, string room, int type)
@@ -120,13 +113,13 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     private void GroundContact()
     {
         lastGroundAt = Time.fixedTimeAsDouble;
-        if (delayedImpulse == null && SimulatesMotion && KnockbackActive && leftGround &&
+        if (SimulatesMotion && KnockbackActive && leftGround &&
             Time.fixedTimeAsDouble - impulseFixedAt >= 0.05d && body.linearVelocity.y <= 0.1f)
             FinishKnockback();
     }
     private void FixedUpdate()
     {
-        if (delayedImpulse != null || !SimulatesMotion || !KnockbackActive || world == null || !world.Playing) return;
+        if (!SimulatesMotion || !KnockbackActive || world == null || !world.Playing) return;
         if (Time.fixedTimeAsDouble - impulseFixedAt >= 0.04d &&
             Time.fixedTimeAsDouble - lastGroundAt > Time.fixedDeltaTime * 1.5d) leftGround = true;
     }
@@ -154,23 +147,6 @@ public sealed class MultiplayerEnemy : MonoBehaviour
             body.AddForce((direction.normalized * knockbackForce + Vector3.up * knockbackUpForce) * weaponKnockbackMultiplier, ForceMode.Impulse);
         StartGroundDetection();
     }
-    private void ScheduleImpulse(Vector3 origin)
-    {
-        CancelImpulse();
-        body.linearVelocity = Vector3.zero;
-        delayedImpulse = StartCoroutine(ApplyImpulseAfterHitStop(origin));
-    }
-    private IEnumerator ApplyImpulseAfterHitStop(Vector3 origin)
-    {
-        yield return new WaitForSecondsRealtime(hitStopDuration);
-        delayedImpulse = null;
-        if (SimulatesMotion && KnockbackActive && world != null && world.Playing) ApplyImpulse(origin);
-    }
-    private void CancelImpulse()
-    {
-        if (delayedImpulse != null) StopCoroutine(delayedImpulse);
-        delayedImpulse = null;
-    }
     private void ShowHit(Vector3 origin)
     {
         ShowFlash();
@@ -185,7 +161,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         localSequence = 0; localLanded = false; localFinal = null; motionBlocked = false; frames.Clear(); correctionAt = double.NegativeInfinity;
         Vector3 start = transform.position; Quaternion rotation = transform.rotation;
         SetPhysics(true); body.position = start; body.rotation = rotation;
-        ScheduleImpulse(origin); ShowHit(origin);
+        ApplyImpulse(origin); ShowHit(origin);
         return true;
     }
     public void TakeAuthoritativeHit(int damage, Vector3 origin, int actor = 0, int attack = 0)
@@ -206,8 +182,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         latestMotion = new MultiplayerSlimeMotion { id = Id, actor = actor, attack = attack, position = start,
             rotation = transform.rotation, time = PhotonNetwork.Time };
         SetPhysics(SimulatesMotion);
-        CancelImpulse();
-        if (SimulatesMotion) ScheduleImpulse(origin);
+        if (SimulatesMotion) ApplyImpulse(origin);
     }
     private void RetireCurrentControl()
     {
@@ -351,7 +326,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     public void RejectLocalKnockback(int actor, int attack)
     {
         if (actor != localActor || attack != pendingAttack || pendingAttack <= 0) return;
-        CancelImpulse(); pendingAttack = 0; localLanded = false; motionBlocked = true; SetPhysics(false);
+        pendingAttack = 0; localLanded = false; motionBlocked = true; SetPhysics(false);
         StartCorrection();
     }
     private void FinishKnockback(bool landed = true)
@@ -371,7 +346,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     public void ReturnMotionToHost(MultiplayerSlimeMotion final, bool landed)
     {
         if (!authority || deathStarted) return;
-        CancelImpulse(); RetireCurrentControl();
+        RetireCurrentControl();
         if (final != null) latestMotion = final;
         motionActor = hostActor; motionAttack = 0; motionVersion++; knockbackActive = !landed;
         pendingAttack = 0; localLanded = false; motionBlocked = false; receivedSequence = 0; frames.Clear(); candidates.Clear();
@@ -382,7 +357,6 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     public void RecoverMotionToHost() { ReturnMotionToHost(latestMotion, false); }
     public void SuspendMotion()
     {
-        CancelImpulse();
         suspended = true; pendingAttack = 0; localLanded = false; motionBlocked = true;
         candidates.Clear(); frames.Clear(); anticipatedHits.Clear(); retiredControls.Clear();
         correctionAt = double.NegativeInfinity; SetPhysics(false);
@@ -421,7 +395,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     private void BeginConfirmedDeath()
     {
         if (deathStarted) return;
-        CancelImpulse(); deathStarted = true; pendingAttack = 0; knockbackActive = false;
+        deathStarted = true; pendingAttack = 0; knockbackActive = false;
         candidates.Clear(); frames.Clear(); localLanded = false; PauseAI();
         if (!body.isKinematic) { body.linearVelocity = Vector3.zero; body.angularVelocity = Vector3.zero; }
         SetPhysics(false);
@@ -437,9 +411,9 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     private void ShowFlash() { if (materials == null) return; if (flash != null) StopCoroutine(flash); flash = StartCoroutine(Flash()); }
     private IEnumerator Flash()
     {
-        for (int i = 0; i < materials.Length; i++) materials[i].SetColor("_EmissionColor", flashColor);
-        yield return new WaitForSeconds(flashDuration);
-        for (int i = 0; i < materials.Length; i++) materials[i].SetColor("_EmissionColor", colors[i]);
+        for (int i = 0; i < materials.Length; i++) materials[i].color = flashColor;
+        yield return new WaitForSecondsRealtime(flashDuration);
+        for (int i = 0; i < materials.Length; i++) materials[i].color = colors[i];
         flash = null;
     }
     private void OnDisable() { SuspendMotion(); }

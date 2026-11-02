@@ -12,9 +12,11 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
     [SerializeField] private string lootImagesPath, lootSlotsPath;
     private static readonly FieldInfo Moving = typeof(PlayerInventory).GetField("isMoving", BindingFlags.Instance | BindingFlags.NonPublic);
     private static readonly FieldInfo DragImage = typeof(PlayerInventory).GetField("SpriteObject", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static readonly FieldInfo HitDuration = typeof(PlayerController).GetField("receivedHitStopDuration", BindingFlags.Instance | BindingFlags.NonPublic);
     private MultiplayerWorldSession world;
     private PlayerController player;
     private PlayerInventory inventory;
+    private float previousHitDuration;
     private bool bound, ownBlock, previousBlock;
     private DragSnapshot stable;
     private sealed class DragSnapshot
@@ -33,7 +35,7 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
     {
         error = "El adaptador no coincide con el inventario original o faltan sus referencias UI. Regenera los prefabs de fase 4.";
         if (Moving == null || Moving.FieldType != typeof(bool) || DragImage == null || DragImage.FieldType != typeof(GameObject) ||
-            itemPanelPrefab == null ||
+            HitDuration == null || HitDuration.FieldType != typeof(float) || itemPanelPrefab == null ||
             string.IsNullOrEmpty(lootImagesPath) || string.IsNullOrEmpty(lootSlotsPath)) return false;
         error = string.Empty; return true;
     }
@@ -45,7 +47,7 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
         world = owner;
         if (bound && player == local) { error = string.Empty; return true; }
         Shutdown(); world = owner; player = local; inventory = local.Inventory;
-        bound = true;
+        previousHitDuration = (float)HitDuration.GetValue(player); HitDuration.SetValue(player, 0f); bound = true;
         CaptureStable(); error = string.Empty; return true;
     }
     private static List<List<int>> Clone(List<List<int>> source)
@@ -209,6 +211,7 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
     {
         if (!bound) return;
         CancelDrag(); Unblock();
+        if (player != null) HitDuration.SetValue(player, previousHitDuration);
         bound = false; player = null; inventory = null; stable = null;
     }
     private void OnDestroy() { Shutdown(); }

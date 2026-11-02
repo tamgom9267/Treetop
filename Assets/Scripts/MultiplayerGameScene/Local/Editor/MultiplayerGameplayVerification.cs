@@ -164,7 +164,7 @@ public static class MultiplayerGameplayVerification
             var world=coordinator.GetComponent<MultiplayerWorldSession>();
             Check(world.Initialize(null,coordinator.GetComponent<MultiplayerPlayers>(),out _),"Coordinador de gameplay valida sus dependencias");
             Check(adapter.Bind(world,player,out string error),"Adaptador enlaza sin cambiar scripts originales: "+error);
-            Check((float)duration.GetValue(player)==before,"Hit stop recibido conserva su configuracion");
+            Check((float)duration.GetValue(player)==0,"Hit stop recibido desactivado temporalmente");
             var item=new GameObject("Item",typeof(InventoryObject)).GetComponent<InventoryObject>();
             UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(item.gameObject,preview);item.transform.SetParent(player.transform);item.ID=7;Data().Apply(item);
             inventory.Inventory.Add(item.gameObject);inventory.Loot.Add(item.gameObject);inventory.SelectedObject=inventory.LootObject=item;

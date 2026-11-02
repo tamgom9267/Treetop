@@ -90,7 +90,7 @@ public static class MultiplayerGameplayPrefabBuilder
             Unpack(root);
             var combat = root.GetComponent<EnemyCombat>(); var movement = root.GetComponent<SlimeEnemyMovementProcedural>();
             var enemy = root.AddComponent<MultiplayerEnemy>();
-            Copy(combat, enemy, "maxHealth", "contactDamage", "knockbackForce", "knockbackUpForce", "weaponKnockbackMultiplier", "rend", "flashColor", "flashDuration", "hitStopDuration");
+            Copy(combat, enemy, "maxHealth", "contactDamage", "knockbackForce", "knockbackUpForce", "weaponKnockbackMultiplier", "rend", "flashColor", "flashDuration");
             var settings = new SerializedObject(enemy); settings.FindProperty("authority").boolValue = host; settings.ApplyModifiedPropertiesWithoutUndo();
             if (host) Copy(movement, root.AddComponent<HostSlimeMovement>(), "minJumpCooldown", "maxJumpCooldown", "horizontalJumpForce", "verticalJumpForce", "turnSpeed", "navMeshCheckDistance");
             if (combat != null) Object.DestroyImmediate(combat); if (movement != null) Object.DestroyImmediate(movement);

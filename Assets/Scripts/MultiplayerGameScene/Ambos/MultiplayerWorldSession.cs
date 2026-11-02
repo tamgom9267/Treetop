@@ -223,7 +223,6 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     public void RequestHit(MultiplayerEnemy enemy, WeaponObject weapon)
     {
         if (!Playing || enemy == null || enemy.Health <= 0 || weapon.player != player || localAttack <= 0 || !Loot.CanUse(player.weapon) || !player.RegisterEnemyHit(enemy.gameObject)) return;
-        player.TriggerHitStop(enemy.HitStopDuration);
         var message = new MultiplayerWorldMessage { op = "hit", id = enemy.Id, attack = localAttack };
         if (MultiplayerGameplayProtocol.Host) ReceiveRequest(MultiplayerGameplayProtocol.LocalActor, message);
         else if (MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldRequest, message, true, MultiplayerGameplayProtocol.HostActor, flush: true))
