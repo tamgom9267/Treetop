@@ -13,6 +13,8 @@ public class Chest : MonoBehaviour
     [SerializeField] GameObject Weapon;
     [SerializeField] GameObject Text;
 
+    [SerializeField] private ParticleSystem chestParticles;
+
     private void Start()
     {
         // inicia como falso
@@ -25,6 +27,12 @@ public class Chest : MonoBehaviour
     {
         // Activar la animación de abrir cofre
         animator.SetBool("isOpen", true);
+
+        // particulas al abrir el cofre
+        if (chestParticles != null)
+        {
+            chestParticles.gameObject.SetActive(true);
+        }
 
         // Se activa el estado de interaccion con el cofre
         chestInteracted = true;
