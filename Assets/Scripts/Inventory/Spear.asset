@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectData
   Name: spear
   model: {fileID: 919132149155446097, guid: e6d2f31733a66c07b9b56b8f3404e071, type: 3}
-  prefab: {fileID: 5700964741513762142, guid: 66c86d6a1a933e4469ef452f293f8904, type: 3}
+  prefab: {fileID: 4946747541223356268, guid: e9b49444fbd39aa4d87a3056a07fac7e, type: 3}
   UIsprite: {fileID: 21300000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
   weight: 0
   requiredCells: 010000000000000001000000000000000100000000000000
