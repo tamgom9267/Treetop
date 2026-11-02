@@ -71,16 +71,32 @@ public class CursorObject : MonoBehaviour
     {
         float angle = (Mathf.Round(obj.GetComponent<RectTransform>().localEulerAngles.z / 90f) * 90f) % 360f;
         Vector2 newSize = obj.GetComponent<RectTransform>().sizeDelta;
-        float margin = 10f;
+        Vector2 newColliderSize = obj.GetComponent<BoxCollider2D>().size;
+        Vector2 itemOffset = obj.GetComponent<BoxCollider2D>().offset;
+        Vector2 newOffset = itemOffset;
+
+        if(angle == 90)
+        {
+            newOffset = new Vector2(-itemOffset.y, itemOffset.x);
+        }
+        else if(angle == 180)
+        {
+            newOffset = new Vector2(-itemOffset.x, -itemOffset.y);
+        }
+        else if(angle == 270)
+        {
+            newOffset = new Vector2(itemOffset.y, -itemOffset.x);
+        }
 
         if(angle == 90 || angle == 270)
         {
             newSize = new Vector2(newSize.y, newSize.x);
+            newColliderSize = new Vector2(newColliderSize.y, newColliderSize.x);
         }
 
         GetComponent<RectTransform>().sizeDelta = newSize;
-        GetComponent<BoxCollider2D>().size = new Vector2(newSize.x - margin * 2, newSize.y - margin * 2);
-        GetComponent<BoxCollider2D>().offset = new Vector2((0.5f - GetComponent<RectTransform>().pivot.x) * newSize.x, (0.5f - GetComponent<RectTransform>().pivot.y) * newSize.y);
+        GetComponent<BoxCollider2D>().size = newColliderSize;
+        GetComponent<BoxCollider2D>().offset = newOffset;
     }
 
     IEnumerator counter()

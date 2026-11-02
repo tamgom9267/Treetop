@@ -17,7 +17,7 @@ MonoBehaviour:
   prefab: {fileID: 137415524845617739, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
   UIsprite: {fileID: 21300000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
   weight: 2
-  requiredCells: 00000000010000000000000001000000
+  requiredCells: 01000000000000000100000000000000
   health: 0
   MP: 0
   defense: 0
