@@ -65,6 +65,9 @@ public sealed class MultiplayerWorldMessage
     public float normalizedTime;
     public double time;
     public Vector3 position, velocity, angularVelocity;
+    // Referencia visual del impacto; no interviene en la simulacion de movimiento.
+    public Vector3 hitOrigin;
+    public bool hasHitOrigin;
     public Quaternion rotation = Quaternion.identity;
     public bool inside, knockbackActive;
 }

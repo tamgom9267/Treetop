@@ -33,6 +33,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     private double correctionAt = double.NegativeInfinity;
     private Vector3 correctionFrom;
     private Quaternion correctionRotation;
+    private Vector3 lastHitOrigin;
     private MultiplayerSlimeMotion latestMotion;
     private MultiplayerSlimeMotion localFinal;
     private readonly HashSet<long> anticipatedHits = new HashSet<long>();
@@ -68,7 +69,11 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (rend != null)
         {
             materials = rend.materials; colors = new Color[materials.Length];
-            for (int i = 0; i < colors.Length; i++) colors[i] = materials[i].color;
+            for (int i = 0; i < colors.Length; i++)
+            {
+                materials[i].EnableKeyword("_EMISSION");
+                colors[i] = materials[i].GetColor("_EmissionColor");
+            }
         }
     }
     public void Initialize(MultiplayerWorldSession owner, string id, string room, int type)
@@ -170,7 +175,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (actor <= 0) actor = hostActor;
         Vector3 start = MotionPosition;
         Health = Mathf.Max(0, Health - damage); HitRevision++;
-        lastHitActor = actor; lastHitAttack = attack; ShowHit(origin);
+        lastHitActor = actor; lastHitAttack = attack; lastHitOrigin = origin; ShowHit(origin);
         if (Health == 0) { BeginConfirmedDeath(); return; }
         RetireCurrentControl();
         motionActor = actor; motionAttack = attack; motionVersion++; knockbackActive = true;
@@ -204,6 +209,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         bool remote = motionActor != hostActor && latestMotion != null;
         return new MultiplayerWorldMessage { op = "enemy", id = Id, room = RoomId, type = Type, revision = revision,
             health = Health, hit = HitRevision, actor = lastHitActor, attack = lastHitAttack,
+            hitOrigin = lastHitOrigin, hasHitOrigin = HitRevision > 0,
             motionActor = motionActor, motionAttack = motionAttack, motionVersion = motionVersion,
             motionSequence = remote ? receivedSequence : revision, knockbackActive = knockbackActive,
             position = remote ? latestMotion.position : body.position, rotation = remote ? latestMotion.rotation : body.rotation,
@@ -219,7 +225,8 @@ public sealed class MultiplayerEnemy : MonoBehaviour
             !MultiplayerGameplayProtocol.Finite(state.normalizedTime) || !MultiplayerGameplayProtocol.Finite(state.velocity) ||
             !MultiplayerGameplayProtocol.Finite(state.angularVelocity)) return;
         bool anticipated = anticipatedHits.Contains(Key(state.actor, state.attack));
-        if (state.hit > 0 && presentedHits.Add(state.hit) && !anticipated && !deathStarted) ShowHit(transform.position);
+        if (state.hit > 0 && presentedHits.Add(state.hit) && !anticipated && !deathStarted)
+            ShowHit(state.hasHitOrigin && MultiplayerGameplayProtocol.Finite(state.hitOrigin) ? state.hitOrigin : transform.position);
         Health = Mathf.Min(Health, state.health);
         if (Health == 0) { BeginConfirmedDeath(); return; }
         bool acknowledged = pendingAttack > 0 && state.actor == localActor && state.attack == pendingAttack && state.hit > 0;
@@ -399,7 +406,6 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         candidates.Clear(); frames.Clear(); localLanded = false; PauseAI();
         if (!body.isKinematic) { body.linearVelocity = Vector3.zero; body.angularVelocity = Vector3.zero; }
         SetPhysics(false);
-        SpawnDeathEffect();
         animator.ResetTrigger("StartJump"); animator.ResetTrigger("Land"); animator.ResetTrigger("Die");
         animator.Play(DeathAnimation, 0, 0f); lastAnimation = DeathAnimation;
     }
@@ -407,20 +413,25 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     {
         if (CanRunHostAI && world != null && world.Playing) GetComponent<HostSlimeMovement>().Launch();
     }
-    public void DestroyEnemy() { if (authority && Health == 0 && world != null) world.Despawn(this); }
+    public void DestroyEnemy()
+    {
+        if (Health != 0) return;
+        SpawnDeathEffect();
+        if (authority && world != null) world.Despawn(this);
+    }
     private void ShowFlash() { if (materials == null) return; if (flash != null) StopCoroutine(flash); flash = StartCoroutine(Flash()); }
     private IEnumerator Flash()
     {
-        for (int i = 0; i < materials.Length; i++) materials[i].color = flashColor;
+        for (int i = 0; i < materials.Length; i++) materials[i].SetColor("_EmissionColor", flashColor);
         yield return new WaitForSecondsRealtime(flashDuration);
-        for (int i = 0; i < materials.Length; i++) materials[i].color = colors[i];
+        for (int i = 0; i < materials.Length; i++) materials[i].SetColor("_EmissionColor", colors[i]);
         flash = null;
     }
     private void OnDisable() { SuspendMotion(); }
     private void OnDestroy() { if (materials != null) foreach (Material material in materials) Destroy(material); }
     private void SpawnHitEffect(Vector3 position)
     { if (hitEffectPrefab != null) Instantiate(hitEffectPrefab, position, Quaternion.identity); }
-    private void SpawnDeathEffect()
+    public void SpawnDeathEffect()
     {
         if (deathEffectPrefab == null || deathEffectSpawned) return;
         deathEffectSpawned = true; Instantiate(deathEffectPrefab, transform.position + deathEffectOffset, Quaternion.identity);

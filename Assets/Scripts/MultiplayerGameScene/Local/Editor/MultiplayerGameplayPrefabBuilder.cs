@@ -91,6 +91,7 @@ public static class MultiplayerGameplayPrefabBuilder
             var combat = root.GetComponent<EnemyCombat>(); var movement = root.GetComponent<SlimeEnemyMovementProcedural>();
             var enemy = root.AddComponent<MultiplayerEnemy>();
             Copy(combat, enemy, "maxHealth", "contactDamage", "knockbackForce", "knockbackUpForce", "weaponKnockbackMultiplier", "rend", "flashColor", "flashDuration");
+            CopyEnemyEffects(combat, enemy);
             var settings = new SerializedObject(enemy); settings.FindProperty("authority").boolValue = host; settings.ApplyModifiedPropertiesWithoutUndo();
             if (host) Copy(movement, root.AddComponent<HostSlimeMovement>(), "minJumpCooldown", "maxJumpCooldown", "horizontalJumpForce", "verticalJumpForce", "turnSpeed", "navMeshCheckDistance");
             if (combat != null) Object.DestroyImmediate(combat); if (movement != null) Object.DestroyImmediate(movement);
@@ -102,6 +103,29 @@ public static class MultiplayerGameplayPrefabBuilder
             Save(root, destination);
         }
         finally { PrefabUtility.UnloadPrefabContents(root); }
+    }
+    private static void CopyEnemyEffects(EnemyCombat combat, MultiplayerEnemy enemy)
+    {
+        if (combat == null) return;
+        Copy(combat, enemy, "flashColor", "flashDuration", "deathEffectPrefab");
+        var source = new SerializedObject(combat);
+        var destination = new SerializedObject(enemy);
+        var hit = source.FindProperty("hitEffectPrefab").objectReferenceValue as ParticleSystem;
+        destination.FindProperty("hitEffectPrefab").objectReferenceValue = hit != null ? hit.gameObject : null;
+        destination.ApplyModifiedPropertiesWithoutUndo();
+    }
+    [MenuItem("Tools/Multiplayer/Actualizar efectos de slimes desde solitario")]
+    public static void UpdateEnemyEffects()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Sal de Play para actualizar los efectos.");
+        foreach (string role in new[] { "Host", "Client" }) for (int type = 1; type <= 2; type++)
+        {
+            var source = AssetDatabase.LoadAssetAtPath<GameObject>(Source + "/Enemigos/Enemigo" + type + ".prefab");
+            string destination = Root + "/" + role + "/Enemigos/Enemigo" + type + ".prefab";
+            GameObject root = PrefabUtility.LoadPrefabContents(destination);
+            try { CopyEnemyEffects(source.GetComponent<EnemyCombat>(), root.GetComponent<MultiplayerEnemy>()); Save(root, destination); }
+            finally { PrefabUtility.UnloadPrefabContents(root); }
+        }
     }
     [MenuItem("Tools/Multiplayer/Restaurar mallas de slimes cliente")]
     public static void RestoreClientEnemyVisuals()

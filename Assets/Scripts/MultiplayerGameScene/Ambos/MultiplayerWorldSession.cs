@@ -315,7 +315,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         {
             removed.Add(message.id);
             if (enemies.TryGetValue(message.id, out var enemy) && enemy != null)
-            { enemy.SuspendMotion(); enemy.gameObject.SetActive(false); Destroy(enemy.gameObject); }
+            { enemy.SpawnDeathEffect(); enemy.SuspendMotion(); enemy.gameObject.SetActive(false); Destroy(enemy.gameObject); }
             enemies.Remove(message.id);
         }
         else if (message.op == "enemy" && !string.IsNullOrEmpty(message.id) && !removed.Contains(message.id) &&
