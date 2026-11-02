@@ -142,7 +142,6 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         party = null;
         StopPlayerSync();
         ReleasePlayer();
-        if (completedRun) NewestSingleton.CancelVillagePlayerReset();
     }
 
     private void OnDestroy() { if (Instance == this) Instance = null; }
@@ -173,7 +172,6 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         returnRoutine = null;
         pendingVillageNotice = null;
         invalidRedirectPending = false;
-        NewestSingleton.CancelVillagePlayerReset();
         ReleasePlayer();
         ShowLoading(false, string.Empty);
         ResetRunState();
@@ -516,7 +514,6 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
             // Respetar el boton existente para regresar al menu principal.
             if (returnRoutine != null) StopCoroutine(returnRoutine);
             returnRoutine = null;
-            NewestSingleton.CancelVillagePlayerReset();
             ReleasePlayer();
             ShowLoading(false, string.Empty);
             pendingVillageNotice = null;
@@ -662,16 +659,17 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         if (sceneLoad != null && !sceneLoad.isDone) yield return sceneLoad;
         double until = Time.realtimeSinceStartupAsDouble + transitionTimeout;
         while (party != null && party.IsBusy && Time.realtimeSinceStartupAsDouble < until) yield return null;
-        bool resetPlayer = completedRun;
+        bool completingRun = completedRun;
+        // Tambien recrear al personaje si la partida se cancelo antes de salir de la aldea.
+        bool reloadVillage = activeRun || SceneManager.GetActiveScene().name != villageSceneName;
         NewestSingleton previousPlayer = NewestSingleton.Instance;
-        if (SceneManager.GetActiveScene().name != villageSceneName)
+        if (reloadVillage)
         {
             if (!Application.CanStreamedLevelBeLoaded(villageSceneName))
             {
                 FailReturn("Falta VillageMenuScene en el perfil de compilacion.");
                 yield break;
             }
-            if (resetPlayer) NewestSingleton.RequestVillagePlayerReset();
             AsyncOperation villageLoad = null;
             string loadError = null;
             try { villageLoad = SceneManager.LoadSceneAsync(villageSceneName); }
@@ -683,10 +681,9 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
             }
             yield return villageLoad;
         }
-        yield return null; // Dejar que termine el descarte del personaje duplicado de la aldea.
-        if (resetPlayer) NewestSingleton.CancelVillagePlayerReset();
+        yield return null; // Dejar que termine la destruccion del personaje anterior.
         PlayerController player = MultiplayerStartingRoomSpawns.LocalPlayer;
-        if (resetPlayer && (player == null || ReferenceEquals(previousPlayer, NewestSingleton.Instance)))
+        if (reloadVillage && (player == null || ReferenceEquals(previousPlayer, NewestSingleton.Instance)))
         {
             FailReturn("No se encontro el personaje nuevo al regresar a la aldea.");
             yield break;
@@ -707,7 +704,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
             yield return ConfirmVillageReturn();
             ReleasePlayer();
         }
-        if (resetPlayer && PhotonNetwork.InRoom)
+        if (completingRun && PhotonNetwork.InRoom)
             PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { ReturnedKey, null } });
         ShowLoading(false, string.Empty);
         if (TryConsumeVillageNotice(out string notice))
@@ -718,7 +715,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         ResetRunState();
         returnRoutine = null;
         // El host pudo iniciar otra partida mientras esta instancia terminaba el regreso.
-        if (resetPlayer) OnPartyChanged();
+        if (completingRun) OnPartyChanged();
     }
 
     private IEnumerator ConfirmVillageReturn()
@@ -778,7 +775,6 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     private void FailReturn(string message)
     {
         Debug.LogError(message, this);
-        NewestSingleton.CancelVillagePlayerReset();
         if (completedRun) FailRun(message);
         ReleasePlayer();
         ShowLoading(false, string.Empty);

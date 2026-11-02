@@ -149,12 +149,17 @@ public static class PersistentSessionLifecycleVerification
 
         SceneManager.SetActiveScene(village);
         NewestSingleton player = Player(village, Vector3.zero);
-        var inventoryMarker = new GameObject("Inventario conservado"); inventoryMarker.transform.SetParent(player.transform);
+        var inventoryMarker = new GameObject("Inventario anterior"); inventoryMarker.transform.SetParent(player.transform);
         NewestSingleton duplicate = Player(village, Vector3.right * 7);
-        Check(NewestSingleton.Instance == player && player.transform.position == Vector3.right * 7 &&
-            !duplicate.gameObject.activeSelf, "Duplicado conserva personaje, inventario y posicion de entrada");
+        NewestSingleton newest = Player(village, Vector3.forward * 3);
+        Check(NewestSingleton.Instance == newest && newest.transform.position == Vector3.forward * 3 &&
+            !player.gameObject.activeSelf && !duplicate.gameObject.activeSelf,
+            "Varios duplicados en el mismo frame conservan solo el personaje mas nuevo y su posicion");
         yield return null;
-        Check(duplicate == null, "Duplicado del personaje destruido al terminar el frame");
+        Check(player == null && duplicate == null && inventoryMarker == null && NewestSingleton.Instance == newest,
+            "Destruir las instancias anteriores elimina su inventario sin borrar la referencia nueva");
+        player = newest;
+        inventoryMarker = new GameObject("Inventario conservado"); inventoryMarker.transform.SetParent(player.transform);
         SceneManager.SetActiveScene(game); yield return null;
         SceneManager.SetActiveScene(multiplayer); yield return null;
         Scene auxiliary = SceneManager.CreateScene("Auxiliar de verificacion"); yield return null;
@@ -173,11 +178,13 @@ public static class PersistentSessionLifecycleVerification
         Time.timeScale = 1f;
         SceneManager.SetActiveScene(village);
         player = Player(village, Vector3.zero);
-        NewestSingleton.RequestVillagePlayerReset();
+        Time.timeScale = 0f;
         NewestSingleton fresh = Player(village, Vector3.forward);
-        Check(NewestSingleton.Instance == fresh && !player.gameObject.activeSelf, "Completar mazmorra sigue reemplazando al personaje");
+        Check(NewestSingleton.Instance == fresh && !player.gameObject.activeSelf,
+            "La aldea siempre reemplaza al personaje anterior, incluso en pausa y sin solicitar reinicio");
         yield return null;
         Check(player == null, "La destruccion del anterior no borra la instancia nueva");
+        Time.timeScale = 1f;
 
         PhotonPartyService service = Session(village);
         MultiplayerRunSession run = service.GetComponent<MultiplayerRunSession>();
@@ -307,17 +314,61 @@ public static class PersistentSessionLifecycleVerification
         yield return null;
         player = NewestSingleton.Instance; service = PhotonPartyService.AvailableInstance;
         Check(player != null && service != null, "Salir del tutorial recrea los objetos reales de la aldea");
-        NewestSingleton.RequestVillagePlayerReset();
         load = SceneManager.LoadSceneAsync("VillageMenuScene");
         while (!load.isDone) yield return null;
         yield return null;
         Check(player == null && NewestSingleton.Instance != null && PhotonPartyService.AvailableInstance == service,
-            "El reinicio al completar mazmorra sigue reemplazando solo al personaje en la escena real");
+            "Recargar la aldea real reemplaza al personaje sin solicitar reinicio y conserva el servicio");
+        foreach (PartyEndReason reason in new[] { PartyEndReason.HostAlone, PartyEndReason.HostDisconnected,
+            PartyEndReason.Disconnected, PartyEndReason.HostCancelled })
+            yield return CheckInterruptedReturn(reason);
         load = SceneManager.LoadSceneAsync("StartMenuScene");
         while (!load.isDone) yield return null;
         yield return null;
         Check(NewestSingleton.Instance == null && PhotonPartyService.Instance == null,
             "El ultimo regreso al menu real termina sin instancias persistentes propias");
+    }
+
+    private static IEnumerator CheckInterruptedReturn(PartyEndReason reason)
+    {
+        MultiplayerRunSession run = MultiplayerRunSession.Instance;
+        PhotonPartyService service = PhotonPartyService.AvailableInstance;
+        // Preparar una partida sin red; ending evita que la escena se redirija antes del callback probado.
+        SetField(run, "activeRun", true);
+        SetField(run, "ending", true);
+        if (reason != PartyEndReason.HostCancelled)
+        {
+            AsyncOperation load = SceneManager.LoadSceneAsync("MultiplayerGameScene");
+            while (!load.isDone) yield return null;
+            yield return null;
+        }
+        NewestSingleton previous = NewestSingleton.Instance;
+        PlayerController controller = MultiplayerStartingRoomSpawns.LocalPlayer;
+        WeaponData data = AssetDatabase.LoadAssetAtPath<WeaponData>("Assets/Scripts/Inventory/Sword.asset");
+        GameObject storedWeapon = Object.Instantiate(data.prefab, controller.transform);
+        storedWeapon.SetActive(false);
+        controller.Inventory.Inventory.Add(storedWeapon);
+        controller.weapon = storedWeapon;
+        controller.equipWeapon();
+        GameObject equippedWeapon = controller.EquippedWeaponInstance.gameObject;
+        SetField(run, "ending", false);
+        typeof(MultiplayerRunSession).GetMethod("OnPartyEnded", BindingFlags.NonPublic | BindingFlags.Instance)
+            .Invoke(run, new object[] { reason });
+        double until = Time.realtimeSinceStartupAsDouble + 10d;
+        FieldInfo routine = typeof(MultiplayerRunSession).GetField("returnRoutine", BindingFlags.NonPublic | BindingFlags.Instance);
+        while (routine.GetValue(run) != null)
+        {
+            if (Time.realtimeSinceStartupAsDouble >= until)
+                throw new InvalidOperationException("El regreso interrumpido no termino: " + reason);
+            yield return null;
+        }
+        PlayerController fresh = MultiplayerStartingRoomSpawns.LocalPlayer;
+        Check(SceneManager.GetActiveScene().name == "VillageMenuScene" && previous == null && fresh != null &&
+            storedWeapon == null && equippedWeapon == null && fresh.weapon == null &&
+            fresh.EquippedWeaponInstance == null && fresh.Inventory.Inventory.Count == 0,
+            reason + ": regresar crea un personaje limpio y destruye armas e inventario anteriores");
+        Check(PhotonPartyService.AvailableInstance == service && MultiplayerRunSession.Instance == run && fresh.enabled,
+            reason + ": el nuevo personaje queda habilitado y los gestores siguen disponibles en la aldea");
     }
 
     private static NewestSingleton Player(Scene scene, Vector3 position)

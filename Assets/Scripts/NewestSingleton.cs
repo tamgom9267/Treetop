@@ -4,17 +4,12 @@ using UnityEngine.SceneManagement;
 public class NewestSingleton : MonoBehaviour
 {
     public static NewestSingleton Instance { get; private set; }
-    private static bool resetOnVillageLoad;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
     {
         Instance = null;
-        resetOnVillageLoad = false;
     }
-
-    public static void RequestVillagePlayerReset() { resetOnVillageLoad = true; }
-    public static void CancelVillagePlayerReset() { resetOnVillageLoad = false; }
 
     private void Awake()
     {
@@ -25,33 +20,15 @@ public class NewestSingleton : MonoBehaviour
             return;
         }
 
-        if (resetOnVillageLoad && gameObject.scene.name == "VillageMenuScene")
-        {
-            resetOnVillageLoad = false;
-            NewestSingleton previous = Instance;
-            Instance = this;
-            if (previous != null && previous != this)
-            {
-                previous.gameObject.SetActive(false);
-                Destroy(previous.gameObject);
-            }
-            DontDestroyOnLoad(gameObject);
-            return;
-        }
-
-        // Conserva al personaje y su inventario al cargar otra escena.
-        if (Instance != null && Instance != this)
-        {
-            // Usa la posicion inicial configurada para el personaje en la escena nueva.
-            Instance.transform.SetPositionAndRotation(transform.position, transform.rotation);
-
-            // La instancia existente permanece como singleton; se descarta el duplicado.
-            gameObject.SetActive(false);
-            Destroy(gameObject);
-            return;
-        }
-
+        // La instancia nueva siempre reemplaza a la anterior, incluido su inventario.
+        NewestSingleton previous = Instance;
         Instance = this;
+        if (previous != null && previous != this)
+        {
+            previous.gameObject.SetActive(false);
+            Destroy(previous.gameObject);
+        }
+
         DontDestroyOnLoad(gameObject);
     }
 
@@ -73,7 +50,6 @@ public class NewestSingleton : MonoBehaviour
     private void OnActiveSceneChanged(Scene previous, Scene current)
     {
         if (Instance != this || PersistentScenePolicy.IsAllowed(current)) return;
-        CancelVillagePlayerReset();
         Instance = null;
         gameObject.SetActive(false);
         Destroy(gameObject);

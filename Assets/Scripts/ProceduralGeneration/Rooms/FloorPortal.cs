@@ -28,11 +28,9 @@ public class FloorPortal : MonoBehaviour
             }
 
             activated = true;
-            NewestSingleton.RequestVillagePlayerReset();
             try { SceneManager.LoadScene(VillageSceneName); }
             catch (Exception exception)
             {
-                NewestSingleton.CancelVillagePlayerReset();
                 activated = false;
                 Debug.LogError("No se pudo regresar a la aldea: " + exception.Message, this);
             }
