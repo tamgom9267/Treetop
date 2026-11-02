@@ -15,7 +15,7 @@ MonoBehaviour:
   health: 100
   MP: 20
   defense: 10
-  WD: 5
+  WD: 3
   PD: 0
   HB: 0
   speed: 10

@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
 
     private bool waitingForAttackRotation = false;
 
-    // Collider que detecta el golpe de la espada.
+    // Collider que detecta el golpe del arma equipada.
     private BoxCollider equippedWeaponCollider;
 
     public GameObject weapon;
@@ -262,10 +262,46 @@ public class PlayerController : MonoBehaviour
     private void StartAttack()
     {
         waitingForAttackRotation = false;
+        if (!TryGetAttackTrigger(out string attackTrigger))
+            return;
+
         enemiesHitThisAttack.Clear();
         isAttacking = true;
-        playerAnimation.SetTrigger("isAttacking");
+        playerAnimation.SetTrigger(attackTrigger);
         AttackStarted?.Invoke();
+    }
+
+    private bool TryGetAttackTrigger(out string attackTrigger)
+    {
+        string weaponName = equippedWeapon != null && equippedWeapon.weaponData != null
+            ? equippedWeapon.weaponData.Name
+            : null;
+
+        if (string.IsNullOrWhiteSpace(weaponName) && equippedWeapon != null && equippedWeapon.weaponData != null)
+            weaponName = equippedWeapon.weaponData.name;
+
+        if (string.IsNullOrWhiteSpace(weaponName))
+        {
+            attackTrigger = "isAttackingSword";
+            return true;
+        }
+
+        switch (weaponName.Trim().ToLowerInvariant())
+        {
+            case "sword":
+                attackTrigger = "isAttackingSword";
+                return true;
+            case "spear":
+                attackTrigger = "isAttackingSpear";
+                return true;
+            case "hammer":
+                attackTrigger = "isAttackingHammer";
+                return true;
+            default:
+                Debug.LogWarning("No hay un trigger de ataque configurado para el arma: " + weaponName, this);
+                attackTrigger = null;
+                return false;
+        }
     }
     
     private void RotatePlayer(Vector2 direction)

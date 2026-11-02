@@ -73,7 +73,7 @@ public class WeaponObject : InventoryObject
     {
         if(isSelected == true)
         {
-            GameObject InteractCanva = transform.GetChild(4).gameObject;
+            GameObject InteractCanva = transform.GetChild(0).gameObject;
             if(inHand == false)
             {
                 InteractCanva.SetActive(true);
@@ -82,7 +82,7 @@ public class WeaponObject : InventoryObject
         }
         else
         {
-            GameObject InteractCanva = transform.GetChild(4).gameObject;
+            GameObject InteractCanva = transform.GetChild(0).gameObject;
             InteractCanva.SetActive(false);
         }
     }
