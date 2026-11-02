@@ -29,7 +29,7 @@ public static class MultiplayerCombatVerification
 
     public static void RunBatch()
     {
-        MultiplayerGameplayPrefabBuilder.UpgradeClientEnemyVisuals();
+        MultiplayerGameplayPrefabBuilder.RestoreClientEnemyVisuals();
         RunChecks();
     }
 
@@ -123,91 +123,10 @@ public static class MultiplayerCombatVerification
         Check(players.Initialize(run, out error), "Reinicializar coordinador es seguro");
         var world = players.World;
         world.Resume();
-        var template = new GameObject("CombatVerificationHit"); template.SetActive(false);
-        var deathTemplate = new GameObject("CombatVerificationDeath"); deathTemplate.SetActive(false);
-        for (int type = 1; type <= 2; type++)
-        {
-            var enemy = SpawnEnemy(type, false, world);
-            Set(enemy, "hitEffectPrefab", template); Set(enemy, "deathEffectPrefab", deathTemplate);
-            var visual = enemy.transform.Find("CombatVisual");
-            Check(visual != null && enemy.GetComponent<MeshRenderer>() == null && visual.GetComponent<MeshRenderer>() != null,
-                "Slime " + type + ": malla separada; fisica y Animator en raiz");
-            var origin = enemy.transform.position - Vector3.right * 2f;
-            Vector3 initialPosition = enemy.transform.position;
-            Vector3 colliderCenter = enemy.GetComponent<Collider>().bounds.center;
-            int effects = Effects("CombatVerificationHit");
-            Check(enemy.PredictHit(2, 10, origin) && !enemy.PredictHit(2, 10, origin), "Slime " + type + ": prediccion unica por ataque");
-            Check(enemy.Health == 10 && Effects("CombatVerificationHit") == effects + 1, "Prediccion muestra un efecto sin aplicar dano");
-            Set(enemy, "recoilStartedAt", Time.realtimeSinceStartupAsDouble - 0.1d); Call(enemy, "LateUpdate");
-            Vector3 offset = visual.position - enemy.transform.position;
-            Check(Mathf.Abs(offset.x - 0.5f) < 0.02f && Mathf.Abs(offset.y - 0.15f) < 0.02f, "Retroceso visual respeta limites en unidades de mundo");
-            Check(enemy.transform.position == initialPosition && enemy.GetComponent<Collider>().bounds.center == colliderCenter &&
-                enemy.GetComponent<Rigidbody>().isKinematic, "Prediccion no mueve raiz, collider ni Rigidbody");
-            enemy.transform.localScale *= 0.5f; Call(enemy, "LateUpdate");
-            Check(Vector3.Distance(visual.position - enemy.transform.position, offset) < 0.03f, "Escala animada no multiplica el retroceso");
-            var state = State(enemy, 1, 1, 2, 10, 5);
-            enemy.Receive(state); enemy.Receive(state);
-            Check(Effects("CombatVerificationHit") == effects + 1 && enemy.Health == 5, "Confirmaciones repetidas aplican vida sin duplicar impacto");
-            Set(enemy, "reconcileStartedAt", Time.realtimeSinceStartupAsDouble - 0.11d); Call(enemy, "LateUpdate");
-            Check(visual.localPosition == Vector3.zero, "Confirmacion absorbe desplazamiento en 0,10 segundos");
-            Check(enemy.PredictHit(2, 11, origin), "Ataque posterior puede volver a anticiparse");
-            effects = Effects("CombatVerificationHit");
-            enemy.Receive(State(enemy, 3, 3, 3, 20, 2));
-            enemy.Receive(State(enemy, 2, 2, 2, 11, 3));
-            Check(Effects("CombatVerificationHit") == effects + 1 && enemy.Health == 2, "Otro jugador conserva feedback; confirmacion antigua propia se deduplica");
-            Check((bool)((IDictionary)Get(enemy, "predictedHits"))[((long)2 << 32) | 11L], "Correlacion se resuelve antes del filtro de revision");
-            Check(enemy.PredictHit(2, 12, origin), "Nuevo golpe antes del rechazo");
-            enemy.RejectPredictedHit(2, 12); effects = Effects("CombatVerificationHit");
-            enemy.Receive(State(enemy, 4, 4, 2, 12, 1));
-            Check(Effects("CombatVerificationHit") == effects && enemy.Health == 1, "Rechazo y confirmacion tardia no repiten efectos");
-            Check(enemy.PredictHit(2, 13, origin), "Golpe local pendiente antes de muerte confirmada");
-            enemy.Receive(State(enemy, 5, 5, 2, 13, 0));
-            var animator = enemy.GetComponent<Animator>(); animator.Update(0f);
-            int death = Animator.StringToHash("Base Layer.SlimeDeath");
-            Check(enemy.Health == 0 && animator.GetCurrentAnimatorStateInfo(0).fullPathHash == death && !animator.IsInTransition(0),
-                "Muerte confirmada inicia directamente sin transicion");
-            animator.Update(0.1f); float progress = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
-            enemy.Receive(State(enemy, 6, 4, 3, 20, 1)); Call(enemy, "Update"); animator.Update(0f);
-            Check(enemy.Health == 0 && animator.GetCurrentAnimatorStateInfo(0).fullPathHash == death &&
-                animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= progress, "Estado vivo posterior no revive ni reinicia animacion de muerte");
-            Check(!enemy.PredictHit(2, 14, origin), "No se predicen golpes sobre un enemigo muerto");
-            enemy.Receive(State(enemy, 7, 5, 2, 13, 0));
-            Check(Effects("CombatVerificationDeath") == 1, "Efecto de muerte se reproduce una vez por slime");
-            Object.DestroyImmediate(enemy.gameObject);
-
-            var host = SpawnEnemy(type, true, world); host.GetComponent<HostSlimeMovement>().enabled = false;
-            Set(host, "hitEffectPrefab", template); Set(host, "deathEffectPrefab", deathTemplate);
-            host.TakeAuthoritativeHit(10, origin, 2, 15); var captured = host.Capture(1);
-            host.GetComponent<Animator>().Update(0f);
-            Check(captured.health == 0 && captured.actor == 2 && captured.attack == 15 && captured.animation == death,
-                "Host publica muerte y correlacion en la misma operacion");
-            Check(!host.PredictHit(2, 16, origin), "Host nunca aplica prediccion cliente");
-            host.GetComponent<Animator>().Update(0.7f);
-            Check(host.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f, "Clip de muerte conserva su duracion completa");
-            Object.DestroyImmediate(host.gameObject);
-            // Mantener separado el recuento de muertes cliente del siguiente tipo.
-            foreach (var obj in Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-                if (obj.name == "CombatVerificationDeath(Clone)") Object.DestroyImmediate(obj);
-        }
-        var pending = SpawnEnemy(1, false, world);
-        pending.PredictHit(2, 99, pending.transform.position - Vector3.right);
-        var enemies = (IDictionary)Get(world, "enemies"); enemies.Add(pending.Id, pending);
-        int localActor = MultiplayerGameplayProtocol.LocalActor;
-        pending.PredictHit(localActor, 100, pending.transform.position - Vector3.right);
-        var rejection = new MultiplayerWorldMessage { op = "hitRejected", id = pending.Id, actor = localActor, attack = 100 };
-        var decoded = JsonUtility.FromJson<MultiplayerWorldMessage>(JsonUtility.ToJson(rejection));
-        Check(decoded.actor == localActor && decoded.attack == 100 && decoded.id == pending.Id, "Protocolo conserva correlacion de rechazo al serializar");
-        typeof(MultiplayerWorldSession).GetMethod("Apply", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(world, new object[] { decoded });
-        Check((bool)((IDictionary)Get(pending, "predictedHits"))[((long)localActor << 32) | 100L], "Rechazo del mundo resuelve la prediccion del destinatario");
-        pending.PredictHit(localActor + 10, 101, pending.transform.position - Vector3.right);
-        rejection.actor = localActor + 10; rejection.attack = 101;
-        typeof(MultiplayerWorldSession).GetMethod("Apply", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(world, new object[] { rejection });
-        Check(!(bool)((IDictionary)Get(pending, "predictedHits"))[((long)(localActor + 10) << 32) | 101L], "Rechazo de otro destinatario no cancela la prediccion local");
-        world.Suspend();
-        Check(((IDictionary)Get(pending, "predictedHits")).Count == 0, "Suspender limpia predicciones");
+        var slimeChecks = MultiplayerSlimeVerification.CheckSlimes(world);
+        while (slimeChecks.MoveNext()) yield return slimeChecks.Current;
         Property(run, "FloorNumber", 2); players.BeginFloor(run.RunId, 2);
         Check(players.Traffic.enemyStateSendHz == 90f && PhotonNetwork.SendRate == 125, "Cambiar de piso conserva frecuencias fijas");
-        Object.DestroyImmediate(pending.gameObject);
         players.Shutdown(); Check(PhotonNetwork.SendRate == 25, "Cerrar coordinador restaura salida previa");
         Object.DestroyImmediate(root); Check(PhotonNetwork.SendRate == 25, "Destruccion repetida no cambia salida restaurada");
         service.LeaveParty(); PhotonNetwork.Disconnect(); Object.DestroyImmediate(sessionRoot);
@@ -227,21 +146,6 @@ public static class MultiplayerCombatVerification
         }
     }
 
-    private static MultiplayerEnemy SpawnEnemy(int type, bool host, MultiplayerWorldSession world)
-    {
-        var root = Object.Instantiate(Resources.Load<GameObject>("Multiplayer/" + (host ? "Host" : "Client") + "/Enemigos/Enemigo" + type));
-        var enemy = root.GetComponent<MultiplayerEnemy>(); enemy.Initialize(world, "test:" + type, "test", type); return enemy;
-    }
-    private static MultiplayerWorldMessage State(MultiplayerEnemy enemy, int revision, int hit, int actor, int attack, int health) =>
-        new MultiplayerWorldMessage { op = "enemy", id = enemy.Id, revision = revision, hit = hit, actor = actor, attack = attack, health = health,
-            position = enemy.transform.position, rotation = enemy.transform.rotation, animation = Animator.StringToHash("Base Layer.SlimeJumpCharge"),
-            time = PhotonNetwork.Time - 0.2d };
-    private static int Effects(string name)
-    {
-        int count = 0;
-        foreach (var obj in Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None)) if (obj.name == name + "(Clone)") count++;
-        return count;
-    }
     private static void Check(bool condition, string message)
     { if (!condition) throw new InvalidOperationException(message); checks.Add(message); }
     private static void Set(object target, string name, object value) => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(target, value);

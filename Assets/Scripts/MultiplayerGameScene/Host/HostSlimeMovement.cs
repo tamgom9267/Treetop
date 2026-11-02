@@ -18,7 +18,7 @@ public sealed class HostSlimeMovement : MonoBehaviour
     private void Update()
     {
         MultiplayerWorldSession world = MultiplayerWorldSession.Instance;
-        if (!enemy.Authority || enemy.Health <= 0 || world == null || !world.Playing) return;
+        if (!enemy.CanRunHostAI || world == null || !world.Playing) return;
         // Como en solitario, actualizar la direccion y el giro en cada frame,
         // incluso durante la espera y la animacion de salto.
         UpdateJumpDirection(world);
@@ -39,12 +39,23 @@ public sealed class HostSlimeMovement : MonoBehaviour
     }
     public void Launch()
     {
+        if (!enemy.CanRunHostAI) return;
         body.AddForce(direction * horizontalJumpForce + Vector3.up * verticalJumpForce, ForceMode.Impulse);
         nextJump = Time.time + Random.Range(minJumpCooldown, maxJumpCooldown);
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if (!jumping || !collision.gameObject.CompareTag("Obstacle")) return;
+        if (!enemy.CanRunHostAI || !jumping || !collision.gameObject.CompareTag("Obstacle")) return;
         jumping = false; animator.SetTrigger("Land");
+    }
+    public void PauseForKnockback()
+    {
+        jumping = false;
+        animator.ResetTrigger("StartJump"); animator.ResetTrigger("Land");
+    }
+    public void ResumeAfterKnockback()
+    {
+        jumping = false;
+        nextJump = Time.time + Random.Range(minJumpCooldown, maxJumpCooldown);
     }
 }
