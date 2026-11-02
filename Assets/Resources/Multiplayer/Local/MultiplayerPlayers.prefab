@@ -65,7 +65,7 @@ MonoBehaviour:
   catalog:
   - typeId: sword
     localWeapon: {fileID: 11400000, guid: a2415408a2bb30d43b0301c3bc2a7f70, type: 2}
-    remotePrefab: {fileID: 3167070855819173452, guid: 39aa76a0f7621fb458177363fc5e541f, type: 3}
+    remotePrefab: {fileID: -7803514105995455728, guid: 406d7c52344c9b040b34d5890f4e18b9, type: 3}
   interpolationDelay: 0.1
 --- !u!114 &4291850356998223961
 MonoBehaviour:

@@ -4,6 +4,7 @@ using UnityEngine;
 public sealed class MultiplayerWeaponVisual : MonoBehaviour
 {
     private TrailRenderer[] trails;
+    private ParticleSystem[] particles;
 
     public void SetTrail(bool emitting)
     {
@@ -12,6 +13,12 @@ public sealed class MultiplayerWeaponVisual : MonoBehaviour
         {
             trail.emitting = emitting;
             if (!emitting) trail.Clear();
+        }
+        if (particles == null) particles = GetComponentsInChildren<ParticleSystem>(true);
+        foreach (ParticleSystem particle in particles)
+        {
+            if (emitting) particle.Play(false);
+            else particle.Stop(false, ParticleSystemStopBehavior.StopEmitting);
         }
     }
 
