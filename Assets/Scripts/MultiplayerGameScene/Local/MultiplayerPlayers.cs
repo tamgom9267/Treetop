@@ -69,7 +69,7 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
         error = "Falta RemotePlayer o su Animator/Hand en el prefab MultiplayerPlayers.";
         if (remotePlayerPrefab == null || !remotePlayerPrefab.ValidateAssets()) return false;
         HashSet<string> types = new HashSet<string>();
-        HashSet<WeaponData> weapons = new HashSet<WeaponData>();
+        HashSet<ObjectData> weapons = new HashSet<ObjectData>();
         if (catalog == null || catalog.Length == 0) { error = "El catalogo visual multijugador esta vacio."; return false; }
         foreach (MultiplayerVisualDefinition definition in catalog)
         {
@@ -102,7 +102,7 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
         return true;
     }
 
-    public bool TryGetType(WeaponData data, out string type)
+    public bool TryGetType(ObjectData data, out string type)
     {
         foreach (MultiplayerVisualDefinition definition in catalog)
             if (definition.localWeapon == data) { type = definition.typeId; return true; }

@@ -42,7 +42,7 @@ public static class MultiplayerPlayerPrefabBuilder
         EnsureFolder(Root);
         foreach (string folder in new[] { "Local", "Online", "Host", "Client", "Online/Weapons" })
             EnsureFolder(Root + "/" + folder);
-        WeaponData swordData = AssetDatabase.LoadAssetAtPath<WeaponData>(SwordDataPath);
+        ObjectData swordData = AssetDatabase.LoadAssetAtPath<ObjectData>(SwordDataPath);
         if (swordData == null || swordData.prefab == null) throw new InvalidOperationException("Falta Sword.asset o su prefab original.");
 
         Scene preview = EditorSceneManager.OpenPreviewScene(SourceScene);
@@ -57,7 +57,7 @@ public static class MultiplayerPlayerPrefabBuilder
         Debug.Log("FASE 3: prefabs de jugadores creados y validados. No se guardaron escenas ni se modificaron prefabs originales.");
     }
 
-    private static void CreateSword(WeaponData data, Scene preview)
+    private static void CreateSword(ObjectData data, Scene preview)
     {
         GameObject copy = (GameObject)PrefabUtility.InstantiatePrefab(data.prefab, preview);
         copy.name = "SwordVisual";
@@ -107,7 +107,7 @@ public static class MultiplayerPlayerPrefabBuilder
         Save(copy, RemotePath);
     }
 
-    private static void CreateCoordinator(WeaponData swordData, Scene preview)
+    private static void CreateCoordinator(ObjectData swordData, Scene preview)
     {
         GameObject root = new GameObject("MultiplayerPlayers");
         SceneManager.MoveGameObjectToScene(root, preview);

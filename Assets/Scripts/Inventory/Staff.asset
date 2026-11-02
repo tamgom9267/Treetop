@@ -9,6 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f749c4cabd25b124f8a2f4f51fa2c29e, type: 3}
+  m_Script: {fileID: 11500000, guid: a4432b723246e044ea0f5877a0000474, type: 3}
   m_Name: Staff
-  m_EditorClassIdentifier: Assembly-CSharp::Weapon
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectData

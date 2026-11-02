@@ -135,6 +135,6 @@ public static class MultiplayerPlayerProtocol
 public sealed class MultiplayerVisualDefinition
 {
     public string typeId;
-    public WeaponData localWeapon;
+    public ObjectData localWeapon;
     public MultiplayerWeaponVisual remotePrefab;
 }
