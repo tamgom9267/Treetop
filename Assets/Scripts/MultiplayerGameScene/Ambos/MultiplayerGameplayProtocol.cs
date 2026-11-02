@@ -8,7 +8,7 @@ using UnityEngine;
 // Canal independiente de los eventos visuales 20-23 de la fase 3.
 public static class MultiplayerGameplayProtocol
 {
-    public const byte WorldRequest = 30, WorldState = 31, EnemyFrames = 32, WorldSnapshot = 33;
+    public const byte WorldRequest = 30, WorldState = 31, EnemyFrames = 32, WorldSnapshot = 33, SlimeMotion = 34;
     public const byte LootRequest = 40, LootState = 41, LootSnapshot = 42, Settlement = 43;
     public const int Version = 1;
     public static bool Participant(int actor)
@@ -61,11 +61,35 @@ public sealed class MultiplayerWorldMessage
 {
     public string op, room, id, item;
     public int revision, stage, type, health, hit, animation, attack, damage, actor;
+    public int motionActor, motionAttack, motionVersion, motionSequence;
     public float normalizedTime;
     public double time;
-    public Vector3 position, velocity;
+    public Vector3 position, velocity, angularVelocity;
     public Quaternion rotation = Quaternion.identity;
-    public bool inside;
+    public bool inside, knockbackActive;
+}
+
+// Movimiento exclusivamente: el cliente nunca publica salud ni decisiones de gameplay.
+[Serializable]
+public sealed class MultiplayerSlimeMotion
+{
+    public string id;
+    public int actor, attack, sequence, animation;
+    public double time;
+    public Vector3 position, velocity, angularVelocity;
+    public Quaternion rotation = Quaternion.identity;
+    public float normalizedTime;
+    public bool landed, finished;
+
+    public bool IsValid => !string.IsNullOrEmpty(id) && actor > 0 && attack > 0 && sequence > 0 &&
+        !double.IsNaN(time) && !double.IsInfinity(time) && MultiplayerGameplayProtocol.Finite(position) &&
+        MultiplayerGameplayProtocol.Finite(velocity) && MultiplayerGameplayProtocol.Finite(angularVelocity) &&
+        MultiplayerGameplayProtocol.Rotation(rotation) && MultiplayerGameplayProtocol.Finite(normalizedTime);
+}
+[Serializable]
+public sealed class MultiplayerSlimeMotionBatch
+{
+    public MultiplayerSlimeMotion[] entries;
 }
 
 // Los grupos contienen mensajes individuales que no pueden contener otros grupos.

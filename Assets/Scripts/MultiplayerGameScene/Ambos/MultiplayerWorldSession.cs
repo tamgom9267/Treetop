@@ -24,6 +24,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     private int revision, localAttack;
     private double lastPresence = double.NegativeInfinity, lastSnapshot = double.NegativeInfinity;
     private MultiplayerPlayers.TrafficClock frameClock;
+    private MultiplayerPlayers.TrafficClock ownedMotionClock;
     private bool suspended = true;
     public MultiplayerLootSession Loot { get; private set; }
     public MultiplayerInventoryAdapter Inventory { get; private set; }
@@ -48,7 +49,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         if (floorKey == key) return;
         floorKey = key; rooms.Clear(); presence.Clear(); roomStates.Clear(); removed.Clear(); attacks.Clear();
         enemies.Clear(); positions.Clear(); poseTimes.Clear(); lastPresence = lastSnapshot = double.NegativeInfinity;
-        frameClock = default;
+        frameClock = ownedMotionClock = default;
         Loot.BeginFloor(floor);
     }
     public bool Bind(PlayerController local, out string error)
@@ -65,9 +66,18 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     public void Suspend()
     {
         suspended = true; attacks.Clear();
-        foreach (MultiplayerEnemy enemy in enemies.Values) if (enemy != null) enemy.ClearPredictedHits();
+        foreach (MultiplayerEnemy enemy in enemies.Values) if (enemy != null) enemy.SuspendMotion();
     }
-    public void Resume() { suspended = false; Loot.Resume(); lastPresence = lastSnapshot = double.NegativeInfinity; }
+    public void Resume()
+    {
+        suspended = false; Loot.Resume(); lastPresence = lastSnapshot = double.NegativeInfinity;
+        foreach (MultiplayerEnemy enemy in enemies.Values) if (enemy != null)
+        {
+            bool delegated = enemy.Authority && enemy.MotionActor != MultiplayerGameplayProtocol.HostActor;
+            enemy.ResumeMotion();
+            if (delegated) PublishEnemyState(enemy);
+        }
+    }
     public void Shutdown()
     {
         Suspend();
@@ -111,9 +121,22 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     }
     private void Update()
     {
-        if (!Playing || player == null) return;
+        if (!Playing) return;
         double now = Time.realtimeSinceStartupAsDouble;
         MultiplayerPlayers.TrafficRates traffic = Traffic;
+        if (MultiplayerGameplayProtocol.Host)
+            foreach (MultiplayerEnemy enemy in enemies.Values) if (enemy != null &&
+                enemy.NeedsHostRecovery(now, MultiplayerGameplayProtocol.Participant(enemy.MotionActor)))
+            { enemy.RecoverMotionToHost(); PublishEnemyState(enemy); }
+        if (ownedMotionClock.Tick(now, traffic.enemyStateSendHz))
+        {
+            var owned = new List<MultiplayerSlimeMotion>();
+            foreach (MultiplayerEnemy enemy in enemies.Values)
+                if (enemy != null && enemy.PublishesMotion) owned.Add(enemy.CaptureMotion());
+            if (owned.Count > 0) MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.SlimeMotion,
+                new MultiplayerSlimeMotionBatch { entries = owned.ToArray() }, false);
+        }
+        if (player == null) return;
         if (now - lastPresence >= 1d / traffic.roomPresenceSendHz)
         {
             lastPresence = now;
@@ -150,7 +173,8 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         if (frameClock.Tick(now, traffic.enemyStateSendHz))
         {
             var frames = new List<MultiplayerWorldMessage>();
-            foreach (MultiplayerEnemy enemy in enemies.Values) if (enemy != null) frames.Add(enemy.Capture(++revision));
+            foreach (MultiplayerEnemy enemy in enemies.Values)
+                if (enemy != null && enemy.MotionActor == MultiplayerGameplayProtocol.HostActor) frames.Add(enemy.Capture(++revision));
             if (frames.Count > 0) MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.EnemyFrames,
                 new MultiplayerWorldBatch { op = "frames", entries = frames.ToArray() }, false);
         }
@@ -202,7 +226,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         var message = new MultiplayerWorldMessage { op = "hit", id = enemy.Id, attack = localAttack };
         if (MultiplayerGameplayProtocol.Host) ReceiveRequest(MultiplayerGameplayProtocol.LocalActor, message);
         else if (MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldRequest, message, true, MultiplayerGameplayProtocol.HostActor, flush: true))
-            enemy.PredictHit(MultiplayerGameplayProtocol.LocalActor, localAttack, player.transform.position);
+            enemy.BeginLocalKnockback(MultiplayerGameplayProtocol.LocalActor, localAttack, player.transform.position);
     }
     private void ReceiveRequest(int actor, MultiplayerWorldMessage message)
     {
@@ -221,19 +245,42 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         {
             if (attacks.TryGetValue(actor, out var attack) && attack.Number == message.attack && now <= attack.Until &&
                 enemies.TryGetValue(message.id ?? "", out var enemy) && enemy != null && enemy.Health > 0 &&
-                TryPosition(actor, out Vector3 origin) && Vector3.Distance(origin, enemy.transform.position) <= enemy.AttackReach && attack.TryHit(message.attack, message.id, now))
+                TryPosition(actor, out Vector3 origin) && Vector3.Distance(origin, enemy.MotionPosition) <= enemy.AttackReach && attack.TryHit(message.attack, message.id, now))
             {
                 enemy.TakeAuthoritativeHit(attack.Damage, origin, actor, message.attack);
-                MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldState, enemy.Capture(++revision), true, flush: true);
+                PublishEnemyState(enemy);
+                enemy.ApplyBufferedMotion();
             }
             else RejectHit(actor, message);
         }
     }
-    private static void RejectHit(int actor, MultiplayerWorldMessage message)
+    private void RejectHit(int actor, MultiplayerWorldMessage message)
     {
         if (message.op != "hit" || actor == MultiplayerGameplayProtocol.LocalActor || message.attack <= 0 || string.IsNullOrEmpty(message.id)) return;
         MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldState,
             new MultiplayerWorldMessage { op = "hitRejected", id = message.id, actor = actor, attack = message.attack }, true, actor, flush: true);
+        if (enemies.TryGetValue(message.id, out var enemy) && enemy != null)
+        {
+            // Si un segundo golpe del controlador se rechaza, no conservar su impulso provisional.
+            if (enemy.MotionActor == actor) { enemy.RecoverMotionToHost(); PublishEnemyState(enemy); }
+            else MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldState, enemy.Capture(++revision), true, actor, flush: true);
+        }
+    }
+    private void PublishEnemyState(MultiplayerEnemy enemy) =>
+        MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldState, enemy.Capture(++revision), true, flush: true);
+    public void PublishSlimeLanding(MultiplayerSlimeMotion final)
+    {
+        if (!Playing || final == null) return;
+        final.finished = true;
+        MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.SlimeMotion,
+            new MultiplayerSlimeMotionBatch { entries = new[] { final } }, true, flush: true);
+    }
+    public void CompleteSlimeMotion(MultiplayerEnemy enemy, MultiplayerSlimeMotion final, bool landed)
+    {
+        if (!MultiplayerGameplayProtocol.Host || !Playing || enemy == null || final == null || enemy.Health <= 0 ||
+            !enemies.TryGetValue(enemy.Id, out var current) || current != enemy ||
+            final.actor != enemy.MotionActor || final.attack != enemy.MotionAttack) return;
+        enemy.ReturnMotionToHost(final, landed); PublishEnemyState(enemy);
     }
     public void Despawn(MultiplayerEnemy enemy)
     {
@@ -255,7 +302,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         {
             if (message.actor == MultiplayerGameplayProtocol.LocalActor && !string.IsNullOrEmpty(message.id) &&
                 enemies.TryGetValue(message.id, out var rejected) && rejected != null)
-                rejected.RejectPredictedHit(message.actor, message.attack);
+                rejected.RejectLocalKnockback(message.actor, message.attack);
         }
         else if (message.op == "room")
         {
@@ -268,7 +315,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         {
             removed.Add(message.id);
             if (enemies.TryGetValue(message.id, out var enemy) && enemy != null)
-            { enemy.ClearPredictedHits(); enemy.gameObject.SetActive(false); Destroy(enemy.gameObject); }
+            { enemy.SuspendMotion(); enemy.gameObject.SetActive(false); Destroy(enemy.gameObject); }
             enemies.Remove(message.id);
         }
         else if (message.op == "enemy" && !string.IsNullOrEmpty(message.id) && !removed.Contains(message.id) &&
@@ -281,7 +328,15 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     public void OnEvent(EventData ev)
     {
         if (session == null || !session.IsRunning) return;
-        if (ev.Code == MultiplayerGameplayProtocol.WorldRequest && MultiplayerGameplayProtocol.Host &&
+        if (ev.Code == MultiplayerGameplayProtocol.SlimeMotion)
+        {
+            if (!Playing || !MultiplayerGameplayProtocol.Read(ev, out MultiplayerSlimeMotionBatch motion) ||
+                motion.entries == null || motion.entries.Length > 512) return;
+            foreach (var frame in motion.entries)
+                if (frame != null && !string.IsNullOrEmpty(frame.id) && enemies.TryGetValue(frame.id, out var enemy) && enemy != null)
+                    enemy.ReceiveMotion(ev.Sender, frame);
+        }
+        else if (ev.Code == MultiplayerGameplayProtocol.WorldRequest && MultiplayerGameplayProtocol.Host &&
             MultiplayerGameplayProtocol.Read(ev, out MultiplayerWorldMessage request)) ReceiveRequest(ev.Sender, request);
         else if (ev.Sender == MultiplayerGameplayProtocol.HostActor && !MultiplayerGameplayProtocol.Host)
         {
