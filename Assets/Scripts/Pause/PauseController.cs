@@ -8,15 +8,35 @@ public class PauseController : MonoBehaviour
     [SerializeField] private GameObject CanvasPause;
     private InputAction PauseAction;
     private bool isPaused = false;
+    private bool externalUIBlocked;
+
+    public void SetExternalUIBlocked(bool blocked)
+    {
+        externalUIBlocked = blocked;
+    }
+
+    private void OnEnable()
+    {
+        // PlayerInput deshabilita su mapa al destruir el personaje anterior.
+        // La pausa usa una accion propia para sobrevivir a ese reemplazo.
+        if (PauseAction == null)
+            PauseAction = InputSystem.actions.FindAction("Player/Pause", true).Clone();
+        PauseAction.Enable();
+    }
+
+    private void OnDisable()
+    {
+        PauseAction?.Disable();
+    }
+
+    private void OnDestroy()
+    {
+        PauseAction?.Dispose();
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        PauseAction = InputSystem.actions.FindAction("Player/Pause");
-
-        // Al iniciar el juego, el tiempo es normal
-        Time.timeScale = 1f;
-
         // Mostramos el canvas de vida
         CanvasHealthBar.SetActive(true);
         
@@ -47,6 +67,8 @@ public class PauseController : MonoBehaviour
 
     public void TogglePause()
     {
+        if (externalUIBlocked) return;
+
         if (isPaused)
         {
             ResumeGame();
@@ -62,9 +84,6 @@ public class PauseController : MonoBehaviour
         // Indicamos que estamos pausados
         isPaused = true;
 
-        // Detenemos el tiempo del juego
-        Time.timeScale = 0f;
-
         // Escondemos la barra de vida
         CanvasHealthBar.SetActive(false);
 
@@ -76,9 +95,6 @@ public class PauseController : MonoBehaviour
     {
         // Ya no estamos pausados
         isPaused = false;
-
-        // Volvemos a activar el tiempo
-        Time.timeScale = 1f;
 
         // Mostramos nuevamente la barra de vida
         CanvasHealthBar.SetActive(true);

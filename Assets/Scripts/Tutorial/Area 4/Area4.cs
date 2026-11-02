@@ -69,7 +69,10 @@ public class Area4 : MonoBehaviour
         if (missingHealth < 19)
         {
             // Mathf.Max evita que la vida sea menor a cero.
-            playerClass.health = Mathf.Max(0, playerClass.health - 20);
+            // playerClass.health = Mathf.Max(0, playerClass.health - 20);
+
+            // implementación nueva con observer
+            playerClass.TakeDamage(20);
         }
     }
 

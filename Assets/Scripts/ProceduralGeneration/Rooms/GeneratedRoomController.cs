@@ -22,6 +22,33 @@ public class GeneratedRoomController : MonoBehaviour
 
     void Awake()
     {
+        Transform plane = transform.Find("Plano");
+        bool hasTrigger = false;
+        if (plane != null)
+        {
+            foreach (Collider planeCollider in plane.GetComponents<Collider>())
+            {
+                if (planeCollider.isTrigger && planeCollider.enabled)
+                {
+                    hasTrigger = true;
+                    break;
+                }
+            }
+        }
+
+        if (hasTrigger)
+        {
+            RoomTriggerForwarder forwarder = plane.GetComponent<RoomTriggerForwarder>();
+            if (forwarder == null)
+                forwarder = plane.gameObject.AddComponent<RoomTriggerForwarder>();
+
+            forwarder.Initialize(this);
+        }
+        else
+        {
+            Debug.LogWarning("No se encontro un trigger en el Plano del cuarto.", this);
+        }
+
         enemy1 = Resources.Load<GameObject>(
             "GeneracionDeCuartos/Enemigos/Enemigo1"
         );
@@ -65,6 +92,11 @@ public class GeneratedRoomController : MonoBehaviour
     }
 
     private void OnTriggerEnter(Collider other)
+    {
+        HandleTriggerEnter(other);
+    }
+
+    public void HandleTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player"))
             return;

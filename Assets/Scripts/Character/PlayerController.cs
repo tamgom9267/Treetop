@@ -1,11 +1,16 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using System.Runtime.CompilerServices;
 
 public class PlayerController : MonoBehaviour
 {
+    // Observadores opcionales; el control local no depende de Photon.
+    public event System.Action AttackStarted;
+    public WeaponObject EquippedWeaponInstance => equippedWeapon;
     public Rigidbody rb;
 
     [SerializeField]
@@ -14,6 +19,13 @@ public class PlayerController : MonoBehaviour
     public Animator playerAnimation;
     private Vector2 _moveDirection;
 
+    private Coroutine hitStopCoroutine;
+    private float hitStopEndTime;
+    private float animatorSpeedBeforeHitStop;
+
+    [SerializeField] private float receivedHitStopDuration = 0.08f;
+    private Coroutine receivedHitCoroutine;
+
     // Guarda los slimes que ya fueron golpeados durante el ataque actual.
     private HashSet<GameObject> enemiesHitThisAttack = new HashSet<GameObject>();
     public bool isAttacking = false;
@@ -21,9 +33,13 @@ public class PlayerController : MonoBehaviour
 
     [Header("Rotacion")]
     [SerializeField] private float turnSpeed = 720f;
+    [SerializeField] private float attackTurnSpeed = 1440f;
+    [SerializeField] private float attackRotationThreshold = 2f;
 
     private Quaternion targetRotation;
     private bool hasTargetRotation;
+
+    private bool waitingForAttackRotation = false;
 
     // Collider que detecta el golpe de la espada.
     private BoxCollider equippedWeaponCollider;
@@ -51,6 +67,20 @@ public class PlayerController : MonoBehaviour
     public GameObject nearChest;
 
     [SerializeField] GameObject InventoryUI;
+
+    public bool IsInventoryOpen => InventoryUI != null && InventoryUI.activeInHierarchy;
+    public bool IsExternalUIBlocked { get; private set; }
+
+    // Bloquea las acciones de juego sin deshabilitar el Input System usado por los campos UI.
+    public void SetExternalUIBlocked(bool blocked)
+    {
+        IsExternalUIBlocked = blocked;
+        if (!blocked) return;
+        _moveDirection = Vector2.zero;
+        if (rb != null)
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+        if (playerAnimation != null) playerAnimation.SetFloat("Speed", 0f);
+    }
 
     [SerializeField] Transform handObj;
 
@@ -83,6 +113,12 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        if (IsExternalUIBlocked)
+        {
+            SetExternalUIBlocked(true);
+            return;
+        }
+
         if(InventoryUI.activeSelf == false)
         {
             UpdateNearestWeapon();
@@ -115,33 +151,47 @@ public class PlayerController : MonoBehaviour
 
             if (!inAir)
                 {
-                    if (!isAttacking)
+                    if (!isAttacking && !waitingForAttackRotation)
                     {
                         RotatePlayer(_moveDirection);    
                     }
                     rb.linearVelocity = new Vector3(_moveDirection.x * playerClass.speed, rb.linearVelocity.y ,_moveDirection.y * playerClass.speed);
                 }
 
-                if (attack.action.WasPressedThisFrame() && !isAttacking)
+                if (attack.action.WasPressedThisFrame() && !isAttacking && !waitingForAttackRotation)
             {
-                // leer teclas - ijkl
+                // leer flechas
                 Vector2 attackInput = attack.action.ReadValue<Vector2>();
 
                 // Definir direccion de ataque - arriba, abajo, isquierda, derecha 
                 // (no es posible hacer ataques diagonales una de las direcciones va a tomar prioridad)
                 Vector2 attackDirection = GetAttackDirections(attackInput);
 
+                if (attackDirection != Vector2.zero)
+                {
+                    // establecer la dirección del ataque
+                    RotatePlayer(attackDirection);
+
+                    // esperar a que termine de girar
+                    waitingForAttackRotation = true;
+                } else
+                {
+                    // si no se pone una direccion diferente solo atacar
+                    StartAttack();
+                }
+
                 // se rota el personaje a la direccion assignada
-                RotatePlayer(attackDirection);
+                // RotatePlayer(attackDirection);
 
-                Debug.Log("Attaque: " + attackDirection);
+                // Debug.Log("Attaque: " + attackDirection);
 
-                // Un nuevo ataque puede volver a golpear a los slimes.
-                enemiesHitThisAttack.Clear();
+                // // Un nuevo ataque puede volver a golpear a los slimes.
+                // enemiesHitThisAttack.Clear();
                 
-                isAttacking = true;
+                // isAttacking = true;
 
-                playerAnimation.SetTrigger("isAttacking");
+                // playerAnimation.SetTrigger("isAttacking");
+                // AttackStarted?.Invoke();
             }
 
 
@@ -158,13 +208,38 @@ public class PlayerController : MonoBehaviour
         
 
             // Gira hacia la direccion indicada.
+            // if (hasTargetRotation)
+            // {
+            //     transform.rotation = Quaternion.RotateTowards(
+            //         transform.rotation,
+            //         targetRotation,
+            //         turnSpeed * Time.deltaTime
+            //     );
+            // }
+
             if (hasTargetRotation)
             {
+                // float currentTurnSpeed;
+
+                // if (waitingForAttackRotation) currentTurnSpeed = attackTurnSpeed;
+                // else currentTurnSpeed = turnSpeed;
+
+                // forma corta
+                float currentTurnSpeed = waitingForAttackRotation ? attackTurnSpeed : turnSpeed;
+
                 transform.rotation = Quaternion.RotateTowards(
                     transform.rotation,
                     targetRotation,
-                    turnSpeed * Time.deltaTime
+                    currentTurnSpeed * Time.deltaTime
                 );
+            }
+
+            // comparar si el jugador ya esta viendo hacía donde va a ser el ataque
+            if (waitingForAttackRotation)
+            {
+                float angle = Quaternion.Angle(transform.rotation, targetRotation);
+
+                if (angle <= attackRotationThreshold) StartAttack();
             }
         }
 
@@ -182,6 +257,15 @@ public class PlayerController : MonoBehaviour
                 }
                 InventoryUI.SetActive(!InventoryUI.activeSelf);
             }
+    }
+
+    private void StartAttack()
+    {
+        waitingForAttackRotation = false;
+        enemiesHitThisAttack.Clear();
+        isAttacking = true;
+        playerAnimation.SetTrigger("isAttacking");
+        AttackStarted?.Invoke();
     }
     
     private void RotatePlayer(Vector2 direction)
@@ -228,10 +312,64 @@ public class PlayerController : MonoBehaviour
         return true;
     }
 
+    public void TriggerHitStop(float duration)
+    {
+        if (duration <= 0f)
+            return;
+
+        hitStopEndTime = Mathf.Max(hitStopEndTime, Time.unscaledTime + duration);
+
+        if (hitStopCoroutine != null)
+            return;
+
+        animatorSpeedBeforeHitStop = playerAnimation.speed;
+        playerAnimation.speed = 0f;
+        hitStopCoroutine = StartCoroutine(RestoreAnimationAfterHitStop());
+    }
+
+    private IEnumerator RestoreAnimationAfterHitStop()
+    {
+        while (Time.unscaledTime < hitStopEndTime)
+            yield return null;
+
+        playerAnimation.speed = animatorSpeedBeforeHitStop;
+        hitStopCoroutine = null;
+    }
+
+    public void TriggerReceivedHitStop()
+    {
+        TriggerHitStop(receivedHitStopDuration);
+    }
+
+    public void ReceiveHit(GameObject enemy)
+    {
+        // Detener temporalmente la animación
+        TriggerHitStop(receivedHitStopDuration);
+
+        // Esperar a que termine el hitstop antes de aplicar knockback
+        if (receivedHitCoroutine != null)
+            StopCoroutine(receivedHitCoroutine);
+
+        receivedHitCoroutine = StartCoroutine(
+            ApplyKnockbackAfterHitStop(enemy)
+        );
+    }
+
+    private IEnumerator ApplyKnockbackAfterHitStop(GameObject enemy)
+    {
+        while (Time.unscaledTime < hitStopEndTime)
+            yield return null;
+
+        ApplyEnemyKnockback(enemy);
+
+        receivedHitCoroutine = null;
+    }
+
+
     // Se llama en Animation Event cuando inicia el ataque.
     public void EnableWeaponCollider()
     {
-        if (weapon)
+        if (equippedWeapon != null && equippedWeaponCollider != null)
         {
             equippedWeaponCollider.enabled = true;
             equippedWeapon.EnableTrail();  
@@ -244,7 +382,7 @@ public class PlayerController : MonoBehaviour
     {
         // Desactiva el collider al terminar el ataque.
 
-        if (weapon)
+        if (equippedWeapon != null && equippedWeaponCollider != null)
         {
             equippedWeaponCollider.enabled = false;
             equippedWeapon.DisableTrail();
@@ -305,31 +443,52 @@ public class PlayerController : MonoBehaviour
 
     public void equipWeapon()
     {
-     
+        WeaponObject item = weapon != null ? weapon.GetComponent<WeaponObject>() : null;
+        if (item == null || item.weaponData == null || item.weaponData.prefab == null || handObj == null) return;
 
-       //    handObj = transform.Find("Hand");
-       GameObject WeaponObj = Instantiate(weapon.GetComponent<WeaponObject>().weaponData.prefab,handObj);
-       WeaponObj.transform.localPosition = new Vector3(0,0,0);
-       WeaponObj.GetComponent<WeaponObject>().inHand = true;
+        ClearEquippedInstance();
+        // UIDisplay elimina su imagen anterior cuando no hay arma seleccionada.
+        GameObject selected = weapon;
+        weapon = null;
+        RefreshEquippedWeaponUI();
+        weapon = selected;
 
-       equippedWeapon = WeaponObj.GetComponent<WeaponObject>();
-
-       WeaponObj.GetComponent<WeaponObject>().player = this;
-       WeaponObj.GetComponent<SphereCollider>().enabled = false;
-
-       // La espada no puede hacer damage si el jugador no esta atacando.
-        equippedWeaponCollider = WeaponObj.GetComponent<BoxCollider>();
-        equippedWeaponCollider.enabled = false;
-
-        Inventory.gameObject.GetComponent<UIDisplay>().UIEquippedWeaponDisplay();
+        GameObject instance = Instantiate(item.weaponData.prefab, handObj);
+        instance.transform.localPosition = Vector3.zero;
+        equippedWeapon = instance.GetComponent<WeaponObject>();
+        equippedWeapon.inHand = true;
+        equippedWeapon.player = this;
+        SphereCollider pickup = instance.GetComponent<SphereCollider>();
+        if (pickup != null) pickup.enabled = false;
+        equippedWeaponCollider = instance.GetComponent<BoxCollider>();
+        if (equippedWeaponCollider != null) equippedWeaponCollider.enabled = false;
+        RefreshEquippedWeaponUI();
     }
 
     public void UnequipWeapon()
     {
+        ClearEquippedInstance();
         weapon = null;
+        RefreshEquippedWeaponUI();
+    }
+
+    private void ClearEquippedInstance()
+    {
+        if (equippedWeaponCollider != null) equippedWeaponCollider.enabled = false;
+        if (equippedWeapon != null)
+        {
+            // Nunca destruir el objeto almacenado ni depender del orden de los huesos de Hand.
+            equippedWeapon.gameObject.SetActive(false);
+            Destroy(equippedWeapon.gameObject);
+        }
         equippedWeapon = null;
-        Destroy(handObj.GetChild(1).gameObject);
-        Inventory.gameObject.GetComponent<UIDisplay>().UIEquippedWeaponDisplay();
+        equippedWeaponCollider = null;
+    }
+
+    private void RefreshEquippedWeaponUI()
+    {
+        UIDisplay display = Inventory != null ? Inventory.GetComponent<UIDisplay>() : null;
+        if (display != null) display.UIEquippedWeaponDisplay();
     }
 
     private void OnCollisionEnter(Collision collision)
