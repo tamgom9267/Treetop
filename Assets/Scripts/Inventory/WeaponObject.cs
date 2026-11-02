@@ -13,10 +13,12 @@ public class WeaponObject : InventoryObject
     [SerializeField]
     public WeaponData weaponData;
 
-    [Header("Trail/Smear de Arma")]
-    [SerializeField]
-    private TrailRenderer weaponTrail;
+    // [Header("Trail/Smear de Arma")]
+    // [SerializeField]
+    // private TrailRenderer weaponTrail;
 
+    [Header("Particula de Ataque")]
+    [SerializeField] private ParticleSystem actionLinesParticle;
 
 
     public int health;
@@ -87,11 +89,22 @@ public class WeaponObject : InventoryObject
 
     public void EnableTrail()
     {
-        weaponTrail.emitting = true;
+        // metodo de trail anterior
+        //weaponTrail.emitting = true;
+        if (actionLinesParticle != null)
+        {
+            actionLinesParticle.Play(true);
+        }
     }
 
     public void DisableTrail()
     {
-        weaponTrail.emitting = false;
+        // metodo de trail enterior
+        //weaponTrail.emitting = false;
+
+        if(actionLinesParticle != null)
+        {
+            actionLinesParticle.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        }
     }
 }
