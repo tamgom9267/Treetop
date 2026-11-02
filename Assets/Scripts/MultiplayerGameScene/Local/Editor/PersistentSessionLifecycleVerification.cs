@@ -9,6 +9,8 @@ using Photon.Realtime;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
@@ -19,6 +21,7 @@ public static class PersistentSessionLifecycleVerification
     private const string RunningKey = "Treetop.LifecycleVerification.Running";
     private const string SetupKey = "Treetop.LifecycleVerification.Setup";
     private const string NetworkKey = "Treetop.LifecycleVerification.Network";
+    private const string VillageReturnKey = "Treetop.LifecycleVerification.VillageReturn";
     private static string ReportPath => Path.GetFullPath(Path.Combine(Application.dataPath, "../Temp/lifecycle-verification/results.json"));
     private static readonly List<string> passed = new List<string>();
     private static readonly Stack<IEnumerator> routines = new Stack<IEnumerator>();
@@ -47,11 +50,19 @@ public static class PersistentSessionLifecycleVerification
         SessionState.SetString(SetupKey, JsonUtility.ToJson(new Setup { scenes = EditorSceneManager.GetSceneManagerSetup() }));
         SessionState.SetBool(RunningKey, true);
         SessionState.SetBool(NetworkKey, false);
+        SessionState.SetBool(VillageReturnKey, false);
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         EditorApplication.isPlaying = true;
     }
 
     public static void RunBatch() { RunChecks(); }
+
+    [MenuItem("Tools/Multiplayer/Probar regreso a la aldea y pausa")]
+    public static void RunVillageReturnChecks()
+    {
+        RunChecks();
+        SessionState.SetBool(VillageReturnKey, true);
+    }
 
     [MenuItem("Tools/Multiplayer/Probar ciclo de vida (con red)")]
     public static void RunBatchWithNetwork()
@@ -70,7 +81,7 @@ public static class PersistentSessionLifecycleVerification
             EditorApplication.isPaused = Application.isBatchMode;
             passed.Clear(); failure = null; routines.Clear(); lastFrame = -1;
             startedAt = EditorApplication.timeSinceStartup;
-            routines.Push(CheckLifecycle());
+            routines.Push(SessionState.GetBool(VillageReturnKey, false) ? CheckProjectScenes() : CheckLifecycle());
             EditorApplication.update += Tick;
         }
         if (state != PlayModeStateChange.EnteredEditMode) return;
@@ -289,6 +300,7 @@ public static class PersistentSessionLifecycleVerification
         PhotonPartyService service = PhotonPartyService.AvailableInstance;
         Check(player != null && service != null && MultiplayerRunSession.Instance != null,
             "La escena real de aldea crea personaje y gestores con sus referencias del Inspector");
+        yield return CheckPauseInput("Entrada inicial a la aldea");
         PlayerController controller = player.GetComponentInChildren<PlayerController>(true);
         PlayerInventory inventory = controller.Inventory;
         load = SceneManager.LoadSceneAsync("GameScene");
@@ -319,6 +331,14 @@ public static class PersistentSessionLifecycleVerification
         yield return null;
         Check(player == null && NewestSingleton.Instance != null && PhotonPartyService.AvailableInstance == service,
             "Recargar la aldea real reemplaza al personaje sin solicitar reinicio y conserva el servicio");
+        yield return CheckPauseInput("Reemplazo del singleton en la aldea");
+        MultiplayerRunSession run = MultiplayerRunSession.Instance;
+        typeof(MultiplayerRunSession).GetMethod("FreezePlayer", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(run, null);
+        Check(!NewestSingleton.Instance.GetComponentInChildren<PauseController>(true).enabled,
+            "La transicion multijugador bloquea temporalmente la pausa");
+        typeof(MultiplayerRunSession).GetMethod("ReleasePlayer", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(run, null);
+        yield return CheckPauseInput("Liberar al personaje tras esperar a la party");
+        yield return CheckCompletedReturn();
         foreach (PartyEndReason reason in new[] { PartyEndReason.HostAlone, PartyEndReason.HostDisconnected,
             PartyEndReason.Disconnected, PartyEndReason.HostCancelled })
             yield return CheckInterruptedReturn(reason);
@@ -327,6 +347,44 @@ public static class PersistentSessionLifecycleVerification
         yield return null;
         Check(NewestSingleton.Instance == null && PhotonPartyService.Instance == null,
             "El ultimo regreso al menu real termina sin instancias persistentes propias");
+    }
+
+    private static IEnumerator CheckCompletedReturn()
+    {
+        PhotonPartyService service = PhotonPartyService.AvailableInstance;
+        MultiplayerRunSession run = MultiplayerRunSession.Instance;
+        PhotonNetwork.OfflineMode = true;
+        service.CreateParty("PauseTest");
+        Check(service.IsInParty && service.IsHost, "Preparar regreso completado con una sala local de Photon");
+        SetField(run, "activeRun", true);
+        SetField(run, "ending", true);
+        string id = Guid.NewGuid().ToString("N");
+        typeof(MultiplayerRunSession).GetProperty("RunId").GetSetMethod(true).Invoke(run, new object[] { id });
+        PhotonNetwork.CurrentRoom.SetCustomProperties(new ExitGames.Client.Photon.Hashtable
+            { { "world.run", id }, { "party.locked", true } });
+        AsyncOperation load = SceneManager.LoadSceneAsync("MultiplayerGameScene");
+        while (!load.isDone) yield return null;
+        yield return null;
+        NewestSingleton previous = NewestSingleton.Instance;
+        SetField(run, "completedRun", true);
+        typeof(MultiplayerRunSession).GetMethod("ReturnToVillage", BindingFlags.NonPublic | BindingFlags.Instance)
+            .Invoke(run, new object[] { string.Empty });
+        FieldInfo routine = typeof(MultiplayerRunSession).GetField("returnRoutine", BindingFlags.NonPublic | BindingFlags.Instance);
+        double until = Time.realtimeSinceStartupAsDouble + 10d;
+        while (routine.GetValue(run) != null)
+        {
+            if (Time.realtimeSinceStartupAsDouble >= until)
+                throw new InvalidOperationException("El regreso completado no termino.");
+            yield return null;
+        }
+        Check(previous == null && !run.IsRunning && service.IsInParty && service.IsPartyLocked &&
+            string.IsNullOrEmpty(PhotonNetwork.CurrentRoom.CustomProperties["world.run"] as string),
+            "Completar partida reemplaza al personaje y confirma el regreso conservando la party bloqueada");
+        yield return CheckPauseInput("Completar partida y confirmar regreso de la party");
+        service.LeaveParty();
+        PhotonNetwork.Disconnect();
+        yield return null; yield return null;
+        Object.FindFirstObjectByType<VillageMultiplayerMenu>().DismissNotice();
     }
 
     private static IEnumerator CheckInterruptedReturn(PartyEndReason reason)
@@ -369,6 +427,59 @@ public static class PersistentSessionLifecycleVerification
             reason + ": regresar crea un personaje limpio y destruye armas e inventario anteriores");
         Check(PhotonPartyService.AvailableInstance == service && MultiplayerRunSession.Instance == run && fresh.enabled,
             reason + ": el nuevo personaje queda habilitado y los gestores siguen disponibles en la aldea");
+        VillageMultiplayerMenu menu = Object.FindFirstObjectByType<VillageMultiplayerMenu>();
+        if (menu != null) menu.DismissNotice();
+        yield return CheckPauseInput(reason.ToString());
+    }
+
+    private static IEnumerator CheckPauseInput(string context)
+    {
+        PauseController pause = NewestSingleton.Instance.GetComponentInChildren<PauseController>(true);
+        var action = (InputAction)typeof(PauseController).GetField("PauseAction", BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetValue(pause);
+        Check(pause.isActiveAndEnabled && action != null && action.enabled,
+            context + ": el controlador de pausa y su accion estan habilitados");
+        GameObject canvas = (GameObject)GetField(pause, "CanvasPause");
+        GameObject healthBar = (GameObject)GetField(pause, "CanvasHealthBar");
+        InputSettings.BackgroundBehavior previousBackground = InputSystem.settings.backgroundBehavior;
+        InputSettings.EditorInputBehaviorInPlayMode previousEditorInput = InputSystem.settings.editorInputBehaviorInPlayMode;
+        InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+        InputSystem.settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+        bool wasEditorPaused = EditorApplication.isPaused;
+        EditorApplication.isPaused = false;
+        Keyboard keyboard = InputSystem.AddDevice<Keyboard>();
+        Mouse mouse = InputSystem.AddDevice<Mouse>();
+        try
+        {
+            PlayerInput input = NewestSingleton.Instance.GetComponentInChildren<PlayerInput>(true);
+            input.SwitchCurrentControlScheme("Keyboard&Mouse", keyboard, mouse);
+            MethodInfo update = typeof(PauseController).GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo processInput = typeof(InputSystem).GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Static,
+                null, new[] { typeof(InputUpdateType) }, null);
+            // Procesar la entrada de juego explicitamente entre los pasos del editor.
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Escape));
+            processInput.Invoke(null, new object[] { InputUpdateType.Dynamic });
+            update.Invoke(pause, null);
+            Check(Time.timeScale == 0f && canvas.activeInHierarchy && !healthBar.activeSelf,
+                context + ": Escape abre la pausa y detiene el juego");
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+            processInput.Invoke(null, new object[] { InputUpdateType.Dynamic });
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Escape));
+            processInput.Invoke(null, new object[] { InputUpdateType.Dynamic });
+            update.Invoke(pause, null);
+            Check(Time.timeScale == 1f && !canvas.activeSelf && healthBar.activeInHierarchy,
+                context + ": otro Escape cierra la pausa y reanuda el juego");
+        }
+        finally
+        {
+            InputSystem.RemoveDevice(keyboard);
+            InputSystem.RemoveDevice(mouse);
+            InputSystem.settings.backgroundBehavior = previousBackground;
+            InputSystem.settings.editorInputBehaviorInPlayMode = previousEditorInput;
+            EditorApplication.isPaused = wasEditorPaused;
+            pause.ResumeGame();
+        }
+        yield return null;
     }
 
     private static NewestSingleton Player(Scene scene, Vector3 position)

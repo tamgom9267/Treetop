@@ -3461,7 +3461,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1698675721}
-  - {fileID: 1173769577}
   - {fileID: 1847954178}
   - {fileID: 1408362003}
   - {fileID: 781635834}
@@ -6018,11 +6017,11 @@ Transform:
   m_GameObject: {fileID: 1173769574}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.4, z: 17}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 678004105}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1186011654
 GameObject:
@@ -7466,6 +7465,8 @@ MonoBehaviour:
   receivedHitStopDuration: 0.08
   isAttacking: 0
   turnSpeed: 720
+  attackTurnSpeed: 1440
+  attackRotationThreshold: 2
   weapon: {fileID: 0}
   Slot1: {fileID: 0}
   Slot2: {fileID: 0}
@@ -20942,6 +20943,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1278039724}
+  - {fileID: 1173769577}
   - {fileID: 403466410}
   - {fileID: 1431349117}
   - {fileID: 1548763047}
