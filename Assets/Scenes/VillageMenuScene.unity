@@ -3486,6 +3486,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2274876065869767667, guid: e9b49444fbd39aa4d87a3056a07fac7e, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4946747541223356268, guid: e9b49444fbd39aa4d87a3056a07fac7e, type: 3}
       propertyPath: m_Name
       value: Lanza
@@ -8334,6 +8338,10 @@ PrefabInstance:
     - target: {fileID: 2750878817769188343, guid: 16ef6a3cc4bfa534fb63975b39979cf4, type: 3}
       propertyPath: m_Name
       value: Martillo
+      objectReference: {fileID: 0}
+    - target: {fileID: 2755364615220087399, guid: 16ef6a3cc4bfa534fb63975b39979cf4, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3410997456978261394, guid: 16ef6a3cc4bfa534fb63975b39979cf4, type: 3}
       propertyPath: m_LocalPosition.x
