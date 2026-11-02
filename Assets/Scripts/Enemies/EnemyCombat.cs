@@ -116,7 +116,7 @@ public class EnemyCombat : MonoBehaviour
             weaponObject.player.TriggerHitStop(hitStopDuration);
 
             // daño y knockback
-            TakeDamage(attackerClass.WD);
+            TakeDamage(attackerClass.WD + weaponObject.WD);
 
             StartCoroutine(ApplyKnockbackAfterHitStop
                 (other.transform.position,
