@@ -13,7 +13,8 @@ public class Chest : MonoBehaviour
     [SerializeField] GameObject Weapon;
     [SerializeField] GameObject Text;
 
-    [SerializeField] private ParticleSystem chestParticles;
+    [Header("Particulas")]
+    [SerializeField] private ParticleSystem[] chestParticles;
 
     private void Start()
     {
@@ -29,10 +30,12 @@ public class Chest : MonoBehaviour
         animator.SetBool("isOpen", true);
 
         // particulas al abrir el cofre
-        if (chestParticles != null)
-        {
-            chestParticles.gameObject.SetActive(true);
-        }
+        // if (chestParticles != null)
+        // {
+        //     chestParticles.gameObject.SetActive(true);
+        // }
+
+        StartCoroutine(ChestGlowEffect());
 
         // Se activa el estado de interaccion con el cofre
         chestInteracted = true;
@@ -82,6 +85,16 @@ public class Chest : MonoBehaviour
             Text.SetActive(false);
             PlayerNear = false;
         }
+    }
+
+    private IEnumerator ChestGlowEffect()
+    {
+        foreach (ParticleSystem particle in chestParticles)
+        {
+            if (particle != null) particle.gameObject.SetActive(true);
+        }
+
+        yield return null;
     }
 
     private IEnumerator AnimacionArma(GameObject weaponObj, Vector3 posFinal)

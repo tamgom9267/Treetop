@@ -61,6 +61,8 @@ public class PlayerClass : MonoBehaviour
     [SerializeField, ColorUsage(true, true)]
     private Color healingEmissionColor = new Color(0.7f, 1f, 0.2f, 1f);
     [SerializeField] private float healingFlashDuration = 0.6f;
+    [SerializeField] private ParticleSystem healingParticles;
+    private ParticleSystem activeHealingParticles;
 
     private MaterialPropertyBlock[] originalPropertyBlocks;
     private MaterialPropertyBlock emissionPropertyBlock;
@@ -178,7 +180,11 @@ public class PlayerClass : MonoBehaviour
 
         // solo cambiar color si se recupera vida en verdad
         // asi no sale si ya pasaste de 100 de vida
-        if (health > previousHealth) TriggerEmissionFeedback(healingEmissionColor, healingFlashDuration, 1);
+        if (health > previousHealth)
+        {
+            TriggerEmissionFeedback(healingEmissionColor, healingFlashDuration, 1);
+            StartHealingParticle();
+        }
 
         // para observer
         NotifyStatsChanged();
@@ -314,8 +320,29 @@ public class PlayerClass : MonoBehaviour
         {
             playerRenderer.SetPropertyBlock(originalPropertyBlocks[i], i);
         }
+        // parar el efecto
+        StopHealingParticles();
 
         currentFeedbackPriority = 0;
         emissionCoroutine = null;
+    }
+
+    private void StartHealingParticle()
+    {
+        if (activeHealingParticles != null) return;
+
+        activeHealingParticles = Instantiate(
+            healingParticles, transform.position, Quaternion.identity, transform
+        );
+
+        activeHealingParticles.Play();
+    }
+
+    private void StopHealingParticles()
+    {
+        if (activeHealingParticles == null) return;
+
+        Destroy(activeHealingParticles.gameObject);
+        activeHealingParticles = null;
     }
 }

@@ -7507,6 +7507,7 @@ MonoBehaviour:
   damageFlashDuration: 0.1
   healingEmissionColor: {r: 0.2188279, g: 1, b: 0.19999999, a: 0.3137255}
   healingFlashDuration: 0.6
+  healingParticles: {fileID: 7884627245462379932, guid: 7086937ad0447a644890084c5406657d, type: 3}
 --- !u!114 &1408362007
 MonoBehaviour:
   m_ObjectHideFlags: 0
