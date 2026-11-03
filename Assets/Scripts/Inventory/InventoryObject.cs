@@ -16,6 +16,21 @@ public class InventoryObject : MonoBehaviour
 
     public List<List<int>> requieredCells = new List<List<int>>();
 
+    public bool isSelected = false;
+
+    public virtual Sprite GetUISprite()
+    {
+        return null;
+    }
+
+    protected void getRealList(List<int> cells)
+    {
+        for(int i = 0; i < cells.Count; i+=2)
+        {
+            requieredCells.Add(new List<int> {cells[i],cells[i+1]});
+        }
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

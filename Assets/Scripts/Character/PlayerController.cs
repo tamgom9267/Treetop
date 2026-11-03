@@ -59,6 +59,10 @@ public class PlayerController : MonoBehaviour
     public InputActionReference inventory;
     public InputActionReference rotate;
 
+    public InputActionReference Spell1;
+    public InputActionReference Spell2;
+    public InputActionReference Spell3;
+
     public GameObject nearestWeapon;
     public InventoryObject nearestWeaponObj;
     public InventoryObject SelectedItem;
@@ -105,6 +109,9 @@ public class PlayerController : MonoBehaviour
        interact.action.Enable();
        inventory.action.Enable();
        rotate.action.Enable();
+       Spell1.action.Enable();
+       Spell2.action.Enable();
+       Spell3.action.Enable();
 
        Inventory.GetComponent<PlayerInventory>().AssignPlayer(this);
 
@@ -133,10 +140,22 @@ public class PlayerController : MonoBehaviour
             {
                 InventoryUI.GetComponent<PlayerInventory>().MovingCursor(new Vector2(_moveDirection.x, _moveDirection.y));
             }
-            if (Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>().isPressed == false && Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>().InventoryItemObj != null && attack.action.WasPressedThisFrame())
+            if(Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>().isPressed == false && Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>().InventoryItemObj != null && attack.action.WasPressedThisFrame() && Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj.CompareTag("Weapon"))
             {
                 weapon = Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>().InventoryItemObj.GetComponent<PanelManager>().itemObj;
                 equipWeapon();
+            }
+            if (Spell1.action.WasPressedThisFrame())
+            {
+                equipSpell(1);
+            }
+            if (Spell2.action.WasPressedThisFrame())
+            {
+                equipSpell(2);
+            }
+            if (Spell3.action.WasPressedThisFrame())
+            {
+                equipSpell(3);
             }
 
             if (rotate.action.WasPressedThisFrame())
@@ -479,6 +498,8 @@ public class PlayerController : MonoBehaviour
 
     public void equipWeapon()
     {
+        if (weapon == null || weapon.CompareTag("Weapon") == false) return;
+
         WeaponObject item = weapon != null ? weapon.GetComponent<WeaponObject>() : null;
         if (item == null || item.weaponData == null || item.weaponData.prefab == null || handObj == null) return;
 
@@ -544,7 +565,7 @@ public class PlayerController : MonoBehaviour
     {
         if(nearestWeapon != null)
         {
-            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
+            nearestWeaponObj.isSelected = false;
             nearestWeaponObj =null;
             nearestWeapon = null;    
         }
@@ -575,15 +596,15 @@ public class PlayerController : MonoBehaviour
 
         if(nearestWeaponObj != null)
         {
-            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = false;
+            nearestWeaponObj.isSelected = false;
         }
 
         nearestWeapon = closest;
 
         if(closest != null)
         {
-            nearestWeaponObj = closest.GetComponent<WeaponObject>();
-            nearestWeaponObj.GetComponent<WeaponObject>().isSelected = true;
+            nearestWeaponObj = closest.GetComponent<InventoryObject>();
+            nearestWeaponObj.isSelected = true;
         }
         else
         {
@@ -591,7 +612,64 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void equipSpell(int slot)
+    {
+        CursorObject cursorObj = Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>();
+
+        if (cursorObj.InventoryItemObj == null) return;
+
+        GameObject spellObj = cursorObj.InventoryItemObj.GetComponent<PanelManager>().itemObj;
+
+        if (spellObj.CompareTag("Spell") == false) return;
+
+        InventoryObject spell = spellObj.GetComponent<InventoryObject>();
+
+        if (spell == null) return;
+
+        if (Slot1 == spell) Slot1 = null;
+        if (Slot2 == spell) Slot2 = null;
+        if (Slot3 == spell) Slot3 = null;
+
+        if (slot == 1) Slot1 = spell;
+        else if (slot == 2) Slot2 = spell;
+        else if (slot == 3) Slot3 = spell;
+
+        RefreshEquippedSpellUI();
+    }
+
+    public void UnequipSpell(GameObject spellObj)
+    {
+        bool changed = false;
+
+        if (Slot1 != null && Slot1.gameObject == spellObj)
+        {
+            Slot1 = null;
+            changed = true;
+        }
+        if (Slot2 != null && Slot2.gameObject == spellObj)
+        {
+            Slot2 = null;
+            changed = true;
+        }
+        if (Slot3 != null && Slot3.gameObject == spellObj)
+        {
+            Slot3 = null;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            RefreshEquippedSpellUI();
+        }
+    }
+
+    private void RefreshEquippedSpellUI()
+    {
+        UIDisplay display = Inventory != null ? Inventory.GetComponent<UIDisplay>() : null;
+        if (display != null) display.UIEquippedSpellsDisplay();
+    }
+
+     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Weapon") || other.CompareTag("Spell"))
         {
@@ -615,3 +693,4 @@ public class PlayerController : MonoBehaviour
     }
 
 }
+

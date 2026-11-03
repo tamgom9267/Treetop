@@ -28,6 +28,10 @@ public class PlayerInventory : MonoBehaviour
     //Gameobjects del canvas chestloot inventario
     [SerializeField] GameObject ChestLoot;
     [SerializeField] GameObject ChestLootImages;
+
+    [SerializeField] public GameObject UISlot1;
+    [SerializeField] public GameObject UISlot2;
+    [SerializeField] public GameObject UISlot3;
     
     bool isMoving = false;
     GameObject SpriteObject;
@@ -286,49 +290,46 @@ public class PlayerInventory : MonoBehaviour
         //Agregar el objecto al chestloot grid
         if(canFit)
         {
-            for(int column = 0; column < worldObject.GetComponent<WeaponObject>().requieredCells.Count; column++)
-            {
-                for(int row = 0; row < worldObject.GetComponent<WeaponObject>().requieredCells[column].Count; row++)
+            for(int column = 0; column < worldObject.GetComponent<InventoryObject>().requieredCells.Count; column++)
+{
+                for(int row = 0; row < worldObject.GetComponent<InventoryObject>().requieredCells[column].Count; row++)
                 {
-                    if(worldObject.GetComponent<WeaponObject>().requieredCells[column][row] == 1 && lootgrid[column][row] == 0)
+                    if(worldObject.GetComponent<InventoryObject>().requieredCells[column][row] == 1 && lootgrid[column][row] == 0)
                     {
-                        lootgrid[column][row] = worldObject.GetComponent<WeaponObject>().ID;
+                        lootgrid[column][row] = worldObject.GetComponent<InventoryObject>().ID;
                     }
                 }
             }
         }
 
         //Reflejar el cambio en la UI
-GameObject InvObj = Instantiate(ObjectImagePanel, ChestLootImages.transform);
+        GameObject InvObj = Instantiate(ObjectImagePanel, ChestLootImages.transform);
 
-InvObj.GetComponent<PanelManager>().WeaponID = worldObject.GetComponent<InventoryObject>().ID;
-InvObj.GetComponent<PanelManager>().itemObj = worldObject;
+        InvObj.GetComponent<PanelManager>().WeaponID = worldObject.GetComponent<InventoryObject>().ID;
+        InvObj.GetComponent<PanelManager>().itemObj = worldObject;
 
-(int maxRow, int maxColumn, int minRow, int minColumn) = GetShapeSize(worldObject);
+        (int maxRow, int maxColumn, int minRow, int minColumn) = GetShapeSize(worldObject);
 
-RectTransform rectPanel = InvObj.GetComponent<RectTransform>();
-rectPanel.sizeDelta = new Vector2(rectPanel.sizeDelta.x * (maxRow - minRow + 1), rectPanel.sizeDelta.y * (maxColumn - minColumn + 1));
+        RectTransform rectPanel = InvObj.GetComponent<RectTransform>();
+        rectPanel.sizeDelta = new Vector2(rectPanel.sizeDelta.x * (maxRow - minRow + 1), rectPanel.sizeDelta.y * (maxColumn - minColumn + 1));
 
-float margin = 10f;
+        float margin = 10f;
 
-BoxCollider2D InvObjCollider = InvObj.GetComponent<BoxCollider2D>();
-InvObjCollider.size = new Vector2(rectPanel.sizeDelta.x - margin * 2, rectPanel.sizeDelta.y - margin * 2);
-InvObjCollider.offset = new Vector2((0.5f - rectPanel.pivot.x) * rectPanel.sizeDelta.x, (0.5f - rectPanel.pivot.y) * rectPanel.sizeDelta.y);
+        BoxCollider2D InvObjCollider = InvObj.GetComponent<BoxCollider2D>();
+        InvObjCollider.size = new Vector2(rectPanel.sizeDelta.x - margin * 2, rectPanel.sizeDelta.y - margin * 2);
+        InvObjCollider.offset = new Vector2((0.5f - rectPanel.pivot.x) * rectPanel.sizeDelta.x, (0.5f - rectPanel.pivot.y) * rectPanel.sizeDelta.y);
 
-foreach(Transform obj in ChestLoot.transform)
-{
-    if(obj.GetComponent<PanelManager>().location == ObjImagePosition[0])
-    {
-        RectTransform rect = obj.GetComponent<RectTransform>();
-        RectTransform rectInv = InvObj.GetComponent<RectTransform>();
-        rectInv.anchoredPosition = rect.anchoredPosition;
-    }
-}
+        foreach(Transform obj in ChestLoot.transform)
+        {
+            if(obj.GetComponent<PanelManager>().location == ObjImagePosition[0])
+            {
+                RectTransform rect = obj.GetComponent<RectTransform>();
+                RectTransform rectInv = InvObj.GetComponent<RectTransform>();
+                rectInv.anchoredPosition = rect.anchoredPosition;
+            }
+        }
 
-if(worldObject.CompareTag("Weapon"))
-{
-    InvObj.GetComponent<Image>().sprite = worldObject.GetComponent<WeaponObject>().weaponData.UIsprite;
-}
+        InvObj.GetComponent<Image>().sprite = worldObject.GetComponent<InventoryObject>().GetUISprite();
     }
 
     
@@ -347,6 +348,8 @@ if(worldObject.CompareTag("Weapon"))
             {
                 Player.UnequipWeapon();
             }
+
+            Player.UnequipSpell(item);
 
             for (int column = 0; column < lootgrid.Count; column++)
             {

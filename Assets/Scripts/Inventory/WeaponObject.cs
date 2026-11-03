@@ -35,11 +35,14 @@ public class WeaponObject : InventoryObject
     public string GetInteractText() => $"Player picked up {gameObject.name}";
 
     public Transform GetTransform() => transform; 
-
-    public bool isSelected = false;   
+  
     public bool inHand = false;
 
-
+    public override Sprite GetUISprite()
+    {
+        return weaponData.UIsprite;
+    }
+    
     public void looted()
     {
         player.Inventory.SelectedObject = this;
@@ -47,13 +50,6 @@ public class WeaponObject : InventoryObject
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     
-    void getRealList(List<int> cells)
-    {
-        for(int i = 0; i < cells.Count; i+=2)
-        {
-            requieredCells.Add(new List<int> {cells[i],cells[i+1]});
-        }
-    }
     void Awake()
     {
         Name = weaponData.Name;
@@ -71,10 +67,19 @@ public class WeaponObject : InventoryObject
     // Update is called once per frame
     void Update()
     {
-        if (transform.childCount > 0)
+        if(isSelected == true)
         {
-            GameObject interactCanvas = transform.GetChild(0).gameObject;
-            interactCanvas.SetActive(isSelected && !inHand);
+            GameObject InteractCanva = transform.GetChild(0).gameObject;
+            if(inHand == false)
+            {
+                InteractCanva.SetActive(true);
+            }
+            
+        }
+        else
+        {
+            GameObject InteractCanva = transform.GetChild(0).gameObject;
+            InteractCanva.SetActive(false);
         }
     }
 
