@@ -89,18 +89,23 @@ MonoBehaviour:
   - type: sword
     prefab: {fileID: 6403767111067648006, guid: 93edc705b330aa049887c763bebc5ee5, type: 3}
     weapon: {fileID: 11400000, guid: a2415408a2bb30d43b0301c3bc2a7f70, type: 2}
-    objectName:
+    objectName: 
     icon: {fileID: 21300000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
   - type: spear
     prefab: {fileID: 2532832787750263923, guid: 44d5fec98777f744dab41a277c900ca0, type: 3}
     weapon: {fileID: 11400000, guid: b0219f95a4d400e4eba30455e0bdeccd, type: 2}
-    objectName:
+    objectName: 
     icon: {fileID: 21300000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
   - type: hammer
     prefab: {fileID: 7510638732348808801, guid: 970f9f651e3ab8c47a47eef629d15597, type: 3}
     weapon: {fileID: 11400000, guid: 2c146f585ec298e4fab40c094d85b062, type: 2}
-    objectName:
+    objectName: 
     icon: {fileID: 21300000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
+  - type: e797e4bb67949514e994b86dfeac5cba
+    prefab: {fileID: 1995249544943147221, guid: eee8e3db73107cd45ac1566b34caf490, type: 3}
+    weapon: {fileID: 11400000, guid: e8ac51720ecffa74eb98798d2f4f6485, type: 2}
+    objectName: 
+    icon: {fileID: 8583323054461502815, guid: 3c613c6fff530bd4eaca7209ced08b99, type: 3}
 --- !u!114 &8318190442623539677
 MonoBehaviour:
   m_ObjectHideFlags: 0
