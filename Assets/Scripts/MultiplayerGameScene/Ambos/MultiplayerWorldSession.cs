@@ -213,10 +213,11 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     }
     private void StartAttack()
     {
-        if (!Playing || !Loot.CanUse(player.weapon)) return;
+        WeaponObject weapon = player.EquippedWeaponInstance;
+        if (!Playing || weapon == null || !Loot.CanUse(player.weapon)) return;
         var identity = player.weapon.GetComponent<MultiplayerItemIdentity>();
         var message = new MultiplayerWorldMessage { op = "attack", attack = ++localAttack, item = identity.Id,
-            damage = Mathf.Clamp(player.playerClass.WD, 1, 10000), position = player.transform.position };
+            damage = Mathf.Clamp(player.playerClass.WD + weapon.WD, 1, 10000), position = player.transform.position };
         if (MultiplayerGameplayProtocol.Host) ReceiveRequest(MultiplayerGameplayProtocol.LocalActor, message);
         else MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldRequest, message, true, MultiplayerGameplayProtocol.HostActor, flush: true);
     }
