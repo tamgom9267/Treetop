@@ -11,7 +11,6 @@ TagManager:
   - PhysicalEnemy
   - ProjectileEnemy
   - Chest
-  - Spell
   layers:
   - Default
   - TransparentFX
