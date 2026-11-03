@@ -71,12 +71,19 @@ public class WeaponObject : InventoryObject
     // Update is called once per frame
     void Update()
     {
-        if(isSelected == true)
+        if(transform.childCount > 0)
         {
             GameObject InteractCanva = transform.GetChild(0).gameObject;
             if(inHand == false)
             {
-                InteractCanva.SetActive(true);
+                if(inHand == false)
+                {
+                    InteractCanva.SetActive(true);
+                }
+            }
+            else
+            {
+                InteractCanva.SetActive(false);
             }
             
         }
