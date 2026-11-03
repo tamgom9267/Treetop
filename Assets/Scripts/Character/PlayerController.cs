@@ -593,7 +593,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("Weapon"))
+        if(other.CompareTag("Weapon") || other.CompareTag("Spell"))
         {
             if(nearWeapons.Contains(other.gameObject) == false)
             {
@@ -608,7 +608,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if(other.CompareTag("Weapon"))
+        if(other.CompareTag("Weapon") || other.CompareTag("Spell"))
         {
             nearWeapons.Remove(other.gameObject);
         }
