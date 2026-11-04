@@ -12,3 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4432b723246e044ea0f5877a0000474, type: 3}
   m_Name: Staff
   m_EditorClassIdentifier: Assembly-CSharp::ObjectData
+  Name: spear
+  model: {fileID: 919132149155446097, guid: 943f2b74a9383fe06a0af6c3699d5863, type: 3}
+  prefab: {fileID: 2038680570063503422, guid: 5ed751d2c05f647468915e065607f6c1, type: 3}
+  UIsprite: {fileID: 21300000, guid: b959236cd3250f146ad591fb2620f824, type: 3}
+  weight: 0
+  requiredCells: 010000000000000001000000000000000100000000000000
+  health: 0
+  MP: 0
+  defense: 0
+  WD: 2
+  PD: 5
+  HB: 0
+  speed: 0
+  additionalEffects: []
