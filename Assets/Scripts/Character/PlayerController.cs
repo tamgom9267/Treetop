@@ -199,6 +199,8 @@ public class PlayerController : MonoBehaviour
                     StartAttack();
                 }
 
+                
+
                 // se rota el personaje a la direccion assignada
                 // RotatePlayer(attackDirection);
 
@@ -211,6 +213,19 @@ public class PlayerController : MonoBehaviour
 
                 // playerAnimation.SetTrigger("isAttacking");
                 // AttackStarted?.Invoke();
+            }
+
+            if (Spell1.action.WasPressedThisFrame() && Slot1 != null)
+            {
+                Slot1.GetComponent<SpellObject>().SpellEffect();
+            }
+            else if (Spell2.action.WasPressedThisFrame() && Slot2 != null)
+            {
+                Slot2.GetComponent<SpellObject>().SpellEffect();
+            }
+            else if (Spell3.action.WasPressedThisFrame() && Slot3 != null)
+            {
+                Slot3.GetComponent<SpellObject>().SpellEffect();
             }
 
 

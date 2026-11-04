@@ -3,6 +3,9 @@ using UnityEngine;
 
 public abstract class SpellObject : InventoryObject
 {
+    [SerializeField] 
+    public PlayerController player;
+
     [SerializeField]
     public ObjectData spellData;
 
@@ -17,9 +20,9 @@ public abstract class SpellObject : InventoryObject
     public int HB;
     public int speed;
 
-    public abstract void SpellEffect(PlayerController player);
+    public abstract void SpellEffect();
 
-    public virtual IEnumerator EndEffect(float num, PlayerClass playerClass)
+    public virtual IEnumerator EndEffect(float num)
     {
         yield return new WaitForSeconds(num);
 

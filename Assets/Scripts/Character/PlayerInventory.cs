@@ -266,6 +266,13 @@ public class PlayerInventory : MonoBehaviour
     
     public void Createloot(GameObject worldObject)
     {
+        if (worldObject.CompareTag("Spell"))
+        {
+            if (worldObject.GetComponent<SpellObject>() != null)
+            {
+                worldObject.GetComponent<SpellObject>().player = Player;
+            }
+        }
 
         if (Inventory.Contains(worldObject))
         {

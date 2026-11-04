@@ -7,10 +7,10 @@ using UnityEngine.UI;
 
 public class WeaponObject : InventoryObject
 {
-    [SerializeField]
+    [SerializeField] 
     public PlayerController player;
 
-    [SerializeField]
+    [SerializeField] 
     public ObjectData weaponData;
 
     // [Header("Trail/Smear de Arma")]
