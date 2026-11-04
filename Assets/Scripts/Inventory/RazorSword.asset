@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4432b723246e044ea0f5877a0000474, type: 3}
   m_Name: RazorSword
   m_EditorClassIdentifier: Assembly-CSharp::ObjectData
-  Name: sword
+  Name: razorsword
   model: {fileID: 919132149155446097, guid: 0f513483d064f2a6ca19a390a4d030d3, type: 3}
   prefab: {fileID: 7291598591648831995, guid: bfc14715b5f84c543b2fcd104e715983, type: 3}
   UIsprite: {fileID: 21300000, guid: 005e0cad7dfccf741a524f7f8120a8c2, type: 3}

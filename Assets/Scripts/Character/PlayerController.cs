@@ -307,10 +307,10 @@ public class PlayerController : MonoBehaviour
 
         switch (weaponName.Trim().ToLowerInvariant())
         {
-            case "sword":
+            case "sword" or "razorsword":
                 attackTrigger = "isAttackingSword";
                 return true;
-            case "spear":
+            case "spear" or "staff":
                 attackTrigger = "isAttackingSpear";
                 return true;
             case "hammer":
