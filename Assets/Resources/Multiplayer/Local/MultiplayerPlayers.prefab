@@ -72,10 +72,10 @@ MonoBehaviour:
   - typeId: hammer
     localWeapon: {fileID: 11400000, guid: 2c146f585ec298e4fab40c094d85b062, type: 2}
     remotePrefab: {fileID: 1876457747837315402, guid: ce5ad393c805fd54ba4fac3b475916e7, type: 3}
-  - typeId: razorSword
+  - typeId: sword
     localWeapon: {fileID: 11400000, guid: f19e0984dc1a427419b9a5c0c3c8ac2e, type: 2}
     remotePrefab: {fileID: 2065996016250935625, guid: 9f8995422d85cdd42aadd9a41e079812, type: 3}
-  - typeId: staff
+  - typeId: spear
     localWeapon: {fileID: 11400000, guid: 56ad6963cecf69b439e2a635d6820820, type: 2}
     remotePrefab: {fileID: 6612720521502261377, guid: b642da4fa6935ae4d88e26722c156b15, type: 3}
   interpolationDelay: 0.1
