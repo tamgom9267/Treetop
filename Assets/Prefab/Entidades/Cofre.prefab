@@ -232,6 +232,7 @@ MonoBehaviour:
   PlayerNear: 0
   Weapon: {fileID: 137415524845617739, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
   Text: {fileID: 304904994789321899}
+  randomLoot: 1
   chestParticles:
   - {fileID: 3197902868419337084}
   - {fileID: 2810610617568735823}

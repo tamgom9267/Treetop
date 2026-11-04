@@ -12,6 +12,7 @@ public class Chest : MonoBehaviour
 
     [SerializeField] GameObject Weapon;
     [SerializeField] GameObject Text;
+    [SerializeField] private bool randomLoot = true;
 
     [Header("Particulas")]
     [SerializeField] private ParticleSystem[] chestParticles;
@@ -26,6 +27,25 @@ public class Chest : MonoBehaviour
 
     public GameObject hasInteracted()
     {
+        GameObject weaponPrefab = Weapon;
+        if (randomLoot)
+        {
+            GameObject[] lootPrefabs = Resources.LoadAll<GameObject>("GeneracionDeCuartos/Armas");
+            if (lootPrefabs.Length == 0)
+            {
+                Debug.LogError("No se encontraron prefabs de loot en Resources/GeneracionDeCuartos/Armas.", this);
+                return null;
+            }
+
+            weaponPrefab = lootPrefabs[Random.Range(0, lootPrefabs.Length)];
+        }
+
+        if (weaponPrefab == null)
+        {
+            Debug.LogError("El cofre no tiene un prefab de arma asignado.", this);
+            return null;
+        }
+
         // Activar la animación de abrir cofre
         animator.SetBool("isOpen", true);
 
@@ -48,7 +68,7 @@ public class Chest : MonoBehaviour
             transform.position.z - 3
         ); 
 
-        GameObject WeaponObj = Instantiate(Weapon);
+        GameObject WeaponObj = Instantiate(weaponPrefab);
         WeaponObj.GetComponent<WeaponObject>().isSelected = true;
 
         // que inicie dentro del cofre el arma
