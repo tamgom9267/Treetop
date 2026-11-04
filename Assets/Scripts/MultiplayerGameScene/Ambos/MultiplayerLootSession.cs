@@ -78,6 +78,17 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
     }
     private MultiplayerLootDefinition Definition(string type)
     { foreach (var entry in catalog) if (entry.type == type) return entry; return null; }
+    public bool TryGetWeaponData(string id, int actor, out ObjectData weaponData)
+    {
+        weaponData = null;
+        if (!OwnedBy(id, actor)) return false;
+        var source = MultiplayerGameplayProtocol.Host ? ledger.Records : records;
+        if (!source.TryGetValue(id, out var record)) return false;
+        MultiplayerLootDefinition definition = Definition(record.type);
+        if (definition == null || definition.weapon == null) return false;
+        weaponData = definition.weapon;
+        return true;
+    }
     private bool LocalHeld(InventoryObject item) => player.Inventory.Inventory.Contains(item.gameObject) || player.Inventory.Loot.Contains(item.gameObject) || player.weapon == item.gameObject;
     // Algunos modelos contienen un WeaponObject deshabilitado, ademas del objeto raiz.
     // No son objetos independientes ni deben recibir identidad o propiedad de red.

@@ -72,6 +72,12 @@ MonoBehaviour:
   - typeId: hammer
     localWeapon: {fileID: 11400000, guid: 2c146f585ec298e4fab40c094d85b062, type: 2}
     remotePrefab: {fileID: 1876457747837315402, guid: ce5ad393c805fd54ba4fac3b475916e7, type: 3}
+  - typeId: razorsword
+    localWeapon: {fileID: 11400000, guid: f19e0984dc1a427419b9a5c0c3c8ac2e, type: 2}
+    remotePrefab: {fileID: 2065996016250935625, guid: 9f8995422d85cdd42aadd9a41e079812, type: 3}
+  - typeId: staff
+    localWeapon: {fileID: 11400000, guid: 56ad6963cecf69b439e2a635d6820820, type: 2}
+    remotePrefab: {fileID: 6612720521502261377, guid: b642da4fa6935ae4d88e26722c156b15, type: 3}
   interpolationDelay: 0.1
 --- !u!114 &4291850356998223961
 MonoBehaviour:
@@ -90,22 +96,32 @@ MonoBehaviour:
     prefab: {fileID: 6403767111067648006, guid: 93edc705b330aa049887c763bebc5ee5, type: 3}
     weapon: {fileID: 11400000, guid: a2415408a2bb30d43b0301c3bc2a7f70, type: 2}
     objectName: 
-    icon: {fileID: 21300000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
+    icon: {fileID: 21300000, guid: 90b51d2309d80e94cab0516c093ff46f, type: 3}
   - type: spear
     prefab: {fileID: 2532832787750263923, guid: 44d5fec98777f744dab41a277c900ca0, type: 3}
     weapon: {fileID: 11400000, guid: b0219f95a4d400e4eba30455e0bdeccd, type: 2}
     objectName: 
-    icon: {fileID: 21300000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
+    icon: {fileID: 21300000, guid: a06a78a6e55ca39408098fc40422d07d, type: 3}
   - type: hammer
     prefab: {fileID: 7510638732348808801, guid: 970f9f651e3ab8c47a47eef629d15597, type: 3}
     weapon: {fileID: 11400000, guid: 2c146f585ec298e4fab40c094d85b062, type: 2}
     objectName: 
-    icon: {fileID: 21300000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
+    icon: {fileID: 21300000, guid: c85282c0e7eacb04ca1d535e25191028, type: 3}
   - type: e797e4bb67949514e994b86dfeac5cba
     prefab: {fileID: 1995249544943147221, guid: eee8e3db73107cd45ac1566b34caf490, type: 3}
     weapon: {fileID: 11400000, guid: e8ac51720ecffa74eb98798d2f4f6485, type: 2}
     objectName: 
     icon: {fileID: 8583323054461502815, guid: 3c613c6fff530bd4eaca7209ced08b99, type: 3}
+  - type: 5ed751d2c05f647468915e065607f6c1
+    prefab: {fileID: 7841330066653735437, guid: 878cdef31265e74408e43947269dcad4, type: 3}
+    weapon: {fileID: 11400000, guid: 56ad6963cecf69b439e2a635d6820820, type: 2}
+    objectName: 
+    icon: {fileID: 21300000, guid: b959236cd3250f146ad591fb2620f824, type: 3}
+  - type: bfc14715b5f84c543b2fcd104e715983
+    prefab: {fileID: 5625540426619385674, guid: 71e9c95ab3f52ea429b8f040d5884852, type: 3}
+    weapon: {fileID: 11400000, guid: f19e0984dc1a427419b9a5c0c3c8ac2e, type: 2}
+    objectName: 
+    icon: {fileID: 21300000, guid: 005e0cad7dfccf741a524f7f8120a8c2, type: 3}
 --- !u!114 &8318190442623539677
 MonoBehaviour:
   m_ObjectHideFlags: 0

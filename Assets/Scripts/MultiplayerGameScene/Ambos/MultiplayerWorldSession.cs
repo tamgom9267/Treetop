@@ -240,8 +240,9 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
             presence[message.room].Set(actor, message.inside && room.NearFloor(message.position), now);
         }
         else if (message.op == "attack" && message.attack > 0 && message.damage > 0 && message.damage <= 10000 &&
-            Loot.OwnedBy(message.item, actor) && (!attacks.TryGetValue(actor, out var prior) || message.attack > prior.Number))
-            attacks[actor] = new MultiplayerAttackWindow(message.attack, message.damage, now + 1.5d);
+            Loot.TryGetWeaponData(message.item, actor, out ObjectData weaponData) &&
+            (!attacks.TryGetValue(actor, out var prior) || message.attack > prior.Number))
+            attacks[actor] = new MultiplayerAttackWindow(message.attack, message.damage, now + 1.5d, weaponData);
         else if (message.op == "hit")
         {
             if (attacks.TryGetValue(actor, out var attack) && attack.Number == message.attack && now <= attack.Until &&
@@ -249,6 +250,8 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
                 TryPosition(actor, out Vector3 origin) && Vector3.Distance(origin, enemy.MotionPosition) <= enemy.AttackReach && attack.TryHit(message.attack, message.id, now))
             {
                 enemy.TakeAuthoritativeHit(attack.Damage, origin, actor, message.attack);
+                if (enemy.Health > 0 && attack.WeaponData != null)
+                    enemy.ApplyWeaponEffects(attack.WeaponData.additionalEffects);
                 PublishEnemyState(enemy);
                 enemy.ApplyBufferedMotion();
             }
@@ -269,6 +272,11 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     }
     private void PublishEnemyState(MultiplayerEnemy enemy) =>
         MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldState, enemy.Capture(++revision), true, flush: true);
+    public void PublishStatusDamage(MultiplayerEnemy enemy)
+    {
+        if (MultiplayerGameplayProtocol.Host && enemy != null)
+            PublishEnemyState(enemy);
+    }
     public void PublishSlimeLanding(MultiplayerSlimeMotion final)
     {
         if (!Playing || final == null) return;

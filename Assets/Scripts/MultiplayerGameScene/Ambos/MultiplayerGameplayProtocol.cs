@@ -120,7 +120,9 @@ public sealed class MultiplayerAttackWindow
 {
     public readonly int Number, Damage;
     public readonly double Until;
+    public readonly ObjectData WeaponData;
     private readonly HashSet<string> hits = new HashSet<string>();
-    public MultiplayerAttackWindow(int number, int damage, double until) { Number = number; Damage = damage; Until = until; }
+    public MultiplayerAttackWindow(int number, int damage, double until, ObjectData weaponData = null)
+    { Number = number; Damage = damage; Until = until; WeaponData = weaponData; }
     public bool TryHit(int attack, string enemy, double now) => attack == Number && now <= Until && !string.IsNullOrEmpty(enemy) && hits.Add(enemy);
 }

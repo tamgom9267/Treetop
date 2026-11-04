@@ -42,6 +42,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     private readonly Dictionary<int, BufferedMotion> candidates = new Dictionary<int, BufferedMotion>();
     private readonly List<MultiplayerSlimeMotion> frames = new List<MultiplayerSlimeMotion>();
     private readonly List<int> expiredCandidates = new List<int>();
+    private WeaponEffectController weaponEffectController;
     private sealed class BufferedMotion { public MultiplayerSlimeMotion frame; public double receivedAt; }
 
     public string Id { get; private set; }
@@ -60,10 +61,16 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     public bool PublishesMotion => !authority && SimulatesMotion && KnockbackActive;
     public Vector3 MotionPosition => SimulatesMotion ? body.position : latestMotion != null ? latestMotion.position : transform.position;
     public float AttackReach => 6f + GetComponent<Collider>().bounds.extents.magnitude;
+    public bool CanReceiveWeaponEffects => authority && Health > 0 && !deathStarted && !suspended &&
+        world != null && world.Playing;
 
     private void Awake()
     {
         body = GetComponent<Rigidbody>(); animator = GetComponent<Animator>(); Health = maxHealth;
+        weaponEffectController = GetComponent<WeaponEffectController>();
+        if (weaponEffectController == null)
+            weaponEffectController = gameObject.AddComponent<WeaponEffectController>();
+        weaponEffectController.Initialize(this);
         body.isKinematic = !authority; body.useGravity = authority;
         if (!authority) animator.updateMode = AnimatorUpdateMode.UnscaledTime;
         if (rend != null)
@@ -188,6 +195,19 @@ public sealed class MultiplayerEnemy : MonoBehaviour
             rotation = transform.rotation, time = PhotonNetwork.Time };
         SetPhysics(SimulatesMotion);
         if (SimulatesMotion) ApplyImpulse(origin);
+    }
+    public void ApplyWeaponEffects(IList<WeaponEffectData> effects)
+    {
+        if (CanReceiveWeaponEffects && weaponEffectController != null)
+            weaponEffectController.Apply(effects);
+    }
+    public bool ApplyWeaponEffectDamage(int damage)
+    {
+        if (!CanReceiveWeaponEffects || damage <= 0) return false;
+        Health = Mathf.Max(0, Health - damage);
+        if (Health == 0) BeginConfirmedDeath();
+        if (world != null) world.PublishStatusDamage(this);
+        return Health > 0;
     }
     private void RetireCurrentControl()
     {
@@ -427,7 +447,11 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         for (int i = 0; i < materials.Length; i++) materials[i].SetColor("_EmissionColor", colors[i]);
         flash = null;
     }
-    private void OnDisable() { SuspendMotion(); }
+    private void OnDisable()
+    {
+        SuspendMotion();
+        if (weaponEffectController != null) weaponEffectController.Clear();
+    }
     private void OnDestroy() { if (materials != null) foreach (Material material in materials) Destroy(material); }
     private void SpawnHitEffect(Vector3 position)
     { if (hitEffectPrefab != null) Instantiate(hitEffectPrefab, position, Quaternion.identity); }

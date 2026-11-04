@@ -109,6 +109,7 @@ MonoBehaviour:
   Objectname: 
   ID: 0
   weight: 0
+  isSelected: 0
   player: {fileID: 0}
   weaponData: {fileID: 11400000, guid: 2c146f585ec298e4fab40c094d85b062, type: 2}
   actionLinesParticle: {fileID: 0}
@@ -119,7 +120,6 @@ MonoBehaviour:
   PD: 0
   HB: 0
   speed: 0
-  isSelected: 0
   inHand: 0
 --- !u!1 &2750878817769188343
 GameObject:
@@ -196,6 +196,7 @@ MonoBehaviour:
   Objectname: 
   ID: 0
   weight: 0
+  isSelected: 0
   player: {fileID: 0}
   weaponData: {fileID: 11400000, guid: 2c146f585ec298e4fab40c094d85b062, type: 2}
   actionLinesParticle: {fileID: 5598202338267520074}
@@ -206,7 +207,6 @@ MonoBehaviour:
   PD: 0
   HB: 0
   speed: 0
-  isSelected: 0
   inHand: 0
 --- !u!54 &4458748043302275008
 Rigidbody:
@@ -3877,7 +3877,7 @@ ParticleSystem:
   CollisionModule:
     enabled: 0
     serializedVersion: 4
-    type: 0
+    type: 1
     collisionMode: 0
     colliderForce: 0
     multiplyColliderForceByParticleSize: 0

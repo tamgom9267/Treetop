@@ -49,11 +49,18 @@ public class EnemyCombat : MonoBehaviour
     private Rigidbody rb;
     private Animator animator;
     private PlayerClass playerClass;
+    private WeaponEffectController weaponEffectController;
+
+    public bool CanReceiveWeaponEffects => isActive && !isDead;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+        weaponEffectController = GetComponent<WeaponEffectController>();
+        if (weaponEffectController == null)
+            weaponEffectController = gameObject.AddComponent<WeaponEffectController>();
+        weaponEffectController.Initialize(this);
 
         currentHealth = maxHealth;
         isActive = startsActive;
@@ -117,6 +124,8 @@ public class EnemyCombat : MonoBehaviour
 
             // daño y knockback
             TakeDamage(attackerClass.WD + weaponObject.WD);
+            if (currentHealth > 0 && weaponObject.weaponData != null)
+                weaponEffectController.Apply(weaponObject.weaponData.additionalEffects);
 
             StartCoroutine(ApplyKnockbackAfterHitStop
                 (other.transform.position,
@@ -262,5 +271,10 @@ public class EnemyCombat : MonoBehaviour
         deathEffectSpawned = true;
 
         GameObject effect = Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
+    }
+
+    private void OnDisable()
+    {
+        if (weaponEffectController != null) weaponEffectController.Clear();
     }
 }
