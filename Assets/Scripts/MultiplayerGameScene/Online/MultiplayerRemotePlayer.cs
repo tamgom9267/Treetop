@@ -129,8 +129,8 @@ public sealed class MultiplayerRemotePlayer : MonoBehaviour
             int trigger;
             switch (next.item.id == 0 ? "sword" : next.item.type)
             {
-                case "sword": trigger = SwordAttack; break;
-                case "spear": trigger = SpearAttack; break;
+                case "sword" or "razorsword": trigger = SwordAttack; break;
+                case "spear" or "staff": trigger = SpearAttack; break;
                 case "hammer": trigger = HammerAttack; break;
                 default: continue;
             }
