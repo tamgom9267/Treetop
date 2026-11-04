@@ -235,6 +235,7 @@ GameObject:
   - component: {fileID: 7715153492473524214}
   - component: {fileID: 632450042982090515}
   - component: {fileID: 8110541601811033957}
+  - component: {fileID: -7713218335770257859}
   m_Layer: 0
   m_Name: EspadaAfilada
   m_TagString: Weapon
@@ -357,6 +358,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-7713218335770257859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7291598591648831995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a908aa6d53a54c63a028d06da2f8349f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MultiplayerItemIdentity
+  embeddedId: 
 --- !u!1 &7623223609425014100
 GameObject:
   m_ObjectHideFlags: 0

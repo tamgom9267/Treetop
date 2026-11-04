@@ -177,6 +177,7 @@ GameObject:
   - component: {fileID: 2920587560994645132}
   - component: {fileID: 3131561837686043461}
   - component: {fileID: 2847945159681411504}
+  - component: {fileID: 3680623300327593488}
   m_Layer: 0
   m_Name: Baston
   m_TagString: Weapon
@@ -298,6 +299,19 @@ MonoBehaviour:
   HB: 0
   speed: 0
   inHand: 0
+--- !u!114 &3680623300327593488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038680570063503422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a908aa6d53a54c63a028d06da2f8349f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MultiplayerItemIdentity
+  embeddedId: 
 --- !u!1 &3192336700144762707
 GameObject:
   m_ObjectHideFlags: 0
