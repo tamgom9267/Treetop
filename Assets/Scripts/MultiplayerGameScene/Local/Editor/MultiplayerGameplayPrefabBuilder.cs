@@ -297,6 +297,21 @@ public static class MultiplayerGameplayPrefabBuilder
         var coordinator = AssetDatabase.LoadAssetAtPath<GameObject>(Root + "/Local/MultiplayerPlayers.prefab");
         if (coordinator.GetComponent<MultiplayerWorldSession>() == null || coordinator.GetComponent<MultiplayerLootSession>() == null ||
             !coordinator.GetComponent<MultiplayerInventoryAdapter>().Validate(out string error)) throw new InvalidOperationException("Coordinador incompleto.");
+        ValidateLootCatalog(coordinator.GetComponent<MultiplayerLootSession>());
+    }
+    private static void ValidateLootCatalog(MultiplayerLootSession loot)
+    {
+        var catalog = new SerializedObject(loot).FindProperty("catalog");
+        var types = new HashSet<string>();
+        if (catalog == null || catalog.arraySize == 0) throw new InvalidOperationException("Falta el catalogo de loot de fase 4.");
+        for (int i = 0; i < catalog.arraySize; i++)
+        {
+            var entry = catalog.GetArrayElementAtIndex(i);
+            string type = entry.FindPropertyRelative("type").stringValue;
+            GameObject prefab = entry.FindPropertyRelative("prefab").objectReferenceValue as GameObject;
+            if (string.IsNullOrEmpty(type) || !types.Add(type) || prefab == null || prefab.GetComponent<InventoryObject>() == null)
+                throw new InvalidOperationException("Entrada invalida en el catalogo de loot de fase 4: " + type);
+        }
     }
 }
 #endif
