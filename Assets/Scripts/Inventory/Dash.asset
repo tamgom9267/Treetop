@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4432b723246e044ea0f5877a0000474, type: 3}
+  m_Name: Dash
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectData
+  Name: Dash
+  model: {fileID: 0}
+  prefab: {fileID: 8117721023256671360, guid: b7578f6edf9a35b42a11cda900d1bc54, type: 3}
+  UIsprite: {fileID: 8148620385725361733, guid: 054e47dd39ba4ae428dedcb6479c3880, type: 3}
+  weight: 0
+  requiredCells: 0100000000000000
+  health: 0
+  MP: 0
+  defense: 0
+  WD: 0
+  PD: 0
+  HB: 0
+  speed: 0

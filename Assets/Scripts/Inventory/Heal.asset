@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectData
   Name: Heal
   model: {fileID: 0}
-  prefab: {fileID: 562544113849866092, guid: fd6932cf05394544386a28eca61ce5ad, type: 3}
+  prefab: {fileID: 7539547155309952578, guid: e797e4bb67949514e994b86dfeac5cba, type: 3}
   UIsprite: {fileID: 8583323054461502815, guid: 3c613c6fff530bd4eaca7209ced08b99, type: 3}
   weight: 0
   requiredCells: 0100000000000000

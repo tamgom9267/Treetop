@@ -103,9 +103,9 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: c03de625a43a2484a81b3118580616c3, type: 3}
   - type: e797e4bb67949514e994b86dfeac5cba
     prefab: {fileID: 1995249544943147221, guid: eee8e3db73107cd45ac1566b34caf490, type: 3}
-    weapon: {fileID: 11400000, guid: e8ac51720ecffa74eb98798d2f4f6485, type: 2}
+    weapon: {fileID: 0}
     objectName: 
-    icon: {fileID: 8583323054461502815, guid: 3c613c6fff530bd4eaca7209ced08b99, type: 3}
+    icon: {fileID: 0}
 --- !u!114 &8318190442623539677
 MonoBehaviour:
   m_ObjectHideFlags: 0
