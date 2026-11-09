@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
     private bool hasTargetRotation;
 
     private bool waitingForAttackRotation = false;
+    private bool nextSwordSpearAttackUsesSpear;
 
     // Collider que detecta el golpe del arma equipada.
     private BoxCollider equippedWeaponCollider;
@@ -312,6 +313,12 @@ public class PlayerController : MonoBehaviour
                 return true;
             case "spear" or "staff":
                 attackTrigger = "isAttackingSpear";
+                return true;
+            case "swordspear":
+                attackTrigger = nextSwordSpearAttackUsesSpear
+                    ? "isAttackingSpear"
+                    : "isAttackingSword";
+                nextSwordSpearAttackUsesSpear = !nextSwordSpearAttackUsesSpear;
                 return true;
             case "hammer":
                 attackTrigger = "isAttackingHammer";
@@ -693,4 +700,3 @@ public class PlayerController : MonoBehaviour
     }
 
 }
-

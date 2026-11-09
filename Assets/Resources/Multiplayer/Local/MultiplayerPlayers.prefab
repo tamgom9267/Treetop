@@ -122,6 +122,11 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: f19e0984dc1a427419b9a5c0c3c8ac2e, type: 2}
     objectName: 
     icon: {fileID: 21300000, guid: 005e0cad7dfccf741a524f7f8120a8c2, type: 3}
+  - type: 328f488063926bb418e6c1e932e5c0d6
+    prefab: {fileID: 4819083046342011234, guid: 60f664854fc18d24f8c673c20acab6b6, type: 3}
+    weapon: {fileID: 11400000, guid: bc9b305859a08c649b089d5837752d96, type: 2}
+    objectName: 
+    icon: {fileID: 21300000, guid: a06a78a6e55ca39408098fc40422d07d, type: 3}
 --- !u!114 &8318190442623539677
 MonoBehaviour:
   m_ObjectHideFlags: 0

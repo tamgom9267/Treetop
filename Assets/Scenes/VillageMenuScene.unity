@@ -3197,6 +3197,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Lanza
       objectReference: {fileID: 0}
+    - target: {fileID: 7061271893989617636, guid: e9b49444fbd39aa4d87a3056a07fac7e, type: 3}
+      propertyPath: isSelected
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7693438229592495372, guid: e9b49444fbd39aa4d87a3056a07fac7e, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.78
@@ -11894,6 +11898,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 766704979426980889}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &351016932939261081
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2540236224194365382, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
+      propertyPath: m_Name
+      value: espadaLanza
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957035691118666429, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.421
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957035691118666429, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.441
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957035691118666429, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -13.565
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957035691118666429, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957035691118666429, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957035691118666429, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957035691118666429, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957035691118666429, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957035691118666429, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6957035691118666429, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
 --- !u!224 &358755026053859857
 RectTransform:
   m_ObjectHideFlags: 0
@@ -20599,3 +20660,4 @@ SceneRoots:
   - {fileID: 1461409102}
   - {fileID: 2002834653244641906}
   - {fileID: 4958045809141698885}
+  - {fileID: 351016932939261081}
