@@ -179,8 +179,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Exit
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
+  m_sharedMaterial: {fileID: 1042559896868849173, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -204,7 +204,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 79.8
+  m_fontSize: 71.3
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1239,8 +1239,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: THE VOW OF THE FALLEN
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
+  m_sharedMaterial: {fileID: 1042559896868849173, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1264,7 +1264,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 74.5
+  m_fontSize: 86.6
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1330,7 +1330,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
   m_AspectMode: 0
-  m_AspectRatio: 3.8089492
+  m_AspectRatio: 3.8089485
 --- !u!1 &1538104744
 GameObject:
   m_ObjectHideFlags: 0
@@ -1391,8 +1391,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Options
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
+  m_sharedMaterial: {fileID: 1042559896868849173, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1416,7 +1416,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 78.65
+  m_fontSize: 70.3
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1739,8 +1739,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Start
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
+  m_sharedMaterial: {fileID: 1042559896868849173, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1764,7 +1764,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 80.2
+  m_fontSize: 71.7
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
