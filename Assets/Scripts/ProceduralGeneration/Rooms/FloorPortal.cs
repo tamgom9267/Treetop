@@ -39,6 +39,22 @@ public class FloorPortal : MonoBehaviour
 
         // El portal anterior se destruye al regenerar el mundo.
         activated = true;
+        ClearFloorLoot();
         generator.RegenerateWorld();
+    }
+
+    private static void ClearFloorLoot()
+    {
+        foreach (GameObject root in SceneManager.GetActiveScene().GetRootGameObjects())
+        {
+            if (root.name != "Loot")
+                continue;
+
+            foreach (Transform item in root.transform)
+                item.gameObject.SetActive(false);
+
+            foreach (Transform item in root.transform)
+                Destroy(item.gameObject);
+        }
     }
 }
