@@ -17,7 +17,7 @@ public static class MultiplayerPlayerPrefabBuilder
     public const string SwordPath = Root + "/Online/Weapons/SwordVisual.prefab";
     public const string SpearPath = Root + "/Online/Weapons/SpearVisual.prefab";
     public const string HammerPath = Root + "/Online/Weapons/HammerVisual.prefab";
-    public static readonly string[] WeaponTypes = { "sword", "spear", "hammer" };
+    public static readonly string[] WeaponTypes = { "sword", "spear", "hammer", "swordspear" };
     private const string SourceScene = "Assets/Scenes/VillageMenuScene.unity";
     private const string SwordDataPath = "Assets/Scripts/Inventory/Sword.asset";
 

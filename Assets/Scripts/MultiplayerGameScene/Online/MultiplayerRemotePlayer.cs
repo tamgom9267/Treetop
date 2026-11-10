@@ -14,6 +14,8 @@ public sealed class MultiplayerRemotePlayer : MonoBehaviour
     private int poseSequence;
     private int equipmentSequence;
     private int attackSequence;
+
+    private bool nextSwordSpearAttackUsesSpear;
     private bool initialState;
     private bool actionPlaying;
     private float actionElapsed;
@@ -132,6 +134,7 @@ public sealed class MultiplayerRemotePlayer : MonoBehaviour
                 case "sword" or "razorsword": trigger = SwordAttack; break;
                 case "spear" or "staff": trigger = SpearAttack; break;
                 case "hammer": trigger = HammerAttack; break;
+                case "swordspear": trigger = nextSwordSpearAttackUsesSpear ? SpearAttack : SwordAttack; nextSwordSpearAttackUsesSpear = !nextSwordSpearAttackUsesSpear; break;
                 default: continue;
             }
             equipment.BeginAction(next.item);

@@ -78,6 +78,9 @@ MonoBehaviour:
   - typeId: staff
     localWeapon: {fileID: 11400000, guid: 56ad6963cecf69b439e2a635d6820820, type: 2}
     remotePrefab: {fileID: 6612720521502261377, guid: b642da4fa6935ae4d88e26722c156b15, type: 3}
+  - typeId: swordspear
+    localWeapon: {fileID: 11400000, guid: bc9b305859a08c649b089d5837752d96, type: 2}
+    remotePrefab: {fileID: 8436002262019346503, guid: 90ccd08805db1484a9eb737e6b0132f9, type: 3}
   interpolationDelay: 0.1
 --- !u!114 &4291850356998223961
 MonoBehaviour:
@@ -122,8 +125,8 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: f19e0984dc1a427419b9a5c0c3c8ac2e, type: 2}
     objectName: 
     icon: {fileID: 21300000, guid: 005e0cad7dfccf741a524f7f8120a8c2, type: 3}
-  - type: 328f488063926bb418e6c1e932e5c0d6
-    prefab: {fileID: 4819083046342011234, guid: 60f664854fc18d24f8c673c20acab6b6, type: 3}
+  - type: swordspear
+    prefab: {fileID: 3497634549746109320, guid: f7c772bda16922844b9148987232b8d8, type: 3}
     weapon: {fileID: 11400000, guid: bc9b305859a08c649b089d5837752d96, type: 2}
     objectName: 
     icon: {fileID: 21300000, guid: a06a78a6e55ca39408098fc40422d07d, type: 3}
