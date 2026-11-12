@@ -323,7 +323,8 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
         if (colorIndex < 0) return;
 
         MultiplayerPlayerAppearance appearance = 
-        player.GetComponentInChildren<MultiplayerPlayerAppearance>(true);
+            // player.GetComponentInChildren<MultiplayerPlayerAppearance>(true);
+            player.GetComponentInParent<MultiplayerPlayerAppearance>();
 
         if (appearance == null)
         {
