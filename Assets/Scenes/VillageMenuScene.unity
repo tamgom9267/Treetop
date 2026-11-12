@@ -3152,6 +3152,7 @@ GameObject:
   m_Component:
   - component: {fileID: 678004105}
   - component: {fileID: 678004106}
+  - component: {fileID: 678004107}
   m_Layer: 0
   m_Name: Personaje Local
   m_TagString: Untagged
@@ -3190,6 +3191,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e412c3098de27f041831801ee7495dd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewestSingleton
+--- !u!114 &678004107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 678004104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 612492d1114f2aabc9015a905d9b773a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MultiplayerPlayerAppearance
+  rojo: {fileID: 2100000, guid: 609610a97615b4ac082ea868afb20db1, type: 2}
+  azul: {fileID: 2100000, guid: f7584b67c0ce1f8fc9544f3d3d643b50, type: 2}
+  blanco: {fileID: 2100000, guid: d429bc2241c335621a3240c5edeb88c7, type: 2}
+  targetMaterialName: Warrior_Cloth
 --- !u!1 &739685152
 GameObject:
   m_ObjectHideFlags: 0

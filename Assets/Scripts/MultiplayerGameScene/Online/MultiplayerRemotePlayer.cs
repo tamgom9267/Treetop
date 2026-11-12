@@ -29,6 +29,9 @@ public sealed class MultiplayerRemotePlayer : MonoBehaviour
     public bool HasInitialState => initialState;
     public int LastAttackSequence => attackSequence;
 
+    // para el cambio de color entre los diferentes jugadores
+    private MultiplayerPlayerAppearance appearance;
+
     public bool ValidateAssets() => animator != null && animator.gameObject == gameObject &&
         animator.runtimeAnimatorController != null && equipment != null && equipment.Hand != null;
 
@@ -41,6 +44,10 @@ public sealed class MultiplayerRemotePlayer : MonoBehaviour
     public void Initialize(MultiplayerVisualDefinition[] catalog, float delay)
     {
         interpolationDelay = Mathf.Clamp(delay, 0f, 0.3f);
+        
+        appearance = GetComponentInChildren<MultiplayerPlayerAppearance>(true);
+        if (appearance == null) Debug.LogError($"Falta MultiplayerPlayerAppearance en {gameObject.name}");
+        
         equipment.Configure(equipment.Hand, catalog);
         animator.updateMode = AnimatorUpdateMode.UnscaledTime;
         animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
@@ -170,5 +177,23 @@ public sealed class MultiplayerRemotePlayer : MonoBehaviour
     {
         attacks.Clear();
         if (equipment != null) EndAttack();
+    }
+
+    public void ApplyPlayerColor(int colorIndex)
+    {
+        if (appearance == null) return;
+
+        switch (colorIndex)
+        {
+            case 0:
+                appearance.ApplyRed();
+                break;
+            case 1:
+                appearance.ApplyBlue();
+                break;
+            case 2:
+                appearance.ApplyWhite();
+                break;
+        }
     }
 }
