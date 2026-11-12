@@ -163,7 +163,7 @@ public static class MultiplayerPlayerPrefabBuilder
         SceneManager.MoveGameObjectToScene(copy, preview);
         copy.name = "RemotePlayer";
         copy.SetActive(false);
-        StripGameplay(copy);
+        StripGameplay(copy, keepPlayerAppearance: true);
         Animator animator = copy.GetComponent<Animator>();
         if (animator == null) throw new InvalidOperationException("Falta el Animator raiz del personaje original.");
         foreach (Animator other in copy.GetComponentsInChildren<Animator>(true))
@@ -200,10 +200,11 @@ public static class MultiplayerPlayerPrefabBuilder
         Save(root, LocalPath);
     }
 
-    private static void StripGameplay(GameObject root, bool keepWeaponVisual = false)
+    private static void StripGameplay(GameObject root, bool keepWeaponVisual = false, bool keepPlayerAppearance = false)
     {
         foreach (MonoBehaviour behaviour in root.GetComponentsInChildren<MonoBehaviour>(true))
-            if (!(keepWeaponVisual && behaviour is MultiplayerWeaponVisual)) Object.DestroyImmediate(behaviour);
+            if (!(keepWeaponVisual && behaviour is MultiplayerWeaponVisual) &&
+                !(keepPlayerAppearance && behaviour is MultiplayerPlayerAppearance)) Object.DestroyImmediate(behaviour);
         foreach (Collider collider in root.GetComponentsInChildren<Collider>(true)) Object.DestroyImmediate(collider);
         foreach (Rigidbody body in root.GetComponentsInChildren<Rigidbody>(true)) Object.DestroyImmediate(body);
         foreach (Camera camera in root.GetComponentsInChildren<Camera>(true)) Object.DestroyImmediate(camera);
@@ -251,8 +252,10 @@ public static class MultiplayerPlayerPrefabBuilder
             root.GetComponentsInChildren<Camera>(true).Length != 0 || root.GetComponentsInChildren<AudioListener>(true).Length != 0)
             throw new InvalidOperationException("El prefab visual contiene fisica o le falta su modelo: " + path);
         foreach (MonoBehaviour behaviour in root.GetComponentsInChildren<MonoBehaviour>(true))
-            if (behaviour == null || !(player ? behaviour is MultiplayerRemotePlayer || behaviour is MultiplayerRemoteEquipment :
-                behaviour is MultiplayerWeaponVisual)) throw new InvalidOperationException("Script no visual en " + path);
+            if (behaviour == null || !(player ? behaviour is MultiplayerRemotePlayer || behaviour is MultiplayerRemoteEquipment ||
+                behaviour is MultiplayerPlayerAppearance : behaviour is MultiplayerWeaponVisual))
+                throw new InvalidOperationException("Script no visual (" +
+                    (behaviour == null ? "Missing Script" : behaviour.GetType().Name) + ") en " + path);
         foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
             if (!child.CompareTag("Untagged")) throw new InvalidOperationException("Tag de gameplay en " + path);
         if (player && root.GetComponentsInChildren<Animator>(true).Length != 1)
