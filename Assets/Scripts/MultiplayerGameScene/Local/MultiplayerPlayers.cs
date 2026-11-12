@@ -141,6 +141,9 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     {
         BeginFloor(session.RunId, session.FloorNumber);
         if (!publisher.Bind(this, player, out error)) return false;
+
+        ApplyLocalPlayerColor(player);
+
         localReady = true;
         if (!publisher.SendFullState() || !Send(MultiplayerPlayerProtocol.RequestStateEvent,
             MultiplayerPlayerProtocol.PackRequest(runId, floorNumber, NextSequence(), PhotonNetwork.Time), true))
@@ -245,6 +248,12 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
             remote.name = "RemotePlayer_" + actor;
             remote.gameObject.SetActive(false);
             remote.Initialize(catalog, interpolationDelay);
+
+            int colorIndex = GetColorIndexForActor(actor);
+
+            if(colorIndex >= 0) remote.ApplyPlayerColor(colorIndex);
+            else Debug.LogWarning("No se pudo determinar el color del jugador " + actor);
+
             remotes.Add(actor, remote);
         }
         return remote;
@@ -277,4 +286,56 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
 
     public override void OnDisable() { Shutdown(); base.OnDisable(); }
     private void OnDestroy() { Shutdown(); }
+
+    private static int GetColorIndex(PartyRole role)
+    {
+        switch (role)
+        {
+            case PartyRole.Host: return 0; // color rojo
+            case PartyRole.Client1: return 1; // color azul
+            case PartyRole.Client2: return 2; // color blanco
+            default: return -1;
+        }
+    }
+
+    private int GetColorIndexForActor(int actor)
+    {
+        PhotonPartyService party = PhotonPartyService.AvailableInstance;
+        if (party == null) return -1;
+
+        foreach (PartyMember member in party.Members)
+        {
+            if (member.ActorNumber == actor)
+            {
+                return GetColorIndex(member.Role);
+            }
+        }
+
+        return -1;
+    }
+
+    private void ApplyLocalPlayerColor(PlayerController player)
+    {
+        PhotonPartyService party = PhotonPartyService.AvailableInstance;
+        if (party == null || player == null) return;
+
+        int colorIndex = GetColorIndex(party.LocalRole);
+        if (colorIndex < 0) return;
+
+        MultiplayerPlayerAppearance appearance = 
+        player.GetComponentInChildren<MultiplayerPlayerAppearance>(true);
+
+        if (appearance == null)
+        {
+            Debug.LogError("El jugador local no tiene MultiplayerPlayerAppearance.", player);
+            return;
+        }
+
+        switch (colorIndex)
+        {
+            case 0: appearance.ApplyRed(); break;
+            case 1: appearance.ApplyBlue(); break;
+            case 2: appearance.ApplyWhite(); break;
+        }
+    }
 }

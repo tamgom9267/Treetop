@@ -647,6 +647,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         if (!string.IsNullOrEmpty(message)) pendingVillageNotice = message;
         if (returnRoutine != null) return;
         ending = true;
+        RestoreLocalPlayerColor(); // restaurar al color original antes de destruir la sincronización
         StopPlayerSync();
         FreezePlayer();
         ShowLoading(true, "Regresando a la aldea...");
@@ -798,5 +799,15 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     {
         if (loadingText != null) loadingText.text = message;
         if (loadingPanel != null && !transform.IsChildOf(loadingPanel.transform)) loadingPanel.SetActive(visible);
+    }
+
+    private void RestoreLocalPlayerColor()
+    {
+        PlayerController player = MultiplayerStartingRoomSpawns.LocalPlayer;
+        if (player == null) return;
+
+        MultiplayerPlayerAppearance appearance = 
+            player.GetComponentInChildren<MultiplayerPlayerAppearance>(true);
+        if(appearance != null) appearance.RestoreOriginalColor();
     }
 }
