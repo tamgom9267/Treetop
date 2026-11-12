@@ -92,7 +92,21 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     {
         rooms[room.RoomId] = room;
         if (!presence.ContainsKey(room.RoomId)) presence[room.RoomId] = new MultiplayerRoomPresence();
+        for (int i = 0; i < room.enemies.Length; i++) RegisterPlacedEnemy(room, i);
         if (roomStates.TryGetValue(room.RoomId, out var state)) room.ApplyState(state.stage, state.revision);
+    }
+    private MultiplayerEnemy RegisterPlacedEnemy(MultiplayerRoomController room, int index)
+    {
+        MultiplayerEnemy enemy = room.enemies[index];
+        if (enemy == null) return null;
+        string id = room.RoomId + ":placed:" + index;
+        if (removed.Contains(id))
+        { enemy.gameObject.SetActive(false); Destroy(enemy.gameObject); return null; }
+        if (enemies.TryGetValue(id, out var registered)) return registered;
+        enemy.Initialize(this, id, room.RoomId, 0);
+        enemy.SetCombatActive(room.Stage == 1);
+        enemies[id] = enemy;
+        return enemy;
     }
     public void ObservePose(int actor, Vector3 position)
     {
@@ -182,6 +196,8 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     private void Activate(MultiplayerRoomController room)
     {
         CommitRoom(room, 1);
+        foreach (MultiplayerEnemy enemy in room.enemies)
+            if (enemy != null) PublishEnemyState(enemy);
         if (room.enemyType == 0) return;
         for (int i = 0; i < room.spawners.Length; i++)
         {
@@ -202,7 +218,15 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     }
     private MultiplayerEnemy CreateEnemy(MultiplayerWorldMessage state)
     {
-        if (!rooms.TryGetValue(state.room ?? "", out var room) || state.type < 1 || state.type > 2) return null;
+        if (!rooms.TryGetValue(state.room ?? "", out var room)) return null;
+        // Las copias del jefe ya existen en ambos mapas; no se instancian de nuevo.
+        if (state.type == 0)
+        {
+            for (int i = 0; i < room.enemies.Length; i++)
+                if (state.id == room.RoomId + ":placed:" + i) return RegisterPlacedEnemy(room, i);
+            return null;
+        }
+        if (state.type < 1 || state.type > 2) return null;
         string role = MultiplayerGameplayProtocol.Host ? "Host" : "Client";
         GameObject prefab = Resources.Load<GameObject>("Multiplayer/" + role + "/Enemigos/Enemigo" + state.type);
         if (prefab == null) return null;
@@ -223,7 +247,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     }
     public void RequestHit(MultiplayerEnemy enemy, WeaponObject weapon)
     {
-        if (!Playing || enemy == null || enemy.Health <= 0 || weapon.player != player || localAttack <= 0 || !Loot.CanUse(player.weapon) || !player.RegisterEnemyHit(enemy.gameObject)) return;
+        if (!Playing || enemy == null || !enemy.CombatActive || weapon.player != player || localAttack <= 0 || !Loot.CanUse(player.weapon) || !player.RegisterEnemyHit(enemy.gameObject)) return;
         var message = new MultiplayerWorldMessage { op = "hit", id = enemy.Id, attack = localAttack };
         if (MultiplayerGameplayProtocol.Host) ReceiveRequest(MultiplayerGameplayProtocol.LocalActor, message);
         else if (MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldRequest, message, true, MultiplayerGameplayProtocol.HostActor, flush: true))
@@ -246,7 +270,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         else if (message.op == "hit")
         {
             if (attacks.TryGetValue(actor, out var attack) && attack.Number == message.attack && now <= attack.Until &&
-                enemies.TryGetValue(message.id ?? "", out var enemy) && enemy != null && enemy.Health > 0 &&
+                enemies.TryGetValue(message.id ?? "", out var enemy) && enemy != null && enemy.CombatActive &&
                 TryPosition(actor, out Vector3 origin) && Vector3.Distance(origin, enemy.MotionPosition) <= enemy.AttackReach && attack.TryHit(message.attack, message.id, now))
             {
                 enemy.TakeAuthoritativeHit(attack.Damage, origin, actor, message.attack);
