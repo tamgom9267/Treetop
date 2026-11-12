@@ -6,6 +6,8 @@ public class SlimeBossMovementProcedural : MonoBehaviour
 {
     [Header("Referencias")]
 
+    private SlimeBoss slimeBoss;
+    private EnemyCombat enemyCombat;
     private Rigidbody rb;
     private Animator animator;
 
@@ -39,6 +41,9 @@ public class SlimeBossMovementProcedural : MonoBehaviour
 
     private void Awake()
     {
+        slimeBoss = GetComponent<SlimeBoss>();
+        enemyCombat = GetComponent<EnemyCombat>();
+
         // Obtine automaticamente las referencias
         if (rb == null)
             rb = GetComponent<Rigidbody>();
@@ -65,6 +70,10 @@ public class SlimeBossMovementProcedural : MonoBehaviour
 
     private void Update()
     {
+        // No se mueve mientras duerme ni durante la animacion de muerte.
+        if (!CanMove())
+            return;
+
         UpdateJumpDirection();
 
         // Si el slime esta en el aire, en la animacion, o aun no termina el tiempo de salto, no inicia otro salto
@@ -72,6 +81,12 @@ public class SlimeBossMovementProcedural : MonoBehaviour
             return;
 
         StartJump();
+    }
+
+    private bool CanMove()
+    {
+        return slimeBoss != null && slimeBoss.isActive &&
+            enemyCombat != null && enemyCombat.CanReceiveWeaponEffects;
     }
 
     private void StartJump()
@@ -137,6 +152,9 @@ public class SlimeBossMovementProcedural : MonoBehaviour
     // Animation Event dentro de SlimeJump. Aplica la fuerza para que salte.
     public void ApplyJumpForce()
     {
+        if (!CanMove())
+            return;
+
         // Aplica las fuerzas
         Vector3 jumpForce = new Vector3(
             jumpDirection.x * horizontalJumpForce,
@@ -153,7 +171,7 @@ public class SlimeBossMovementProcedural : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         // Solo importa si este slime estaba saltando.
-        if (!jumpCycleActive)
+        if (!CanMove() || !jumpCycleActive)
             return;
 
         // El salto termina al tocar una superficie solida.
