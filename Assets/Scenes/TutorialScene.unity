@@ -5121,6 +5121,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 35113454}
   m_CullTransparentMesh: 1
+--- !u!1 &37040407 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4547242166365193442, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+  m_PrefabInstance: {fileID: 6257425675903214683}
+  m_PrefabAsset: {fileID: 0}
 --- !u!65 &38341238
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5428,7 +5433,7 @@ PrefabInstance:
       objectReference: {fileID: 707366305}
     - target: {fileID: 7199578626369398008, guid: e797e4bb67949514e994b86dfeac5cba, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -100
+      value: -101.6
       objectReference: {fileID: 0}
     - target: {fileID: 7199578626369398008, guid: e797e4bb67949514e994b86dfeac5cba, type: 3}
       propertyPath: m_LocalPosition.y
@@ -82095,6 +82100,66 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8293786094840691852}
   m_Mesh: {fileID: -4886504450785552801, guid: 6683b7c1c1bc76e4396d21c7c9e95198, type: 3}
+--- !u!1001 &6257425675903214683
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -100
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -15.28
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4547242166365193442, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_Name
+      value: Bola de Fuego
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4547242166365193442, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7891591151899321327}
+  m_SourcePrefab: {fileID: 100100000, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
 --- !u!1 &6352670010652964247
 GameObject:
   m_ObjectHideFlags: 0
@@ -90712,6 +90777,33 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.023049073, y: 0.020881638, z: 0.059410963}
   m_Center: {x: -0.0015246569, y: -0.00044082277, z: -0.003129648}
+--- !u!114 &7891591151899321327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 37040407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76484781fbf4d7244a8e174369581046, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FireBallSpell
+  Name: 
+  Objectname: 
+  ID: 0
+  weight: 0
+  isSelected: 0
+  player: {fileID: 707366305}
+  spellData: {fileID: 11400000, guid: ddf25929ba2ed334f9193f684c3c57f6, type: 2}
+  health: 0
+  MP: 0
+  defense: 0
+  WD: 0
+  PD: 0
+  HB: 0
+  speed: 0
+  FireBallParticle: {fileID: 524161754534769769, guid: 126cb3d6ae08dfd4dbdf83c2daf2e1b7, type: 3}
 --- !u!33 &7892493957853851545
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -92445,7 +92537,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8929548368856706618, guid: b7578f6edf9a35b42a11cda900d1bc54, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -100
+      value: -98.64
       objectReference: {fileID: 0}
     - target: {fileID: 8929548368856706618, guid: b7578f6edf9a35b42a11cda900d1bc54, type: 3}
       propertyPath: m_LocalPosition.y
@@ -93005,6 +93097,7 @@ SceneRoots:
   - {fileID: 85984238}
   - {fileID: 7294341705341146345}
   - {fileID: 1308073135}
-  - {fileID: 186174604}
-  - {fileID: 8879453900398899833}
   - {fileID: 1198133391}
+  - {fileID: 8879453900398899833}
+  - {fileID: 186174604}
+  - {fileID: 6257425675903214683}

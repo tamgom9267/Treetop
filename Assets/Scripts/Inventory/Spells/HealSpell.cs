@@ -11,7 +11,7 @@ public class HealSpell : SpellObject
         {
             PlayerClass playerClass = player.GetComponent<PlayerController>().playerClass;
 
-            if(playerClass.MP < 10 || playerClass.maxHealth == playerClass.health)
+            if(playerClass.MP -10 < 0 || playerClass.maxHealth == playerClass.health)
             {
                 return;
             }
