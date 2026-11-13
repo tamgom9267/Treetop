@@ -12,6 +12,8 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     private readonly Dictionary<string, MultiplayerRoomController> rooms = new Dictionary<string, MultiplayerRoomController>();
     private readonly Dictionary<string, MultiplayerRoomPresence> presence = new Dictionary<string, MultiplayerRoomPresence>();
     private readonly Dictionary<string, MultiplayerWorldMessage> roomStates = new Dictionary<string, MultiplayerWorldMessage>();
+    private readonly Dictionary<string, Chest> chests = new Dictionary<string, Chest>();
+    private readonly Dictionary<string, MultiplayerWorldMessage> chestStates = new Dictionary<string, MultiplayerWorldMessage>();
     private readonly Dictionary<string, MultiplayerEnemy> enemies = new Dictionary<string, MultiplayerEnemy>();
     private readonly HashSet<string> removed = new HashSet<string>();
     private readonly Dictionary<int, Vector3> positions = new Dictionary<int, Vector3>();
@@ -48,6 +50,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         string key = MultiplayerMapMath.Key(run, floor);
         if (floorKey == key) return;
         floorKey = key; rooms.Clear(); presence.Clear(); roomStates.Clear(); removed.Clear(); attacks.Clear();
+        chests.Clear(); chestStates.Clear();
         enemies.Clear(); positions.Clear(); poseTimes.Clear(); lastPresence = lastSnapshot = double.NegativeInfinity;
         frameClock = ownedMotionClock = default;
         Loot.BeginFloor(floor);
@@ -94,6 +97,44 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         if (!presence.ContainsKey(room.RoomId)) presence[room.RoomId] = new MultiplayerRoomPresence();
         for (int i = 0; i < room.enemies.Length; i++) RegisterPlacedEnemy(room, i);
         if (roomStates.TryGetValue(room.RoomId, out var state)) room.ApplyState(state.stage, state.revision);
+        Chest[] placedChests = room.GetComponentsInChildren<Chest>(true);
+        Array.Sort(placedChests, (a, b) => string.CompareOrdinal(ChestPath(a.transform, room.transform), ChestPath(b.transform, room.transform)));
+        for (int i = 0; i < placedChests.Length; i++)
+        {
+            string id = room.RoomId + ":chest:" + i;
+            chests[id] = placedChests[i];
+            if (chestStates.ContainsKey(id)) placedChests[i].ApplySharedOpen();
+        }
+    }
+    private static string ChestPath(Transform item, Transform room)
+    {
+        string path = "";
+        while (item != null && item != room)
+        { path = item.name + ":" + item.GetSiblingIndex() + "/" + path; item = item.parent; }
+        return path;
+    }
+    public void RequestChestOpen(Chest chest)
+    {
+        if (!Playing || chest == null || !chest.gameObject.activeInHierarchy || chest.chestInteracted) return;
+        foreach (var pair in chests)
+        {
+            if (pair.Value != chest) continue;
+            var request = new MultiplayerWorldMessage { op = "openChest", id = pair.Key };
+            if (MultiplayerGameplayProtocol.Host) ReceiveRequest(MultiplayerGameplayProtocol.LocalActor, request);
+            else MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldRequest, request, true, MultiplayerGameplayProtocol.HostActor, flush: true);
+            return;
+        }
+    }
+    private void OpenChest(int actor, string id)
+    {
+        if (string.IsNullOrEmpty(id) || chestStates.ContainsKey(id) || !chests.TryGetValue(id, out var chest) ||
+            chest == null || !chest.gameObject.activeInHierarchy || !TryPosition(actor, out Vector3 origin)) return;
+        Collider body = chest.GetComponent<Collider>();
+        Vector3 closest = body != null ? body.ClosestPoint(origin) : chest.transform.position;
+        if (Vector3.Distance(origin, closest) > 3f) return;
+        if (!Loot.SpawnChestReward(id, chest)) return;
+        var state = new MultiplayerWorldMessage { op = "chest", id = id, revision = ++revision };
+        Apply(state); MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldState, state, true, flush: true);
     }
     private MultiplayerEnemy RegisterPlacedEnemy(MultiplayerRoomController room, int index)
     {
@@ -258,7 +299,8 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         if (message.op == "snapshot") { SendSnapshot(actor); return; }
         if (!Playing) { RejectHit(actor, message); return; }
         double now = Time.realtimeSinceStartupAsDouble;
-        if (message.op == "presence" && rooms.TryGetValue(message.room ?? "", out var room) && MultiplayerGameplayProtocol.Finite(message.position))
+        if (message.op == "openChest") OpenChest(actor, message.id);
+        else if (message.op == "presence" && rooms.TryGetValue(message.room ?? "", out var room) && MultiplayerGameplayProtocol.Finite(message.position))
         {
             ObservePose(actor, message.position);
             presence[message.room].Set(actor, message.inside && room.NearFloor(message.position), now);
@@ -324,6 +366,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     private void SendSnapshot(int actor)
     {
         var entries = new List<MultiplayerWorldMessage>(roomStates.Values);
+        entries.AddRange(chestStates.Values);
         foreach (MultiplayerEnemy enemy in enemies.Values) if (enemy != null) entries.Add(enemy.Capture(++revision));
         foreach (string id in removed) entries.Add(new MultiplayerWorldMessage { op = "remove", id = id, revision = ++revision });
         MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldSnapshot,
@@ -331,7 +374,14 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     }
     private void Apply(MultiplayerWorldMessage message)
     {
-        if (message.op == "hitRejected")
+        if (message.op == "chest")
+        {
+            if (string.IsNullOrEmpty(message.id) || message.revision <= 0 ||
+                chestStates.TryGetValue(message.id, out var priorChest) && priorChest.revision >= message.revision) return;
+            chestStates[message.id] = message;
+            if (chests.TryGetValue(message.id, out var chest) && chest != null) chest.ApplySharedOpen();
+        }
+        else if (message.op == "hitRejected")
         {
             if (message.actor == MultiplayerGameplayProtocol.LocalActor && !string.IsNullOrEmpty(message.id) &&
                 enemies.TryGetValue(message.id, out var rejected) && rejected != null)

@@ -119,6 +119,26 @@ public static class MultiplayerGameplayVerification
         Check(ledger.Process(3,Command("claim","late",current),2).location==MultiplayerItemLocation.Removed, "Un paquete viejo no recupera loot del piso anterior");
         var corrupt=record.Copy();corrupt.id="bad";corrupt.data.shape[0].cells[0]=9;
         Check(ledger.Process(1,Command("register","bad",corrupt),1)==null, "Forma de inventario invalida rechazada");
+        var reward = new MultiplayerLootRecord { id="chest:1:boss1:chest:0", type="sword", data=Data(),
+            location=MultiplayerItemLocation.World, chestReward=true, spawnTime=10d,
+            spawnOrigin=Vector3.zero, position=Vector3.back*3f };
+        var prize = ledger.Process(1,Command("register","open-a",reward),1).Copy();
+        var repeated = reward.Copy(); repeated.type="another-weapon";
+        var duplicate = ledger.Process(1,Command("register","open-b",repeated),1);
+        Check(duplicate.type==prize.type && duplicate.revision==prize.revision,
+            "Aperturas simultaneas conservan una unica arma y revision del cofre");
+        var winner = ledger.Process(2,Command("claim","take-a",prize),1).Copy();
+        var loser = ledger.Process(3,Command("claim","take-b",prize),1);
+        Check(winner.owner==2 && loser.owner==2, "El premio compartido solo puede reservarlo un jugador");
+        var dropped = ledger.Process(2,Command("drop","return-prize",winner),1);
+        Check(!dropped.chestReward && dropped.id==prize.id, "Devolver el premio conserva su identidad sin repetir el salto del cofre");
+        Check(MultiplayerLootSession.ChestRewardPosition(reward,10d)==reward.spawnOrigin &&
+            MultiplayerLootSession.ChestRewardPosition(reward,11d)==reward.position &&
+            MultiplayerLootSession.ChestRewardPosition(reward,10.2d).y>1f,
+            "Salto compartido usa el tiempo de red y una llegada tardia deja el arma en su destino");
+        var invalidPrize=reward.Copy(); invalidPrize.id="bad-chest"; invalidPrize.spawnTime=double.NaN;
+        Check(ledger.Process(1,Command("register","bad-chest",invalidPrize),1)==null,
+            "Tiempo de animacion no finito rechazado");
     }
     private static void CheckRooms()
     {
@@ -142,6 +162,20 @@ public static class MultiplayerGameplayVerification
             room.ApplyState(1,1);Check(entry.activeSelf && exit.activeSelf,"Activacion cierra entrada y salida");
             room.ApplyState(2,2);Check(!entry.activeSelf && !exit.activeSelf,"Completar abre ambas puertas");
             room.ApplyState(1,1);Check(room.Stage==2 && !entry.activeSelf,"Un mensaje anterior no reactiva el cuarto");
+            var chestRoomObject=new GameObject("ChestRoom",typeof(HostGeneratedRoomController));
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(chestRoomObject,preview);
+            var chestRoom=chestRoomObject.GetComponent<HostGeneratedRoomController>(); chestRoom.Configure(0,null,"chest-test");
+            var chestObject=new GameObject("SharedChest",typeof(Chest)); chestObject.transform.SetParent(chestRoomObject.transform);
+            var chest=chestObject.GetComponent<Chest>(); chestObject.SetActive(false);
+            var coordinator=(GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(MultiplayerGameplayPrefabBuilder.Root+"/Local/MultiplayerPlayers.prefab"),preview);
+            var world=coordinator.GetComponent<MultiplayerWorldSession>();
+            var apply=typeof(MultiplayerWorldSession).GetMethod("Apply",BindingFlags.Instance|BindingFlags.NonPublic);
+            apply.Invoke(world,new object[] {new MultiplayerWorldMessage {op="chest",id="chest-test:chest:0",revision=7}});
+            world.RegisterRoom(chestRoom);
+            Check(chest.chestInteracted,"Snapshot anterior al registro abre tambien un cofre desactivado");
+            typeof(Chest).GetMethod("Start",BindingFlags.Instance|BindingFlags.NonPublic).Invoke(chest,null);
+            apply.Invoke(world,new object[] {new MultiplayerWorldMessage {op="chest",id="chest-test:chest:0",revision=6}});
+            Check(chest.chestInteracted,"Start y mensajes atrasados no vuelven a cerrar el cofre");
         }
         finally { EditorSceneManager.ClosePreviewScene(preview); }
     }

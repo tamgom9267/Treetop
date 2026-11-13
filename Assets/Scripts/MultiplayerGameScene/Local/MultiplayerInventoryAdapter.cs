@@ -78,7 +78,9 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
         if (!world.Playing || !player.enabled || player.IsExternalUIBlocked && !ownBlock) return;
         if (player.inventory.action.WasPressedThisFrame() && player.IsInventoryOpen) CancelDrag();
         CaptureStable();
-        if (!player.IsInventoryOpen && player.interact.action.WasPressedThisFrame() && player.nearChest == null && player.nearestWeapon != null)
+        Chest nearbyChest = player.nearChest != null ? player.nearChest.GetComponent<Chest>() : null;
+        bool unopenedChest = nearbyChest != null && !nearbyChest.chestInteracted;
+        if (!player.IsInventoryOpen && player.interact.action.WasPressedThisFrame() && !unopenedChest && player.nearestWeapon != null)
         {
             // Consume tambien el intento rechazado: el metodo original nunca puede recoger sin permiso.
             Block(); world.Loot.TryClaim(player.nearestWeapon);
