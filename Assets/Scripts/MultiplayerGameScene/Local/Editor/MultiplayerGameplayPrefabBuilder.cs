@@ -61,6 +61,37 @@ public static class MultiplayerGameplayPrefabBuilder
             var source = root.GetComponent<GeneratedRoomController>();
             MultiplayerRoomController room = host ? (MultiplayerRoomController)root.AddComponent<HostGeneratedRoomController>() : root.AddComponent<ClientGeneratedRoomController>();
             room.spawners = source != null ? source.spawners : Array.Empty<GameObject>(); room.Configure(0, null, id);
+            if (source != null)
+            {
+                var roomSettings = new SerializedObject(room);
+                roomSettings.FindProperty("rewardChest").objectReferenceValue = new SerializedObject(source).FindProperty("rewardChest").objectReferenceValue;
+                roomSettings.ApplyModifiedPropertiesWithoutUndo();
+                var placed = new List<MultiplayerEnemy>();
+                foreach (GameObject obj in source.enemies)
+                {
+                    if (obj == null) continue;
+                    var combat = obj.GetComponent<EnemyCombat>();
+                    var boss = obj.GetComponent<SlimeBoss>();
+                    var movement = obj.GetComponent<SlimeBossMovementProcedural>();
+                    var enemy = obj.AddComponent<MultiplayerEnemy>();
+                    Copy(combat, enemy, "maxHealth", "contactDamage", "knockbackForce", "knockbackUpForce", "weaponKnockbackMultiplier", "rend", "flashColor", "flashDuration");
+                    CopyEnemyEffects(combat, enemy);
+                    var settings = new SerializedObject(enemy);
+                    settings.FindProperty("authority").boolValue = host;
+                    settings.FindProperty("startsActive").boolValue = false;
+                    if (boss != null) settings.FindProperty("deathAnimationState").stringValue = "Base Layer.SlimeBossDeath";
+                    settings.ApplyModifiedPropertiesWithoutUndo();
+                    if (host && movement != null) Copy(movement, obj.AddComponent<HostSlimeMovement>(), "minJumpCooldown", "maxJumpCooldown", "horizontalJumpForce", "verticalJumpForce", "turnSpeed", "navMeshCheckDistance");
+                    if (boss != null) Object.DestroyImmediate(boss);
+                    if (movement != null) Object.DestroyImmediate(movement);
+                    if (combat != null) Object.DestroyImmediate(combat);
+                    obj.GetComponent<Rigidbody>().isKinematic = true;
+                    obj.GetComponent<Rigidbody>().useGravity = false;
+                    if (!host) obj.GetComponent<Animator>().updateMode = AnimatorUpdateMode.UnscaledTime;
+                    placed.Add(enemy);
+                }
+                room.enemies = placed.ToArray();
+            }
             foreach (RoomTriggerForwarder old in root.GetComponentsInChildren<RoomTriggerForwarder>(true)) Object.DestroyImmediate(old);
             foreach (GeneratedRoomController old in root.GetComponentsInChildren<GeneratedRoomController>(true)) Object.DestroyImmediate(old);
             foreach (StartingRoomSpawns old in root.GetComponentsInChildren<StartingRoomSpawns>(true)) Object.DestroyImmediate(old);
@@ -284,6 +315,25 @@ public static class MultiplayerGameplayPrefabBuilder
             if (actual != (role == "Host" ? original : 0)) throw new InvalidOperationException("NavMesh incorrecto en " + role + "/" + id);
             if (root.GetComponent<MultiplayerRoomController>().spawners.Length != source.GetComponent<GeneratedRoomController>().spawners.Length)
                 throw new InvalidOperationException("Spawners diferentes en " + role + "/" + id);
+            var placed = root.GetComponent<MultiplayerRoomController>().enemies;
+            var counterpart = AssetDatabase.LoadAssetAtPath<GameObject>(Root + "/" + (role == "Host" ? "Client" : "Host") + "/Cuartos/" + id + ".prefab");
+            if (counterpart == null || placed.Length != counterpart.GetComponent<MultiplayerRoomController>().enemies.Length)
+                throw new InvalidOperationException("Enemigos colocados diferentes entre Host y Client: " + id);
+            foreach (MultiplayerEnemy enemy in placed)
+            {
+                if (enemy == null || !enemy.transform.IsChildOf(root.transform) || enemy.Authority != (role == "Host") ||
+                    (enemy.GetComponent<HostSlimeMovement>() != null) != (role == "Host") || enemy.GetComponent<SlimeBoss>() != null ||
+                    enemy.GetComponent<EnemyCombat>() != null || enemy.GetComponent<SlimeBossMovementProcedural>() != null)
+                    throw new InvalidOperationException("Enemigo colocado mal configurado en " + role + "/" + id);
+                var settings = new SerializedObject(enemy);
+                if (settings.FindProperty("startsActive").boolValue)
+                    throw new InvalidOperationException("El enemigo colocado debe esperar la activacion del cuarto: " + role + "/" + id);
+                int deathState = Animator.StringToHash(settings.FindProperty("deathAnimationState").stringValue);
+                var animatorController = enemy.GetComponent<Animator>().runtimeAnimatorController as UnityEditor.Animations.AnimatorController;
+                if (animatorController == null || animatorController.layers.Length == 0 ||
+                    !HasAnimationState(animatorController.layers[0].stateMachine, animatorController.layers[0].name, deathState))
+                    throw new InvalidOperationException("Animacion de muerte inexistente en " + role + "/" + id);
+            }
         }
         foreach (string role in new[] { "Host", "Client" }) for (int type = 1; type <= 2; type++)
         {
@@ -298,6 +348,14 @@ public static class MultiplayerGameplayPrefabBuilder
         if (coordinator.GetComponent<MultiplayerWorldSession>() == null || coordinator.GetComponent<MultiplayerLootSession>() == null ||
             !coordinator.GetComponent<MultiplayerInventoryAdapter>().Validate(out string error)) throw new InvalidOperationException("Coordinador incompleto.");
         ValidateLootCatalog(coordinator.GetComponent<MultiplayerLootSession>());
+    }
+    private static bool HasAnimationState(UnityEditor.Animations.AnimatorStateMachine machine, string path, int hash)
+    {
+        foreach (var state in machine.states)
+            if (Animator.StringToHash(path + "." + state.state.name) == hash) return true;
+        foreach (var child in machine.stateMachines)
+            if (HasAnimationState(child.stateMachine, path + "." + child.stateMachine.name, hash)) return true;
+        return false;
     }
     private static void ValidateLootCatalog(MultiplayerLootSession loot)
     {

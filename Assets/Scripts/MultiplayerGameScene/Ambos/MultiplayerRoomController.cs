@@ -5,6 +5,9 @@ public abstract class MultiplayerRoomController : MonoBehaviour
 {
     public int enemyType;
     public GameObject[] spawners = new GameObject[0];
+    [Tooltip("Enemigos ya colocados. Usa el mismo orden en los prefabs de Host y Client.")]
+    public MultiplayerEnemy[] enemies = new MultiplayerEnemy[0];
+    [SerializeField] private GameObject rewardChest;
     public GameObject enterDoor, exitDoor;
     [SerializeField] private string roomId;
     private Collider[] floorTriggers;
@@ -19,7 +22,7 @@ public abstract class MultiplayerRoomController : MonoBehaviour
         floorTriggers = floor != null ? floor.GetComponents<Collider>() : new Collider[0];
         if (MultiplayerWorldSession.Instance != null) MultiplayerWorldSession.Instance.RegisterRoom(this);
     }
-    protected virtual void Start() { ApplyDoors(); }
+    protected virtual void Start() { ApplyRoomState(); }
     public bool ContainsLocal(PlayerController player)
     {
         if (player == null || floorTriggers == null) return false;
@@ -46,7 +49,14 @@ public abstract class MultiplayerRoomController : MonoBehaviour
     public void ApplyState(int stage, int revision)
     {
         if (stage < 0 || stage > 2 || revision <= Revision || stage < Stage) return;
-        Stage = stage; Revision = revision; ApplyDoors();
+        Stage = stage; Revision = revision; ApplyRoomState();
+    }
+    private void ApplyRoomState()
+    {
+        ApplyDoors();
+        foreach (MultiplayerEnemy enemy in enemies)
+            if (enemy != null) enemy.SetCombatActive(Stage == 1);
+        if (rewardChest != null) rewardChest.SetActive(Stage == 2);
     }
     private void ApplyDoors()
     {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Pun;
@@ -78,6 +79,31 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
     }
     private MultiplayerLootDefinition Definition(string type)
     { foreach (var entry in catalog) if (entry.type == type) return entry; return null; }
+    public bool SpawnChestReward(string chestId, Chest chest)
+    {
+        if (!initialized || !MultiplayerGameplayProtocol.Host || chest == null) return false;
+        int floor = MultiplayerRunSession.Instance.FloorNumber;
+        string id = "chest:" + floor + ":" + chestId;
+        // Tambien protege contra dos solicitudes de apertura en el mismo frame.
+        if (ledger.Records.ContainsKey(id)) return true;
+        GameObject selected = chest.ChooseWeaponPrefab();
+        InventoryObject selectedItem = selected != null ? selected.GetComponent<InventoryObject>() : null;
+        var definition = selectedItem != null ? Definition(selectedItem) : null;
+        if (definition == null)
+        { Debug.LogError("El premio del cofre no esta en el catalogo de loot multijugador.", chest); return false; }
+        var item = Instantiate(definition.prefab, chest.LootPosition, Quaternion.identity).GetComponent<InventoryObject>();
+        var identity = item.GetComponent<MultiplayerItemIdentity>();
+        if (identity == null) identity = item.gameObject.AddComponent<MultiplayerItemIdentity>();
+        identity.Id = id; identity.Run = MultiplayerRunSession.Instance.RunId;
+        var record = ledger.Process(localActor, new MultiplayerLootMessage { op = "register", request = id,
+            record = new MultiplayerLootRecord { id = id, type = definition.type, location = MultiplayerItemLocation.World,
+                position = chest.LootPosition, rotation = Quaternion.identity, data = MultiplayerItemData.Capture(item),
+                chestReward = true, spawnOrigin = chest.transform.position, spawnTime = PhotonNetwork.Time } }, floor);
+        if (record == null) { Destroy(item.gameObject); return false; }
+        copies[id] = item;
+        Confirm(0, null, record.Copy());
+        return true;
+    }
     public bool TryGetWeaponData(string id, int actor, out ObjectData weaponData)
     {
         weaponData = null;
@@ -157,6 +183,8 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
     {
         if (request.op == "snapshot") { SendSnapshot(actor); return; }
         if (request.record == null || Definition(request.record.type) == null) return;
+        if (request.op == "register" && request.record.id != null && request.record.id.StartsWith("chest:", StringComparison.Ordinal) &&
+            actor != MultiplayerGameplayProtocol.HostActor) return;
         if (request.op == "claim" && (!world.TryPosition(actor, out Vector3 position) ||
             !ledger.Records.TryGetValue(request.record.id ?? "", out var available) || Vector3.Distance(position, available.position) > 10f))
         {
@@ -176,7 +204,8 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
         if (ownResponse) { pending.Remove(message.request); sentAt.Remove(message.request); }
         var record = message.record;
         if (record != null && !string.IsNullOrEmpty(record.id) && record.data != null && record.data.Valid() &&
-            Definition(record.type) != null && MultiplayerGameplayProtocol.Finite(record.position) && MultiplayerGameplayProtocol.Rotation(record.rotation))
+            Definition(record.type) != null && MultiplayerGameplayProtocol.Finite(record.position) && MultiplayerGameplayProtocol.Rotation(record.rotation) &&
+            (!record.chestReward || MultiplayerGameplayProtocol.Finite(record.spawnOrigin) && !double.IsNaN(record.spawnTime) && !double.IsInfinity(record.spawnTime)))
         {
             if (!records.TryGetValue(record.id, out var previous) || record.revision > previous.revision)
             {
@@ -216,6 +245,8 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
             item.transform.SetParent(null, true); SceneManager.MoveGameObjectToScene(item.gameObject, SceneManager.GetActiveScene());
             item.transform.SetParent(player.Inventory.GetOrCreateWorldLootContainer(), true);
             item.transform.SetPositionAndRotation(record.position, record.rotation); item.gameObject.SetActive(true);
+            if (record.chestReward && PhotonNetwork.Time - record.spawnTime < 0.55d)
+                StartCoroutine(AnimateChestReward(item, record));
         }
         else if (mine && (record.location == MultiplayerItemLocation.Reserved || record.location == MultiplayerItemLocation.Inventory))
         {
@@ -231,6 +262,27 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
     {
         var array = new List<MultiplayerLootRecord>(); foreach (var item in ledger.Records.Values) array.Add(item.Copy());
         MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.LootSnapshot, new MultiplayerLootMessage { records = array.ToArray() }, true, actor);
+    }
+    public static Vector3 ChestRewardPosition(MultiplayerLootRecord record, double time)
+    {
+        float age = Mathf.Max(0f, (float)(time - record.spawnTime));
+        if (age < 0.4f)
+        {
+            float t = age / 0.4f;
+            return Vector3.Lerp(record.spawnOrigin, record.position, t) + Vector3.up * (4f * 1.2f * t * (1f - t));
+        }
+        if (age < 0.55f) return record.position + Vector3.up * (0.2f * Mathf.Sin((age - 0.4f) / 0.15f * Mathf.PI));
+        return record.position;
+    }
+    private IEnumerator AnimateChestReward(InventoryObject item, MultiplayerLootRecord record)
+    {
+        while (item != null && item.gameObject.activeInHierarchy && records.TryGetValue(record.id, out var current) &&
+            current.revision == record.revision && current.location == MultiplayerItemLocation.World)
+        {
+            item.transform.position = ChestRewardPosition(record, PhotonNetwork.Time);
+            if (PhotonNetwork.Time - record.spawnTime >= 0.55d) yield break;
+            yield return null;
+        }
     }
     public void Settle(Action<bool> completion)
     {

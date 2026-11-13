@@ -7,7 +7,11 @@ using UnityEngine;
 // Salud e IA pertenecen al host; el movimiento puede delegarse durante un empuje.
 public sealed class MultiplayerEnemy : MonoBehaviour
 {
-    private static readonly int DeathAnimation = Animator.StringToHash("Base Layer.SlimeDeath");
+    [Header("Activacion y animacion")]
+    [SerializeField] private bool startsActive = true;
+    [SerializeField] private string deathAnimationState = "Base Layer.SlimeDeath";
+    private int DeathAnimation => Animator.StringToHash(deathAnimationState);
+    private bool componentsInitialized, combatActive;
     [SerializeField] private int maxHealth = 10, contactDamage = 5;
     [SerializeField] private float knockbackForce = 5f, knockbackUpForce = 2f, weaponKnockbackMultiplier = 1f;
     [SerializeField] private Renderer rend;
@@ -55,23 +59,27 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     public int MotionAttack => motionAttack;
     public int MotionVersion => motionVersion;
     public bool KnockbackActive => knockbackActive || pendingAttack > 0;
-    public bool SimulatesMotion => !suspended && !deathStarted && !localLanded && !motionBlocked &&
+    public bool CombatActive => combatActive && world != null && Health > 0 && !deathStarted;
+    public bool SimulatesMotion => CombatActive && !suspended && !deathStarted && !localLanded && !motionBlocked &&
         (pendingAttack > 0 || motionActor == localActor);
     public bool CanRunHostAI => authority && SimulatesMotion && !KnockbackActive;
     public bool PublishesMotion => !authority && SimulatesMotion && KnockbackActive;
     public Vector3 MotionPosition => SimulatesMotion ? body.position : latestMotion != null ? latestMotion.position : transform.position;
     public float AttackReach => 6f + GetComponent<Collider>().bounds.extents.magnitude;
-    public bool CanReceiveWeaponEffects => authority && Health > 0 && !deathStarted && !suspended &&
+    public bool CanReceiveWeaponEffects => authority && CombatActive && !suspended &&
         world != null && world.Playing;
 
-    private void Awake()
+    private void Awake() { InitializeComponents(); }
+    private void InitializeComponents()
     {
+        if (componentsInitialized) return;
+        componentsInitialized = true; combatActive = startsActive;
         body = GetComponent<Rigidbody>(); animator = GetComponent<Animator>(); Health = maxHealth;
         weaponEffectController = GetComponent<WeaponEffectController>();
         if (weaponEffectController == null)
             weaponEffectController = gameObject.AddComponent<WeaponEffectController>();
         weaponEffectController.Initialize(this);
-        body.isKinematic = !authority; body.useGravity = authority;
+        SetPhysics(false);
         if (!authority) animator.updateMode = AnimatorUpdateMode.UnscaledTime;
         if (rend != null)
         {
@@ -85,11 +93,21 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     }
     public void Initialize(MultiplayerWorldSession owner, string id, string room, int type)
     {
+        // El Awake del cuarto puede registrar a sus hijos antes de que reciban Awake.
+        InitializeComponents();
         world = owner; Id = id; RoomId = room; Type = type;
         suspended = owner != null && !owner.Playing;
         localActor = MultiplayerGameplayProtocol.LocalActor; hostActor = MultiplayerGameplayProtocol.HostActor;
         motionActor = hostActor; motionVersion = authority ? 1 : 0;
         SetPhysics(SimulatesMotion);
+    }
+    public void SetCombatActive(bool active)
+    {
+        InitializeComponents();
+        if (deathStarted || combatActive == active) return;
+        combatActive = active;
+        SetPhysics(SimulatesMotion);
+        if (active && !startsActive) animator.SetTrigger("Activate");
     }
     private static long Key(int actor, int attack) => ((long)actor << 32) | (uint)attack;
     private void SetPhysics(bool simulate)
@@ -100,14 +118,14 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (Health <= 0 || world == null || !world.Playing) return;
+        if (!CombatActive || !world.Playing) return;
         WeaponObject weapon = other.GetComponent<WeaponObject>();
         if (other.CompareTag("Weapon") && weapon != null) world.RequestHit(this, weapon);
     }
     private void OnCollisionEnter(Collision collision)
     {
         ObserveGround(collision);
-        if (Health <= 0 || world == null || !world.Playing) return;
+        if (!CombatActive || !world.Playing) return;
         PlayerController target = collision.collider.GetComponentInParent<PlayerController>();
         if (target == null || target != MultiplayerStartingRoomSpawns.LocalPlayer) return;
         target.playerClass.TakeDamage(contactDamage); target.ReceiveHit(gameObject);
@@ -167,7 +185,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     }
     public bool BeginLocalKnockback(int actor, int attack, Vector3 origin)
     {
-        if (authority || Health <= 0 || suspended || actor != localActor || actor <= 0 || attack <= 0 ||
+        if (authority || !CombatActive || suspended || actor != localActor || actor <= 0 || attack <= 0 ||
             !MultiplayerGameplayProtocol.Finite(origin) || !anticipatedHits.Add(Key(actor, attack))) return false;
         pendingAttack = attack; pendingBaseVersion = motionVersion; pendingAt = Time.realtimeSinceStartupAsDouble;
         localSequence = 0; localLanded = false; localFinal = null; motionBlocked = false; frames.Clear(); correctionAt = double.NegativeInfinity;
@@ -178,7 +196,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     }
     public void TakeAuthoritativeHit(int damage, Vector3 origin, int actor = 0, int attack = 0)
     {
-        if (!authority || Health <= 0 || damage <= 0) return;
+        if (!authority || !CombatActive || damage <= 0) return;
         if (actor <= 0) actor = hostActor;
         Vector3 start = MotionPosition;
         Health = Mathf.Max(0, Health - damage); HitRevision++;
@@ -302,7 +320,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     };
     public bool ReceiveMotion(int sender, MultiplayerSlimeMotion frame)
     {
-        if (deathStarted || suspended || frame == null || !frame.IsValid || frame.id != Id || sender != frame.actor ||
+        if (!CombatActive || suspended || frame == null || !frame.IsValid || frame.id != Id || sender != frame.actor ||
             retiredControls.Contains(Key(frame.actor, frame.attack))) return false;
         if (!knockbackActive || frame.actor != motionActor || frame.attack != motionAttack)
         {
@@ -400,7 +418,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         ExpireCandidates();
         if (authority && deathStarted && world != null && world.Playing)
         { deathAge += Time.deltaTime; if (deathAge > 3f) DestroyEnemy(); }
-        if (world == null || !world.Playing || suspended || deathStarted) return;
+        if (!CombatActive || !world.Playing || suspended) return;
         if (pendingAttack > 0 && Time.realtimeSinceStartupAsDouble - pendingAt >= 5d)
             RejectLocalKnockback(localActor, pendingAttack);
         if (!authority && SimulatesMotion && KnockbackActive && Time.timeScale <= 0f)
