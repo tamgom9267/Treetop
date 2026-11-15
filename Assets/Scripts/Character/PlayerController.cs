@@ -389,6 +389,22 @@ public class PlayerController : MonoBehaviour
         hitStopCoroutine = StartCoroutine(RestoreAnimationAfterHitStop());
     }
 
+    private void OnDisable()
+    {
+        if (receivedHitCoroutine != null)
+        {
+            StopCoroutine(receivedHitCoroutine);
+            receivedHitCoroutine = null;
+        }
+        if (hitStopCoroutine != null)
+        {
+            StopCoroutine(hitStopCoroutine);
+            hitStopCoroutine = null;
+            if (playerAnimation != null) playerAnimation.speed = animatorSpeedBeforeHitStop;
+        }
+        hitStopEndTime = 0f;
+    }
+
     private IEnumerator RestoreAnimationAfterHitStop()
     {
         while (Time.unscaledTime < hitStopEndTime)

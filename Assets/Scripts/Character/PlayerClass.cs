@@ -92,6 +92,11 @@ public class PlayerClass : MonoBehaviour
        InitializeEmissionFeedback();
     }
 
+    private void OnDisable()
+    {
+        ResetTransientFeedback();
+    }
+
     // void Start()
     // {
     //     playerMaterials = playerRenderer.materials;
@@ -197,6 +202,7 @@ public class PlayerClass : MonoBehaviour
     public void ReviveForNextFloor(int life)
     {
         if (health > 0 || life <= 0) return;
+        ResetTransientFeedback();
         health = Mathf.Min(maxHealth, life);
         MP = maxMP;
         NotifyStatsChanged();
@@ -327,16 +333,26 @@ public class PlayerClass : MonoBehaviour
             yield return null;
         }
 
-        // restaurar al brillo normal
-        for (int i = 0; i < originalPropertyBlocks.Length; i++)
-        {
-            playerRenderer.SetPropertyBlock(originalPropertyBlocks[i], i);
-        }
-        // parar el efecto
-        StopHealingParticles();
-
-        currentFeedbackPriority = 0;
         emissionCoroutine = null;
+        ResetTransientFeedback();
+    }
+
+    private void ResetTransientFeedback()
+    {
+        if (emissionCoroutine != null)
+        {
+            StopCoroutine(emissionCoroutine);
+            emissionCoroutine = null;
+        }
+
+        if (playerRenderer != null && originalPropertyBlocks != null)
+            for (int i = 0; i < originalPropertyBlocks.Length; i++)
+                playerRenderer.SetPropertyBlock(originalPropertyBlocks[i], i);
+
+        StopHealingParticles();
+        currentFeedbackPriority = 0;
+        emissionEndTime = 0f;
+        currentEmissionColor = default;
     }
 
     private void StartHealingParticle()
@@ -354,6 +370,7 @@ public class PlayerClass : MonoBehaviour
     {
         if (activeHealingParticles == null) return;
 
+        activeHealingParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         Destroy(activeHealingParticles.gameObject);
         activeHealingParticles = null;
     }
