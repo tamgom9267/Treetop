@@ -12,6 +12,8 @@ public class EnemyCombat : MonoBehaviour
 
     private int currentHealth;
     private bool isDead;
+    [Header("Destrucción")]
+    [SerializeField] private GameObject destroyTarget;
 
     [Header("Knockback recibido")]
     [SerializeField] private float knockbackForce = 5f;
@@ -56,7 +58,11 @@ public class EnemyCombat : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        // if (rb == null) rb = GetComponentInChildren<Rigidbody>();
+        
         animator = GetComponent<Animator>();
+        // if (animator == null) animator = GetComponentInChildren<Animator>();
+
         weaponEffectController = GetComponent<WeaponEffectController>();
         if (weaponEffectController == null)
             weaponEffectController = gameObject.AddComponent<WeaponEffectController>();
@@ -73,8 +79,13 @@ public class EnemyCombat : MonoBehaviour
             for (int i = 0; i < enemyMaterials.Length; i++)
             {
                 enemyMaterials[i].EnableKeyword("_EMISSION");
+
+                // quitar esta linea si se arregla el material negro de ciertos enemigos para ser emmisivos y no unlit
+                if (!enemyMaterials[i].HasProperty("_EmissionColor")) continue;
+
                 originalEmissionColors[i] =
                     enemyMaterials[i].GetColor("_EmissionColor");
+                
             }
         }
     }
@@ -207,7 +218,11 @@ public class EnemyCombat : MonoBehaviour
     {
         SpawnDeathEffect();
 
-        Destroy(gameObject);
+        // Destroy(gameObject);
+        Destroy(destroyTarget != null ? destroyTarget : gameObject);
+        // si es nulo se destruye el puro gameobject para no tener que reconfigurar enemigos pasados
+        // si no es nulo, entonces destruyo lo asignado, en este caso se usa para el arbol no tener que programar otro script
+        // que se encargue de borrar el objeto padre
     }
 
     // daño al jugador
@@ -229,6 +244,9 @@ public class EnemyCombat : MonoBehaviour
     {
         for (int i = 0; i <enemyMaterials.Length; i++)
         {
+            // quitar esta linea si se arregla el material negro de ciertos enemigos para ser emmisivos y no unlit
+            if (!enemyMaterials[i].HasProperty("_EmissionColor")) continue;
+
             enemyMaterials[i].SetColor(
                 "_EmissionColor", flashColor);
         }
@@ -237,6 +255,9 @@ public class EnemyCombat : MonoBehaviour
 
         for (int i = 0; i < enemyMaterials.Length; i++)
         {
+            // quitar esta linea si se arregla el material negro de ciertos enemigos para ser emmisivos y no unlit
+            if (!enemyMaterials[i].HasProperty("_EmissionColor")) continue;
+
             enemyMaterials[i].SetColor(
                 "_EmissionColor", originalEmissionColors[i]);
         }
