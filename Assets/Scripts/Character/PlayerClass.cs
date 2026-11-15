@@ -36,6 +36,7 @@ public class PlayerClass : MonoBehaviour
 
     // Patron observer - cuando cambia la vida notifica al HUD
     public event Action<int, int, int, int> OnStatsChanged;
+    public event Action OnDied;
 
     [Header("Feedback Visual")]
     // [SerializeField] private Renderer playerRenderer;
@@ -167,11 +168,14 @@ public class PlayerClass : MonoBehaviour
 
         // para observer
         NotifyStatsChanged();
+
+        if (health == 0)
+            OnDied?.Invoke();
     }
 
     public void Heal(int cantidad)
     {
-        if (cantidad <= 0) return;
+        if (cantidad <= 0 || health <= 0) return;
 
         int previousHealth = health;
 
