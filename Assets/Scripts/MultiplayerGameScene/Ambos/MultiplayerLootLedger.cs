@@ -108,6 +108,9 @@ public sealed class MultiplayerLootLedger
             current.position = incoming.position; current.rotation = incoming.rotation; current.data = incoming.data;
             current.chestReward = false;
         }
+        else if (message.op == "remove" && current.owner == actor &&
+            (current.location == MultiplayerItemLocation.Inventory || current.location == MultiplayerItemLocation.Reserved))
+        { current.location = MultiplayerItemLocation.Removed; current.owner = 0; }
         else return current;
         current.revision = ++revision;
         return current;

@@ -61,7 +61,11 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     public MultiplayerWorldSession World { get; private set; }
     public TrafficRates Traffic => TrafficRates.Defaults();
     public bool GameplayReady => World != null && World.Loot.Ready;
-    public void PublishLocalEquipment() { if (localReady && publisher != null) publisher.SendFullState(); }
+    public void PublishLocalEquipment()
+    {
+        if (localReady && publisher != null && (MultiplayerDeathSession.Instance == null ||
+            MultiplayerDeathSession.Instance.IsAlive(MultiplayerGameplayProtocol.LocalActor))) publisher.SendFullState();
+    }
     public bool PrepareGameplay(PlayerController local, out string error) => World.Bind(local, out error);
 
     public bool ValidateAssets(out string error)
@@ -145,7 +149,9 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
         ApplyLocalPlayerColor(player);
 
         localReady = true;
-        if (!publisher.SendFullState() || !Send(MultiplayerPlayerProtocol.RequestStateEvent,
+        bool alive = MultiplayerDeathSession.Instance == null ||
+            MultiplayerDeathSession.Instance.IsAlive(MultiplayerGameplayProtocol.LocalActor);
+        if ((alive && !publisher.SendFullState()) || !Send(MultiplayerPlayerProtocol.RequestStateEvent,
             MultiplayerPlayerProtocol.PackRequest(runId, floorNumber, NextSequence(), PhotonNetwork.Time), true))
         {
             localReady = false;
@@ -194,12 +200,15 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
         foreach (int actor in remotes.Keys) if (!IsParticipant(actor)) departedActors.Add(actor);
         foreach (int actor in departedActors) RemoveRemote(actor);
         bool playing = localReady && !suspended && session.IsPlaying;
-        if (playing)
+        if (playing && (MultiplayerDeathSession.Instance == null ||
+            MultiplayerDeathSession.Instance.IsAlive(MultiplayerGameplayProtocol.LocalActor)))
         {
             TrafficRates traffic = Traffic;
             publisher.Tick(traffic.playerStateSendHz, traffic.equipmentCheckHz);
         }
-        foreach (MultiplayerRemotePlayer remote in remotes.Values) remote.SetPlaying(playing);
+        foreach (var pair in remotes)
+            pair.Value.SetPlaying(playing && (MultiplayerDeathSession.Instance == null ||
+                MultiplayerDeathSession.Instance.IsAlive(pair.Key)));
     }
 
     private bool IsParticipant(int actor)
@@ -223,6 +232,8 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
             session.RunId, session.FloorNumber, length, out object[] data)) return;
         if (runId != session.RunId || floorNumber != session.FloorNumber) BeginFloor(session.RunId, session.FloorNumber);
         int actor = photonEvent.Sender;
+        if (code != MultiplayerPlayerProtocol.RequestStateEvent && MultiplayerDeathSession.Instance != null &&
+            !MultiplayerDeathSession.Instance.IsAlive(actor)) return;
         if (World != null && MultiplayerPlayerProtocol.TryReadPose(data, out var rawPose)) World.ObservePose(actor, rawPose.position);
         if (code == MultiplayerPlayerProtocol.RequestStateEvent)
         {
@@ -230,7 +241,8 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
             requestSequences.TryGetValue(actor, out int previous);
             if (!MultiplayerPlayerProtocol.IsNewer(incomingSequence, previous)) return;
             requestSequences[actor] = incomingSequence;
-            if (localReady) publisher.SendFullState(actor);
+            if (localReady && (MultiplayerDeathSession.Instance == null ||
+                MultiplayerDeathSession.Instance.IsAlive(MultiplayerGameplayProtocol.LocalActor))) publisher.SendFullState(actor);
         }
         else if (code == MultiplayerPlayerProtocol.EquipmentEvent && MultiplayerPlayerProtocol.TryReadEquipment(data, out var equipment))
             GetRemote(actor).ReceiveEquipment(equipment);
@@ -257,6 +269,12 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
             remotes.Add(actor, remote);
         }
         return remote;
+    }
+
+    public Transform TryGetLivingRemote(int actor)
+    {
+        return remotes.TryGetValue(actor, out MultiplayerRemotePlayer remote) && remote != null &&
+            remote.gameObject.activeInHierarchy ? remote.transform : null;
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer) { RemoveRemote(otherPlayer.ActorNumber); }

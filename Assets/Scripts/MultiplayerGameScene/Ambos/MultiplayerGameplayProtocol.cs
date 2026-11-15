@@ -10,6 +10,7 @@ public static class MultiplayerGameplayProtocol
 {
     public const byte WorldRequest = 30, WorldState = 31, EnemyFrames = 32, WorldSnapshot = 33, SlimeMotion = 34;
     public const byte LootRequest = 40, LootState = 41, LootSnapshot = 42, Settlement = 43;
+    public const byte FloorRequest = 44, DefeatReturnRequest = 45;
     public const int Version = 1;
     public static bool Participant(int actor)
     {
@@ -110,7 +111,7 @@ public sealed class MultiplayerRoomPresence
     public bool Contains(int actor, double now) => occupants.TryGetValue(actor, out double time) && now - time <= 1.5d;
     public bool All(IList<int> actors, double now)
     {
-        if (actors.Count < 2) return false;
+        if (actors.Count < 1) return false;
         foreach (int actor in actors) if (!Contains(actor, now)) return false;
         return true;
     }

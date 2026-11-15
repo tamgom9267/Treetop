@@ -194,6 +194,14 @@ public class PlayerClass : MonoBehaviour
         NotifyStatsChanged();
     }
 
+    public void ReviveForNextFloor(int life)
+    {
+        if (health > 0 || life <= 0) return;
+        health = Mathf.Min(maxHealth, life);
+        MP = maxMP;
+        NotifyStatsChanged();
+    }
+
     public void SpendMP(int cantidad)
     {
         if (cantidad <= 0) { return; }

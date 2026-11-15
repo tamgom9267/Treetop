@@ -65,6 +65,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     private bool completionClearRequested;
     private bool initialized;
     private bool sceneExitPrepared;
+    private MultiplayerDeathSession deathSession;
 
     public string RunId { get; private set; }
     public int BaseSeed { get; private set; }
@@ -117,6 +118,8 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         initialized = true;
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        deathSession = GetComponent<MultiplayerDeathSession>();
+        if (deathSession == null) deathSession = gameObject.AddComponent<MultiplayerDeathSession>();
         return true;
     }
 
@@ -308,6 +311,25 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
             FailRun("No se pudo publicar el final de la partida.");
     }
 
+    public void PublishDefeat()
+    {
+        if (!MultiplayerGameplayProtocol.Host || !IsPlaying || deathSession == null || !deathSession.HasWipe) return;
+        publicationPending = true;
+        BeginTransition("Todos murieron. Regresando a la aldea...");
+        if (!Publish(MultiplayerRunPhase.Defeated, string.Empty, string.Empty))
+            FailRun("No se pudo publicar la derrota de la party.");
+    }
+
+    public bool TryAdvanceFromActor(int actor)
+    {
+        if (!MultiplayerGameplayProtocol.Host || !IsPlaying || deathSession == null || !deathSession.IsAlive(actor)) return false;
+        MultiplayerWorldSession world = MultiplayerWorldSession.Instance;
+        HostFloorPortal portal = FindFirstObjectByType<HostFloorPortal>();
+        if (world == null || portal == null || !world.TryPosition(actor, out Vector3 position) ||
+            Vector3.Distance(position, portal.transform.position) > 8f) return false;
+        return RequestNextFloor();
+    }
+
     private void PublishNextFloor(MultiplayerFloorData data)
     {
         publicationPending = true;
@@ -340,7 +362,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         if (string.IsNullOrEmpty(id)) return;
         if (!Guid.TryParse(id, out _) || !(properties[SeedKey] is int seed) || !RunSeedSettings.IsValid(seed) ||
             !(properties[FloorKey] is int number) || number < 1 || !(properties[PhaseKey] is int state) ||
-            state < 1 || state > (int)MultiplayerRunPhase.Completed)
+            state < 1 || state > (int)MultiplayerRunPhase.Defeated)
         { ReportBuildFailed("El estado de la partida recibido no es valido."); return; }
         // Una partida ya terminada nunca debe iniciar otra carga desde la aldea.
         if (!activeRun && state >= (int)MultiplayerRunPhase.Ending) return;
@@ -364,7 +386,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
             if (newFloor) { buildRequestedKey = localBuiltKey = reportedFailureKey = null; publishingPlaying = false; }
             BeginTransition("Cargando el piso " + FloorNumber + "...");
         }
-        if (Phase == MultiplayerRunPhase.Completed)
+        if (Phase == MultiplayerRunPhase.Completed || Phase == MultiplayerRunPhase.Defeated)
         {
             completedRun = true;
             ReturnToVillage(string.Empty);
@@ -554,6 +576,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void BeginTransition(string message)
     {
+        if (deathSession != null) deathSession.OnFloorBegin(FloorNumber);
         deadline = Time.realtimeSinceStartupAsDouble + transitionTimeout;
         if (playerSync != null) playerSync.BeginFloor(RunId, FloorNumber);
         PlayerController localPlayer = MultiplayerStartingRoomSpawns.LocalPlayer;
@@ -569,6 +592,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     private void FinishTransition()
     {
         settlementRequested = false;
+        if (deathSession != null) deathSession.OnFloorReady(FloorNumber);
         ReleasePlayer();
         if (playerSync != null) playerSync.ResumePlaying();
         ShowLoading(false, string.Empty);
@@ -755,7 +779,8 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
                     completionClearRequested = true;
                     if (!PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable
                         { { RunKey, null }, { SeedKey, null }, { FloorKey, null },
-                          { PhaseKey, null }, { JsonKey, null }, { ErrorKey, null } }))
+                          { PhaseKey, null }, { JsonKey, null }, { ErrorKey, null },
+                          { MultiplayerDeathSession.WipeKey, null } }))
                     {
                         FailRun("No se pudo limpiar el estado de la partida completada.");
                         yield break;

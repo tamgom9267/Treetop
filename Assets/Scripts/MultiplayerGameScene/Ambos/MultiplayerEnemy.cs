@@ -128,7 +128,8 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (!CombatActive || !world.Playing) return;
         PlayerController target = collision.collider.GetComponentInParent<PlayerController>();
         if (target == null || target != MultiplayerStartingRoomSpawns.LocalPlayer) return;
-        target.playerClass.TakeDamage(contactDamage); target.ReceiveHit(gameObject);
+        target.playerClass.TakeDamage(contactDamage);
+        if (target.playerClass.health > 0) target.ReceiveHit(gameObject);
     }
     private void OnCollisionStay(Collision collision) { ObserveGround(collision); }
     private void ObserveGround(Collision collision)

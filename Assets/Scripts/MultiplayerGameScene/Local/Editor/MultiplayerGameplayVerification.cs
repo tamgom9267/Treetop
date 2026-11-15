@@ -25,6 +25,31 @@ public static class MultiplayerGameplayVerification
         }
         catch (Exception error) { Write(false, error.ToString()); throw; }
     }
+
+    [MenuItem("Tools/Multiplayer/Probar muerte multijugador (sin red)")]
+    public static void RunDeathChecks()
+    {
+        passed.Clear();
+        CheckPresence();
+        CheckLoot();
+        GameObject avatar = new GameObject("Verificacion de reaparicion");
+        try
+        {
+            PlayerClass stats = avatar.AddComponent<PlayerClass>();
+            stats.maxHealth = 20; stats.health = 0; stats.maxMP = 9; stats.MP = 1;
+            stats.ReviveForNextFloor(5);
+            Check(stats.health == 5 && stats.MP == 9, "Reaparecer restaura cinco de vida y el mana");
+        }
+        finally { Object.DestroyImmediate(avatar); }
+        GameObject death = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/Canvas Muerte/Canvas Muerte.prefab");
+        GameObject spectator = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/Canvas Espectador/Canvas Espectador.prefab");
+        Check(death != null && death.GetComponent<DeathPanelView>() != null && death.GetComponent<DeathPanelView>().IsConfigured,
+            "Panel editable de muerte conserva mensaje y boton configurados");
+        Check(spectator != null && spectator.GetComponent<SpectatorPanelView>() != null &&
+            new SerializedObject(spectator.GetComponent<SpectatorPanelView>()).FindProperty("messageText").objectReferenceValue != null,
+            "Panel editable de espectador conserva el texto configurado");
+        Debug.Log("MUERTE MULTIJUGADOR: " + passed.Count + " comprobaciones correctas.");
+    }
     private static void CheckWorldSerialization()
     {
         bool depthWarning = false;
@@ -73,7 +98,7 @@ public static class MultiplayerGameplayVerification
         presence.Set(2,false,1); Check(!presence.All(new[] {1,2,3},1), "Salir antes de activar retira presencia");
         Check(presence.All(new[] {1,3},1), "Desconectado deja de contar entre los participantes");
         Check(!presence.All(new[] {1,3},3), "Presencia obsoleta expira");
-        Check(!presence.All(new[] {1},1), "El host solo no activa un cuarto");
+        Check(presence.All(new[] {1},1), "Un unico superviviente activa el cuarto");
         Check(!MultiplayerGameplayProtocol.Finite(new Vector3(float.NaN,0,0)) && !MultiplayerGameplayProtocol.Rotation(new Quaternion()), "Datos de transformacion invalidos rechazados");
     }
     private static void CheckAttacks()
@@ -114,6 +139,11 @@ public static class MultiplayerGameplayVerification
         Check(current.owner==0 && current.position.x==7, "Desconexion libera una reserva");
         var held = new MultiplayerLootRecord {id="two",type="sword",data=Data(),location=MultiplayerItemLocation.Inventory};
         ledger.Process(2,Command("register","held",held),1);
+        var discarded = new MultiplayerLootRecord {id="discard",type="sword",data=Data(),location=MultiplayerItemLocation.Inventory};
+        var owned = ledger.Process(2,Command("register","discard-register",discarded),1).Copy();
+        Check(ledger.Process(3,Command("remove","discard-other",owned),1).owner==2, "Otro actor no puede eliminar el inventario ajeno");
+        Check(ledger.Process(2,Command("remove","discard-own",owned),1).location==MultiplayerItemLocation.Removed,
+            "La muerte elimina un objeto propio del registro compartido");
         ledger.NewFloor(2);
         Check(ledger.Records["one"].location==MultiplayerItemLocation.Removed && ledger.Records["two"].owner==2, "Cambio de piso retira suelo y conserva inventario");
         Check(ledger.Process(3,Command("claim","late",current),2).location==MultiplayerItemLocation.Removed, "Un paquete viejo no recupera loot del piso anterior");
