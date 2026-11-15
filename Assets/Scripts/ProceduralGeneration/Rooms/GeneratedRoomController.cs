@@ -126,6 +126,8 @@ public class GeneratedRoomController : MonoBehaviour
         {
             if (enemy != null && enemy.TryGetComponent(out SlimeBoss boss))
                 boss.ActivateSlime();
+
+            if(enemy.TryGetComponent(out TreeRootController tree)) tree.SetRootActive(true);
         }
     }
 
@@ -133,6 +135,14 @@ public class GeneratedRoomController : MonoBehaviour
     {
         isCompleted = true;
         isActive = false;
+
+        // Se descativa cualquier componente del arbol
+        foreach (GameObject enemy in enemies)
+        {
+            if (enemy == null) continue;
+
+            if (enemy.TryGetComponent(out TreeRootController tree)) tree.SetRootActive(false);
+        }
 
         // Al terminar, se abren las puertas permanentemente.
         OpenDoor(enterDoor);
