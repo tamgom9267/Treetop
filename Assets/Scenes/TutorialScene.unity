@@ -17941,6 +17941,7 @@ GameObject:
   - component: {fileID: 707366304}
   - component: {fileID: 707366303}
   - component: {fileID: 707366302}
+  - component: {fileID: 707366308}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -18047,6 +18048,22 @@ MonoBehaviour:
   healingEmissionColor: {r: 0.21960784, g: 1, b: 0.2, a: 0.3137255}
   healingFlashDuration: 0.6
   healingParticles: {fileID: 7884627245462379932, guid: 7086937ad0447a644890084c5406657d, type: 3}
+--- !u!114 &707366308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 707366300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f5a99e4a39f4c749b1e63f11a08cb23, type: 3}
+  m_Name: ''
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathScreen
+  tutorialMessage: Has muerto en el tutorial
+  tutorialButtonText: Reiniciar
+  soloMessage: Has muerto en la mazmorra
+  soloButtonText: Volver
 --- !u!114 &707366305
 MonoBehaviour:
   m_ObjectHideFlags: 0

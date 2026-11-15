@@ -4,7 +4,7 @@ using System.Globalization;
 using UnityEngine;
 
 public enum MultiplayerDirection { North, East, South, West }
-public enum MultiplayerRunPhase { Idle, LoadingScene, BuildingFloor, Playing, Ending, Completed }
+public enum MultiplayerRunPhase { Idle, LoadingScene, BuildingFloor, Playing, Ending, Completed, Defeated }
 
 [Serializable]
 public sealed class MultiplayerRoomData

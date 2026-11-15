@@ -21,6 +21,12 @@ public class FollowPlayerNoRotation : MonoBehaviour
 
     private Vector3 shakeOffset;
     private Coroutine shakeCoroutine;
+    public Transform Target => player;
+
+    public void SetTarget(Transform target)
+    {
+        if (target != null) player = target;
+    }
 
     private void Start()
     {

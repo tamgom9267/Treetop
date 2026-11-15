@@ -24,6 +24,7 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
     private string barrier, lastBarrier, claimRequest, claimId;
     private Action<bool> onSettled;
     private bool settlementAckSent, initialized;
+    private bool discarding;
     private double lastScan = double.NegativeInfinity, lastSnapshot = double.NegativeInfinity, barrierDeadline;
     public bool Settling { get; private set; }
     public bool Ready => initialized && pending.Count == 0;
@@ -58,6 +59,16 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
         if (first) foreach (var record in new List<MultiplayerLootRecord>(records.Values)) Reconcile(record);
     }
     public void Resume() { Settling = false; barrier = null; settlementAckSent = false; lastScan = lastSnapshot = double.NegativeInfinity; }
+    public void DiscardLocalItems() { discarding = true; Scan(); RequestDiscard(); }
+    public void StopDiscarding() { discarding = false; }
+    private void RequestDiscard()
+    {
+        if (!initialized) return;
+        foreach (var record in new List<MultiplayerLootRecord>(records.Values))
+            if (record.owner == localActor &&
+                (record.location == MultiplayerItemLocation.Inventory || record.location == MultiplayerItemLocation.Reserved) &&
+                !PendingItem(record.id)) Request("remove", record.Copy());
+    }
     public bool OwnedBy(string id, int actor)
     {
         var source = MultiplayerGameplayProtocol.Host ? ledger.Records : records;
@@ -217,7 +228,8 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
             string id = claimId; claimRequest = claimId = null;
             if (records.TryGetValue(id, out var current) && current.owner == localActor && current.location == MultiplayerItemLocation.Reserved)
             {
-                if (Settling || !copies.TryGetValue(id, out var item) || item == null || !world.Inventory.Inspect(item, Definition(current.type).icon))
+                if (discarding) Request("remove", current.Copy());
+                else if (Settling || !copies.TryGetValue(id, out var item) || item == null || !world.Inventory.Inspect(item, Definition(current.type).icon))
                 {
                     var drop = current.Copy(); drop.position = player.transform.position;
                     Request("drop", drop);
@@ -302,6 +314,7 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
         double now = Time.realtimeSinceStartupAsDouble;
         MultiplayerPlayers.TrafficRates traffic = world.Traffic;
         if (now - lastScan >= 1d / traffic.lootScanHz) { lastScan = now; Scan(); }
+        if (discarding) RequestDiscard();
         foreach (var pair in new List<KeyValuePair<string, MultiplayerLootMessage>>(pending))
         {
             if (now - sentAt[pair.Key] < 1d / traffic.lootRetryHz) continue;
@@ -326,7 +339,7 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
         }
         if (!Settling) return;
         if (now > barrierDeadline) { onSettled?.Invoke(false); onSettled = null; MultiplayerRunSession.Instance.ReportBuildFailed("Se agoto la confirmacion del inventario antes de cambiar de piso."); return; }
-        if (pending.Count == 0 && !settlementAckSent)
+        if (pending.Count == 0 && (!discarding || !HasOwnedItems()) && !settlementAckSent)
         {
             settlementAckSent = true;
             if (MultiplayerGameplayProtocol.Host) settlementAcks.Add(localActor);
@@ -338,6 +351,13 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
             foreach (int actor in MultiplayerGameplayProtocol.Participants()) if (!settlementAcks.Contains(actor)) return;
             var done = onSettled; onSettled = null; done(true);
         }
+    }
+    private bool HasOwnedItems()
+    {
+        foreach (var record in records.Values)
+            if (record.owner == localActor &&
+                (record.location == MultiplayerItemLocation.Inventory || record.location == MultiplayerItemLocation.Reserved)) return true;
+        return false;
     }
     public void OnEvent(EventData ev)
     {

@@ -12,7 +12,10 @@ public class HostFloorPortal : MonoBehaviour
             other.GetComponentInParent<PlayerController>() != MultiplayerStartingRoomSpawns.LocalPlayer) return;
         PhotonPartyService party = PhotonPartyService.Instance;
         MultiplayerRunSession session = MultiplayerRunSession.Instance;
-        if (party != null && party.IsHost && session != null && session.IsPlaying)
-            activated = session.RequestNextFloor();
+        MultiplayerDeathSession deaths = MultiplayerDeathSession.Instance;
+        if (party == null || session == null || !session.IsPlaying || deaths == null ||
+            !deaths.IsAlive(MultiplayerGameplayProtocol.LocalActor)) return;
+        if (party.IsHost) activated = session.TryAdvanceFromActor(MultiplayerGameplayProtocol.LocalActor);
+        else activated = deaths.RequestFloorAdvance();
     }
 }

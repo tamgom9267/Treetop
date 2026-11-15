@@ -36,6 +36,7 @@ public class PlayerClass : MonoBehaviour
 
     // Patron observer - cuando cambia la vida notifica al HUD
     public event Action<int, int, int, int> OnStatsChanged;
+    public event Action OnDied;
 
     [Header("Feedback Visual")]
     // [SerializeField] private Renderer playerRenderer;
@@ -89,6 +90,11 @@ public class PlayerClass : MonoBehaviour
        playerController = GetComponent<PlayerController>();
 
        InitializeEmissionFeedback();
+    }
+
+    private void OnDisable()
+    {
+        ResetTransientFeedback();
     }
 
     // void Start()
@@ -167,11 +173,14 @@ public class PlayerClass : MonoBehaviour
 
         // para observer
         NotifyStatsChanged();
+
+        if (health == 0)
+            OnDied?.Invoke();
     }
 
     public void Heal(int cantidad)
     {
-        if (cantidad <= 0) return;
+        if (cantidad <= 0 || health <= 0) return;
 
         int previousHealth = health;
 
@@ -187,6 +196,15 @@ public class PlayerClass : MonoBehaviour
         }
 
         // para observer
+        NotifyStatsChanged();
+    }
+
+    public void ReviveForNextFloor(int life)
+    {
+        if (health > 0 || life <= 0) return;
+        ResetTransientFeedback();
+        health = Mathf.Min(maxHealth, life);
+        MP = maxMP;
         NotifyStatsChanged();
     }
 
@@ -315,16 +333,26 @@ public class PlayerClass : MonoBehaviour
             yield return null;
         }
 
-        // restaurar al brillo normal
-        for (int i = 0; i < originalPropertyBlocks.Length; i++)
-        {
-            playerRenderer.SetPropertyBlock(originalPropertyBlocks[i], i);
-        }
-        // parar el efecto
-        StopHealingParticles();
-
-        currentFeedbackPriority = 0;
         emissionCoroutine = null;
+        ResetTransientFeedback();
+    }
+
+    private void ResetTransientFeedback()
+    {
+        if (emissionCoroutine != null)
+        {
+            StopCoroutine(emissionCoroutine);
+            emissionCoroutine = null;
+        }
+
+        if (playerRenderer != null && originalPropertyBlocks != null)
+            for (int i = 0; i < originalPropertyBlocks.Length; i++)
+                playerRenderer.SetPropertyBlock(originalPropertyBlocks[i], i);
+
+        StopHealingParticles();
+        currentFeedbackPriority = 0;
+        emissionEndTime = 0f;
+        currentEmissionColor = default;
     }
 
     private void StartHealingParticle()
@@ -342,6 +370,7 @@ public class PlayerClass : MonoBehaviour
     {
         if (activeHealingParticles == null) return;
 
+        activeHealingParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         Destroy(activeHealingParticles.gameObject);
         activeHealingParticles = null;
     }

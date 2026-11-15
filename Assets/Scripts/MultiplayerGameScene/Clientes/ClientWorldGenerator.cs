@@ -128,7 +128,7 @@ public class ClientWorldGenerator : MonoBehaviour
             MultiplayerMapMath.WallOffset(portalSide) + new Vector3(0f, 2.2f, 0f);
         Quaternion rotation = MultiplayerMapMath.IsHorizontalWall(portalSide) ? Quaternion.Euler(0f, 90f, 0f) : Quaternion.identity;
         GameObject portal = Instantiate(Required(portalPath), portalPosition, rotation, root);
-        MultiplayerPrefabAdapter.PreparePortal(portal, false);
+        MultiplayerPrefabAdapter.PreparePortal(portal);
         return spawn;
     }
 

@@ -155,6 +155,8 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     }
     public bool TryPosition(int actor, out Vector3 position)
     {
+        if (MultiplayerDeathSession.Instance != null && !MultiplayerDeathSession.Instance.IsAlive(actor))
+        { position = default; return false; }
         if (actor == MultiplayerGameplayProtocol.LocalActor && player != null)
         { position = player.transform.position; return true; }
         position = default;
@@ -167,7 +169,8 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         target = default; float best = float.PositiveInfinity;
         if (!presence.TryGetValue(roomId, out var occupants)) return false;
         foreach (int actor in MultiplayerGameplayProtocol.Participants())
-            if (occupants.Contains(actor, Time.realtimeSinceStartupAsDouble) && TryPosition(actor, out Vector3 position))
+            if ((MultiplayerDeathSession.Instance == null || MultiplayerDeathSession.Instance.IsAlive(actor)) &&
+                occupants.Contains(actor, Time.realtimeSinceStartupAsDouble) && TryPosition(actor, out Vector3 position))
             {
                 float distance = (origin - position).sqrMagnitude;
                 if (distance < best) { best = distance; target = position; }
@@ -192,7 +195,9 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
                 new MultiplayerSlimeMotionBatch { entries = owned.ToArray() }, false);
         }
         if (player == null) return;
-        if (now - lastPresence >= 1d / traffic.roomPresenceSendHz)
+        bool localAlive = MultiplayerDeathSession.Instance == null ||
+            MultiplayerDeathSession.Instance.IsAlive(MultiplayerGameplayProtocol.LocalActor);
+        if (localAlive && now - lastPresence >= 1d / traffic.roomPresenceSendHz)
         {
             lastPresence = now;
             foreach (var pair in rooms)
@@ -214,6 +219,8 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
             return;
         }
         var actors = MultiplayerGameplayProtocol.Participants();
+        if (MultiplayerDeathSession.Instance != null)
+            actors.RemoveAll(actor => !MultiplayerDeathSession.Instance.IsAlive(actor));
         foreach (var pair in rooms)
         {
             MultiplayerRoomController room = pair.Value;
@@ -303,7 +310,8 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         else if (message.op == "presence" && rooms.TryGetValue(message.room ?? "", out var room) && MultiplayerGameplayProtocol.Finite(message.position))
         {
             ObservePose(actor, message.position);
-            presence[message.room].Set(actor, message.inside && room.NearFloor(message.position), now);
+            presence[message.room].Set(actor, message.inside && room.NearFloor(message.position) &&
+                (MultiplayerDeathSession.Instance == null || MultiplayerDeathSession.Instance.IsAlive(actor)), now);
         }
         else if (message.op == "attack" && message.attack > 0 && message.damage > 0 && message.damage <= 10000 &&
             Loot.TryGetWeaponData(message.item, actor, out ObjectData weaponData) &&
