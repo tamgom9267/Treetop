@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class TreeRootAnimationEvents : MonoBehaviour
 {
@@ -9,6 +10,9 @@ public class TreeRootAnimationEvents : MonoBehaviour
     [Header("Ataque")]
     [SerializeField] private BoxCollider attackCollider;
     [SerializeField] private TreeRootAttack rootAttack;
+
+    [Header("Efectos visuales")]
+    [SerializeField] private ParticleSystem emergenceEffect;
 
     private void Awake()
     {
@@ -20,6 +24,7 @@ public class TreeRootAnimationEvents : MonoBehaviour
         if (attackCollider == null || rootAttack == null) return;
 
         rootAttack.EnableAttack();
+        PlayEffect();
         attackCollider.enabled = true;
     }
 
@@ -40,5 +45,14 @@ public class TreeRootAnimationEvents : MonoBehaviour
     {
         if (controller != null) controller.FinishAttack(ramaIndex);
         
+    }
+
+    private void PlayEffect()
+    {
+        if (emergenceEffect == null) return;
+
+        GameObject effectObj = emergenceEffect.gameObject;
+
+        effectObj.SetActive(true);
     }
 }
