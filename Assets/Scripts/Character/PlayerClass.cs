@@ -66,6 +66,7 @@ public class PlayerClass : MonoBehaviour
     [SerializeField] private float healingFlashDuration = 0.6f;
     [SerializeField] private ParticleSystem healingParticles;
     private ParticleSystem activeHealingParticles;
+    private Quaternion healingParticleRotation;
 
     [Header("Feedback de mana")]
     [SerializeField, ColorUsage(true, true)]
@@ -75,6 +76,7 @@ public class PlayerClass : MonoBehaviour
     [SerializeField] private ParticleSystem manaParticles;
 
     private ParticleSystem activeManaParticles;
+    private Quaternion manaParticleRotation;
 
 
     private MaterialPropertyBlock[] originalPropertyBlocks;
@@ -107,6 +109,13 @@ public class PlayerClass : MonoBehaviour
     private void OnDisable()
     {
         ResetFeedback();
+    }
+
+    private void LateUpdate()
+    {
+        if (activeHealingParticles != null) activeHealingParticles.transform.rotation = healingParticleRotation;
+
+        if (activeManaParticles != null ) activeManaParticles.transform.rotation = manaParticleRotation;
     }
 
     // void Start()
@@ -380,9 +389,13 @@ public class PlayerClass : MonoBehaviour
     {
         if (activeHealingParticles != null) return;
 
+        if (healingParticles == null ) return;
+
         activeHealingParticles = Instantiate(
             healingParticles, transform.position, Quaternion.identity, transform
         );
+
+        healingParticleRotation = activeHealingParticles.transform.rotation;
 
         activeHealingParticles.Play();
     }
@@ -411,6 +424,8 @@ public class PlayerClass : MonoBehaviour
             manaParticles, transform.position, Quaternion.identity, transform
         );
 
+        manaParticleRotation = activeManaParticles.transform.rotation;
+
         activeManaParticles.Play();
     }
 
@@ -422,5 +437,14 @@ public class PlayerClass : MonoBehaviour
 
         Destroy(activeManaParticles.gameObject);
         activeManaParticles = null;
+    }
+
+    private void NoRotacionParticula(ParticleSystem particles)
+    {
+        if (particles == null) return;
+
+        // quiero que la rotación de la particula sea como si pusiera simulation space world
+        // pero no quiero que cambie la posicion, solo la rotacion
+        particles.transform.rotation = Quaternion.identity;
     }
 }
