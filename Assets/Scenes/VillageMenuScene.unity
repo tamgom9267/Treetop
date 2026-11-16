@@ -7131,22 +7131,9 @@ MonoBehaviour:
   healingEmissionColor: {r: 0.2188279, g: 1, b: 0.19999999, a: 0.3137255}
   healingFlashDuration: 0.6
   healingParticles: {fileID: 7884627245462379932, guid: 7086937ad0447a644890084c5406657d, type: 3}
---- !u!114 &1408362010
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1408362002}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f5a99e4a39f4c749b1e63f11a08cb23, type: 3}
-  m_Name: ''
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathScreen
-  tutorialMessage: Has muerto en el tutorial
-  tutorialButtonText: Reiniciar
-  soloMessage: Has muerto en la mazmorra
-  soloButtonText: Volver
+  manaEmissionColor: {r: 0.1, g: 0.5, b: 1, a: 1}
+  manaFlashDuracion: 2
+  manaParticles: {fileID: 7884627245462379932, guid: bde56433b5b5db47482816a8b49ae0b0, type: 3}
 --- !u!114 &1408362007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7163,6 +7150,7 @@ MonoBehaviour:
   playerClass: {fileID: 1408362006}
   Inventory: {fileID: 2040965467}
   playerAnimation: {fileID: 1408362004}
+  nearManaFountain: {fileID: 0}
   receivedHitStopDuration: 0.08
   isAttacking: 0
   turnSpeed: 720
@@ -7238,6 +7226,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &1408362010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408362002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f5a99e4a39f4c749b1e63f11a08cb23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathScreen
+  tutorialMessage: Has muerto en el tutorial
+  tutorialButtonText: Reiniciar
+  soloMessage: Has muerto en la mazmorra
+  soloButtonText: Volver
 --- !u!1 &1409796421
 GameObject:
   m_ObjectHideFlags: 0

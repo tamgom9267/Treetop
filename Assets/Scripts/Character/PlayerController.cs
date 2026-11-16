@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour
     public Animator playerAnimation;
     private Vector2 _moveDirection;
 
+    public ManaFountain nearManaFountain;
+
     private Coroutine hitStopCoroutine;
     private float hitStopEndTime;
     private float animatorSpeedBeforeHitStop;
@@ -224,6 +226,9 @@ public class PlayerController : MonoBehaviour
                 InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);    
                 InventoryUI.SetActive(true);
 
+            } else if (interact.action.WasPressedThisFrame() && nearManaFountain != null)
+            {
+                nearManaFountain.Interact();
             }
         
 
