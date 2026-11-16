@@ -61,7 +61,11 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     public MultiplayerWorldSession World { get; private set; }
     public TrafficRates Traffic => TrafficRates.Defaults();
     public bool GameplayReady => World != null && World.Loot.Ready;
-    public void PublishLocalEquipment() { if (localReady && publisher != null) publisher.SendFullState(); }
+    public void PublishLocalEquipment()
+    {
+        if (localReady && publisher != null && (MultiplayerDeathSession.Instance == null ||
+            MultiplayerDeathSession.Instance.IsAlive(MultiplayerGameplayProtocol.LocalActor))) publisher.SendFullState();
+    }
     public bool PrepareGameplay(PlayerController local, out string error) => World.Bind(local, out error);
 
     public bool ValidateAssets(out string error)
@@ -141,8 +145,13 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     {
         BeginFloor(session.RunId, session.FloorNumber);
         if (!publisher.Bind(this, player, out error)) return false;
+
+        ApplyLocalPlayerColor(player);
+
         localReady = true;
-        if (!publisher.SendFullState() || !Send(MultiplayerPlayerProtocol.RequestStateEvent,
+        bool alive = MultiplayerDeathSession.Instance == null ||
+            MultiplayerDeathSession.Instance.IsAlive(MultiplayerGameplayProtocol.LocalActor);
+        if ((alive && !publisher.SendFullState()) || !Send(MultiplayerPlayerProtocol.RequestStateEvent,
             MultiplayerPlayerProtocol.PackRequest(runId, floorNumber, NextSequence(), PhotonNetwork.Time), true))
         {
             localReady = false;
@@ -191,12 +200,15 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
         foreach (int actor in remotes.Keys) if (!IsParticipant(actor)) departedActors.Add(actor);
         foreach (int actor in departedActors) RemoveRemote(actor);
         bool playing = localReady && !suspended && session.IsPlaying;
-        if (playing)
+        if (playing && (MultiplayerDeathSession.Instance == null ||
+            MultiplayerDeathSession.Instance.IsAlive(MultiplayerGameplayProtocol.LocalActor)))
         {
             TrafficRates traffic = Traffic;
             publisher.Tick(traffic.playerStateSendHz, traffic.equipmentCheckHz);
         }
-        foreach (MultiplayerRemotePlayer remote in remotes.Values) remote.SetPlaying(playing);
+        foreach (var pair in remotes)
+            pair.Value.SetPlaying(playing && (MultiplayerDeathSession.Instance == null ||
+                MultiplayerDeathSession.Instance.IsAlive(pair.Key)));
     }
 
     private bool IsParticipant(int actor)
@@ -220,6 +232,8 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
             session.RunId, session.FloorNumber, length, out object[] data)) return;
         if (runId != session.RunId || floorNumber != session.FloorNumber) BeginFloor(session.RunId, session.FloorNumber);
         int actor = photonEvent.Sender;
+        if (code != MultiplayerPlayerProtocol.RequestStateEvent && MultiplayerDeathSession.Instance != null &&
+            !MultiplayerDeathSession.Instance.IsAlive(actor)) return;
         if (World != null && MultiplayerPlayerProtocol.TryReadPose(data, out var rawPose)) World.ObservePose(actor, rawPose.position);
         if (code == MultiplayerPlayerProtocol.RequestStateEvent)
         {
@@ -227,7 +241,8 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
             requestSequences.TryGetValue(actor, out int previous);
             if (!MultiplayerPlayerProtocol.IsNewer(incomingSequence, previous)) return;
             requestSequences[actor] = incomingSequence;
-            if (localReady) publisher.SendFullState(actor);
+            if (localReady && (MultiplayerDeathSession.Instance == null ||
+                MultiplayerDeathSession.Instance.IsAlive(MultiplayerGameplayProtocol.LocalActor))) publisher.SendFullState(actor);
         }
         else if (code == MultiplayerPlayerProtocol.EquipmentEvent && MultiplayerPlayerProtocol.TryReadEquipment(data, out var equipment))
             GetRemote(actor).ReceiveEquipment(equipment);
@@ -245,9 +260,21 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
             remote.name = "RemotePlayer_" + actor;
             remote.gameObject.SetActive(false);
             remote.Initialize(catalog, interpolationDelay);
+
+            int colorIndex = GetColorIndexForActor(actor);
+
+            if(colorIndex >= 0) remote.ApplyPlayerColor(colorIndex);
+            else Debug.LogWarning("No se pudo determinar el color del jugador " + actor);
+
             remotes.Add(actor, remote);
         }
         return remote;
+    }
+
+    public Transform TryGetLivingRemote(int actor)
+    {
+        return remotes.TryGetValue(actor, out MultiplayerRemotePlayer remote) && remote != null &&
+            remote.gameObject.activeInHierarchy ? remote.transform : null;
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer) { RemoveRemote(otherPlayer.ActorNumber); }
@@ -277,4 +304,57 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
 
     public override void OnDisable() { Shutdown(); base.OnDisable(); }
     private void OnDestroy() { Shutdown(); }
+
+    private static int GetColorIndex(PartyRole role)
+    {
+        switch (role)
+        {
+            case PartyRole.Host: return 0; // color rojo
+            case PartyRole.Client1: return 1; // color azul
+            case PartyRole.Client2: return 2; // color blanco
+            default: return -1;
+        }
+    }
+
+    private int GetColorIndexForActor(int actor)
+    {
+        PhotonPartyService party = PhotonPartyService.AvailableInstance;
+        if (party == null) return -1;
+
+        foreach (PartyMember member in party.Members)
+        {
+            if (member.ActorNumber == actor)
+            {
+                return GetColorIndex(member.Role);
+            }
+        }
+
+        return -1;
+    }
+
+    private void ApplyLocalPlayerColor(PlayerController player)
+    {
+        PhotonPartyService party = PhotonPartyService.AvailableInstance;
+        if (party == null || player == null) return;
+
+        int colorIndex = GetColorIndex(party.LocalRole);
+        if (colorIndex < 0) return;
+
+        MultiplayerPlayerAppearance appearance = 
+            // player.GetComponentInChildren<MultiplayerPlayerAppearance>(true);
+            player.GetComponentInParent<MultiplayerPlayerAppearance>();
+
+        if (appearance == null)
+        {
+            Debug.LogError("El jugador local no tiene MultiplayerPlayerAppearance.", player);
+            return;
+        }
+
+        switch (colorIndex)
+        {
+            case 0: appearance.ApplyRed(); break;
+            case 1: appearance.ApplyBlue(); break;
+            case 2: appearance.ApplyWhite(); break;
+        }
+    }
 }

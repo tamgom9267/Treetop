@@ -16,6 +16,13 @@ public class Campfire : MonoBehaviour
         if (!other.CompareTag("Player"))
             return;
 
+        playerClass = other.GetComponentInParent<PlayerClass>();
+        if (playerClass == null)
+        {
+            Debug.LogWarning("El jugador que entro en la fogata no tiene PlayerClass.", other);
+            return;
+        }
+
         // El jugador entro en el rango de la fogata
         isPlayerInRange = true;
 
@@ -37,7 +44,7 @@ public class Campfire : MonoBehaviour
 
     private void Update()
     {
-        if (!isPlayerInRange)
+        if (!isPlayerInRange || playerClass == null)
             return;
 
         if (playerClass.health >= playerClass.maxHealth)

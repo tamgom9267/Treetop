@@ -5,6 +5,7 @@ public class GeneratedRoomController : MonoBehaviour
 {
     public int enemyType;
     public GameObject[] spawners;
+    [Tooltip("Enemigos pendientes del cuarto. Asigna aqui los que ya existen en el prefab, como el jefe.")]
     public List<GameObject> enemies = new List<GameObject>();
 
     private GameObject enemy1;
@@ -14,6 +15,9 @@ public class GeneratedRoomController : MonoBehaviour
 
     public GameObject enterDoor;
     public GameObject exitDoor;
+
+    [Tooltip("Cofre opcional que se activa al completar el cuarto.")]
+    [SerializeField] private GameObject rewardChest;
     
     public bool isActive = false;
     public bool isCompleted = false;
@@ -116,6 +120,15 @@ public class GeneratedRoomController : MonoBehaviour
         CloseDoor(enterDoor);
         CloseDoor(exitDoor);
         SpawnEnemies();
+
+        // Los jefes ya colocados en el cuarto despiertan al comenzar el combate.
+        foreach (GameObject enemy in enemies)
+        {
+            if (enemy != null && enemy.TryGetComponent(out SlimeBoss boss))
+                boss.ActivateSlime();
+
+            if(enemy.TryGetComponent(out TreeRootController tree)) tree.SetRootActive(true);
+        }
     }
 
     private void CompleteRoom()
@@ -123,9 +136,20 @@ public class GeneratedRoomController : MonoBehaviour
         isCompleted = true;
         isActive = false;
 
+        // Se descativa cualquier componente del arbol
+        foreach (GameObject enemy in enemies)
+        {
+            if (enemy == null) continue;
+
+            if (enemy.TryGetComponent(out TreeRootController tree)) tree.SetRootActive(false);
+        }
+
         // Al terminar, se abren las puertas permanentemente.
         OpenDoor(enterDoor);
         OpenDoor(exitDoor);
+
+        if (rewardChest != null)
+            rewardChest.SetActive(true);
     }
 
     private void OpenDoor(GameObject door)

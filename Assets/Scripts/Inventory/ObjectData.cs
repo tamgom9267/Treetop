@@ -28,5 +28,21 @@ public class ObjectData : ScriptableObject
 
     public int HB;
     public int speed;
-    
+
+    [Header("Efectos adicionales")]
+    public List<WeaponEffectData> additionalEffects = new List<WeaponEffectData>();
+}
+
+public enum WeaponEffectType
+{
+    Bleed
+}
+
+[Serializable]
+public sealed class WeaponEffectData
+{
+    public WeaponEffectType type;
+    public int damagePerTick = 1;
+    public float duration = 3f;
+    public float tickInterval = 1f;
 }

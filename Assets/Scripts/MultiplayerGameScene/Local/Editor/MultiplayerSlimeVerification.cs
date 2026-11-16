@@ -37,6 +37,7 @@ public static class MultiplayerSlimeVerification
         Time.captureDeltaTime = Time.fixedDeltaTime;
         try
         {
+            CheckPlacedBosses(world);
             for (int type = 1; type <= 2; type++)
             {
                 var host = Spawn(type, true, world, 1);
@@ -208,6 +209,78 @@ public static class MultiplayerSlimeVerification
         client.SuspendMotion(); client.ResumeMotion();
         Check(!client.SimulatesMotion, "Reanudar no revive una delegacion local anterior");
         Object.DestroyImmediate(host.gameObject); Object.DestroyImmediate(client.gameObject);
+    }
+    private static void CheckPlacedBosses(MultiplayerWorldSession world)
+    {
+        MultiplayerRoomController hostRoom = null, clientRoom = null;
+        var registry = (IDictionary)Get(world, "enemies");
+        try
+        {
+            hostRoom = SpawnBossRoom(world, true, 1);
+            clientRoom = SpawnBossRoom(world, false, 2);
+            MultiplayerEnemy host = hostRoom.enemies[0], client = clientRoom.enemies[0];
+            var hostChest = (GameObject)typeof(MultiplayerRoomController).GetField("rewardChest", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(hostRoom);
+            var clientChest = (GameObject)typeof(MultiplayerRoomController).GetField("rewardChest", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(clientRoom);
+            Check(host.Id == hostRoom.RoomId + ":placed:0" && client.Id == clientRoom.RoomId + ":placed:0" &&
+                registry.Contains(host.Id) && registry.Contains(client.Id), "Jefes colocados reciben identidad estable y se registran antes del combate");
+            int health = host.Health;
+            host.TakeAuthoritativeHit(1, Vector3.zero);
+            Check(host.Health == health && !host.CanRunHostAI && !host.CombatActive && !client.CombatActive &&
+                !client.BeginLocalKnockback(2, 1000, Vector3.zero), "Jefes dormidos no reciben golpes ni simulan movimiento");
+            Check(host.GetComponent<SlimeBoss>() == null && client.GetComponent<EnemyCombat>() == null &&
+                host.Authority && !client.Authority, "Prefabs de jefe usan solo combate multijugador y autoridad por rol");
+            Check(!hostChest.activeSelf && !clientChest.activeSelf, "Recompensas permanecen ocultas antes del combate");
+            hostRoom.ApplyState(1, 1); clientRoom.ApplyState(1, 1);
+            Check(host.CanRunHostAI && client.CombatActive && !client.SimulatesMotion,
+                "Estado sincronizado despierta ambos jefes y solo el host ejecuta IA");
+            var alive = host.Capture(1);
+            var resolved = typeof(MultiplayerWorldSession).GetMethod("CreateEnemy", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(world, new object[] { alive });
+            Check(ReferenceEquals(resolved, host), "Snapshots reutilizan al jefe colocado sin crear duplicados");
+            host.TakeAuthoritativeHit(health, Vector3.zero, 1, 1001);
+            var death = host.Capture(2); client.Receive(death);
+            host.GetComponent<Animator>().Update(0f); client.GetComponent<Animator>().Update(0f);
+            int deathHash = Animator.StringToHash("Base Layer.SlimeBossDeath");
+            Check(host.Health == 0 && client.Health == 0 && !host.CanRunHostAI && !client.SimulatesMotion &&
+                host.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).fullPathHash == deathHash &&
+                client.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).fullPathHash == deathHash,
+                "Muerte confirmada usa la animacion del jefe en host y cliente");
+            client.Receive(alive);
+            Check(client.Health == 0 && !client.CombatActive, "Snapshot atrasado no revive al jefe");
+            host.DestroyEnemy();
+            Check(!registry.Contains(host.Id) && !host.gameObject.activeSelf, "Evento de muerte retira al jefe del registro autoritativo");
+            hostRoom.ApplyState(2, 2); clientRoom.ApplyState(2, 2);
+            hostRoom.ApplyState(1, 3); clientRoom.ApplyState(1, 3);
+            Check(hostChest.activeSelf && clientChest.activeSelf && hostRoom.Stage == 2 && clientRoom.Stage == 2,
+                "Completar revela ambos cofres y mensajes atrasados no reinician el cuarto");
+        }
+        finally
+        {
+            foreach (MultiplayerRoomController room in new[] { hostRoom, clientRoom })
+            {
+                if (room == null) continue;
+                string id = room.RoomId + ":placed:0";
+                registry.Remove(id); ((HashSet<string>)Get(world, "removed")).Remove(id);
+                foreach (string field in new[] { "rooms", "presence", "roomStates" }) ((IDictionary)Get(world, field)).Remove(room.RoomId);
+                Object.DestroyImmediate(room.gameObject);
+            }
+        }
+    }
+    private static MultiplayerRoomController SpawnBossRoom(MultiplayerWorldSession world, bool host, int actor)
+    {
+        string role = host ? "Host" : "Client";
+        var prefab = Resources.Load<GameObject>("Multiplayer/" + role + "/Cuartos/boss1");
+        var root = new GameObject("CombatVerificationBoss" + role); root.SetActive(false);
+        var room = host ? (MultiplayerRoomController)root.AddComponent<HostGeneratedRoomController>() : root.AddComponent<ClientGeneratedRoomController>();
+        room.Configure(0, null, "verify-boss-" + role);
+        var boss = Object.Instantiate(prefab.GetComponentInChildren<MultiplayerEnemy>(true).gameObject, root.transform).GetComponent<MultiplayerEnemy>();
+        room.enemies = new[] { boss };
+        var chest = new GameObject("Reward"); chest.transform.SetParent(root.transform); chest.SetActive(false);
+        typeof(MultiplayerRoomController).GetField("rewardChest", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(room, chest);
+        root.SetActive(true); world.RegisterRoom(room);
+        Set(boss, "localActor", actor); Set(boss, "hostActor", 1); Set(boss, "motionActor", 1);
+        foreach (Collider collider in boss.GetComponents<Collider>()) collider.enabled = false;
+        var movement = boss.GetComponent<HostSlimeMovement>(); if (movement != null) movement.enabled = false;
+        return room;
     }
     private static MultiplayerEnemy Spawn(int type, bool host, MultiplayerWorldSession world, int actor)
     {

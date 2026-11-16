@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour
     public Animator playerAnimation;
     private Vector2 _moveDirection;
 
+    public ManaFountain nearManaFountain;
+
     private Coroutine hitStopCoroutine;
     private float hitStopEndTime;
     private float animatorSpeedBeforeHitStop;
@@ -40,6 +42,7 @@ public class PlayerController : MonoBehaviour
     private bool hasTargetRotation;
 
     private bool waitingForAttackRotation = false;
+    private bool nextSwordSpearAttackUsesSpear;
 
     // Collider que detecta el golpe del arma equipada.
     private BoxCollider equippedWeaponCollider;
@@ -238,6 +241,9 @@ public class PlayerController : MonoBehaviour
                 InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);    
                 InventoryUI.SetActive(true);
 
+            } else if (interact.action.WasPressedThisFrame() && nearManaFountain != null)
+            {
+                nearManaFountain.Interact();
             }
         
 
@@ -322,11 +328,17 @@ public class PlayerController : MonoBehaviour
 
         switch (weaponName.Trim().ToLowerInvariant())
         {
-            case "sword":
+            case "sword" or "razorsword":
                 attackTrigger = "isAttackingSword";
                 return true;
-            case "spear":
+            case "spear" or "staff":
                 attackTrigger = "isAttackingSpear";
+                return true;
+            case "swordspear":
+                attackTrigger = nextSwordSpearAttackUsesSpear
+                    ? "isAttackingSpear"
+                    : "isAttackingSword";
+                nextSwordSpearAttackUsesSpear = !nextSwordSpearAttackUsesSpear;
                 return true;
             case "hammer":
                 attackTrigger = "isAttackingHammer";
@@ -395,6 +407,22 @@ public class PlayerController : MonoBehaviour
         animatorSpeedBeforeHitStop = playerAnimation.speed;
         playerAnimation.speed = 0f;
         hitStopCoroutine = StartCoroutine(RestoreAnimationAfterHitStop());
+    }
+
+    private void OnDisable()
+    {
+        if (receivedHitCoroutine != null)
+        {
+            StopCoroutine(receivedHitCoroutine);
+            receivedHitCoroutine = null;
+        }
+        if (hitStopCoroutine != null)
+        {
+            StopCoroutine(hitStopCoroutine);
+            hitStopCoroutine = null;
+            if (playerAnimation != null) playerAnimation.speed = animatorSpeedBeforeHitStop;
+        }
+        hitStopEndTime = 0f;
     }
 
     private IEnumerator RestoreAnimationAfterHitStop()
@@ -708,4 +736,3 @@ public class PlayerController : MonoBehaviour
     }
 
 }
-

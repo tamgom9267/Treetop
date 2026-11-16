@@ -25,6 +25,31 @@ public static class MultiplayerGameplayVerification
         }
         catch (Exception error) { Write(false, error.ToString()); throw; }
     }
+
+    [MenuItem("Tools/Multiplayer/Probar muerte multijugador (sin red)")]
+    public static void RunDeathChecks()
+    {
+        passed.Clear();
+        CheckPresence();
+        CheckLoot();
+        GameObject avatar = new GameObject("Verificacion de reaparicion");
+        try
+        {
+            PlayerClass stats = avatar.AddComponent<PlayerClass>();
+            stats.maxHealth = 20; stats.health = 0; stats.maxMP = 9; stats.MP = 1;
+            stats.ReviveForNextFloor(5);
+            Check(stats.health == 5 && stats.MP == 9, "Reaparecer restaura cinco de vida y el mana");
+        }
+        finally { Object.DestroyImmediate(avatar); }
+        GameObject death = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/Canvas Muerte/Canvas Muerte.prefab");
+        GameObject spectator = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/Canvas Espectador/Canvas Espectador.prefab");
+        Check(death != null && death.GetComponent<DeathPanelView>() != null && death.GetComponent<DeathPanelView>().IsConfigured,
+            "Panel editable de muerte conserva mensaje y boton configurados");
+        Check(spectator != null && spectator.GetComponent<SpectatorPanelView>() != null &&
+            new SerializedObject(spectator.GetComponent<SpectatorPanelView>()).FindProperty("messageText").objectReferenceValue != null,
+            "Panel editable de espectador conserva el texto configurado");
+        Debug.Log("MUERTE MULTIJUGADOR: " + passed.Count + " comprobaciones correctas.");
+    }
     private static void CheckWorldSerialization()
     {
         bool depthWarning = false;
@@ -73,7 +98,7 @@ public static class MultiplayerGameplayVerification
         presence.Set(2,false,1); Check(!presence.All(new[] {1,2,3},1), "Salir antes de activar retira presencia");
         Check(presence.All(new[] {1,3},1), "Desconectado deja de contar entre los participantes");
         Check(!presence.All(new[] {1,3},3), "Presencia obsoleta expira");
-        Check(!presence.All(new[] {1},1), "El host solo no activa un cuarto");
+        Check(presence.All(new[] {1},1), "Un unico superviviente activa el cuarto");
         Check(!MultiplayerGameplayProtocol.Finite(new Vector3(float.NaN,0,0)) && !MultiplayerGameplayProtocol.Rotation(new Quaternion()), "Datos de transformacion invalidos rechazados");
     }
     private static void CheckAttacks()
@@ -114,11 +139,36 @@ public static class MultiplayerGameplayVerification
         Check(current.owner==0 && current.position.x==7, "Desconexion libera una reserva");
         var held = new MultiplayerLootRecord {id="two",type="sword",data=Data(),location=MultiplayerItemLocation.Inventory};
         ledger.Process(2,Command("register","held",held),1);
+        var discarded = new MultiplayerLootRecord {id="discard",type="sword",data=Data(),location=MultiplayerItemLocation.Inventory};
+        var owned = ledger.Process(2,Command("register","discard-register",discarded),1).Copy();
+        Check(ledger.Process(3,Command("remove","discard-other",owned),1).owner==2, "Otro actor no puede eliminar el inventario ajeno");
+        Check(ledger.Process(2,Command("remove","discard-own",owned),1).location==MultiplayerItemLocation.Removed,
+            "La muerte elimina un objeto propio del registro compartido");
         ledger.NewFloor(2);
         Check(ledger.Records["one"].location==MultiplayerItemLocation.Removed && ledger.Records["two"].owner==2, "Cambio de piso retira suelo y conserva inventario");
         Check(ledger.Process(3,Command("claim","late",current),2).location==MultiplayerItemLocation.Removed, "Un paquete viejo no recupera loot del piso anterior");
         var corrupt=record.Copy();corrupt.id="bad";corrupt.data.shape[0].cells[0]=9;
         Check(ledger.Process(1,Command("register","bad",corrupt),1)==null, "Forma de inventario invalida rechazada");
+        var reward = new MultiplayerLootRecord { id="chest:1:boss1:chest:0", type="sword", data=Data(),
+            location=MultiplayerItemLocation.World, chestReward=true, spawnTime=10d,
+            spawnOrigin=Vector3.zero, position=Vector3.back*3f };
+        var prize = ledger.Process(1,Command("register","open-a",reward),1).Copy();
+        var repeated = reward.Copy(); repeated.type="another-weapon";
+        var duplicate = ledger.Process(1,Command("register","open-b",repeated),1);
+        Check(duplicate.type==prize.type && duplicate.revision==prize.revision,
+            "Aperturas simultaneas conservan una unica arma y revision del cofre");
+        var winner = ledger.Process(2,Command("claim","take-a",prize),1).Copy();
+        var loser = ledger.Process(3,Command("claim","take-b",prize),1);
+        Check(winner.owner==2 && loser.owner==2, "El premio compartido solo puede reservarlo un jugador");
+        var dropped = ledger.Process(2,Command("drop","return-prize",winner),1);
+        Check(!dropped.chestReward && dropped.id==prize.id, "Devolver el premio conserva su identidad sin repetir el salto del cofre");
+        Check(MultiplayerLootSession.ChestRewardPosition(reward,10d)==reward.spawnOrigin &&
+            MultiplayerLootSession.ChestRewardPosition(reward,11d)==reward.position &&
+            MultiplayerLootSession.ChestRewardPosition(reward,10.2d).y>1f,
+            "Salto compartido usa el tiempo de red y una llegada tardia deja el arma en su destino");
+        var invalidPrize=reward.Copy(); invalidPrize.id="bad-chest"; invalidPrize.spawnTime=double.NaN;
+        Check(ledger.Process(1,Command("register","bad-chest",invalidPrize),1)==null,
+            "Tiempo de animacion no finito rechazado");
     }
     private static void CheckRooms()
     {
@@ -142,6 +192,20 @@ public static class MultiplayerGameplayVerification
             room.ApplyState(1,1);Check(entry.activeSelf && exit.activeSelf,"Activacion cierra entrada y salida");
             room.ApplyState(2,2);Check(!entry.activeSelf && !exit.activeSelf,"Completar abre ambas puertas");
             room.ApplyState(1,1);Check(room.Stage==2 && !entry.activeSelf,"Un mensaje anterior no reactiva el cuarto");
+            var chestRoomObject=new GameObject("ChestRoom",typeof(HostGeneratedRoomController));
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(chestRoomObject,preview);
+            var chestRoom=chestRoomObject.GetComponent<HostGeneratedRoomController>(); chestRoom.Configure(0,null,"chest-test");
+            var chestObject=new GameObject("SharedChest",typeof(Chest)); chestObject.transform.SetParent(chestRoomObject.transform);
+            var chest=chestObject.GetComponent<Chest>(); chestObject.SetActive(false);
+            var coordinator=(GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(MultiplayerGameplayPrefabBuilder.Root+"/Local/MultiplayerPlayers.prefab"),preview);
+            var world=coordinator.GetComponent<MultiplayerWorldSession>();
+            var apply=typeof(MultiplayerWorldSession).GetMethod("Apply",BindingFlags.Instance|BindingFlags.NonPublic);
+            apply.Invoke(world,new object[] {new MultiplayerWorldMessage {op="chest",id="chest-test:chest:0",revision=7}});
+            world.RegisterRoom(chestRoom);
+            Check(chest.chestInteracted,"Snapshot anterior al registro abre tambien un cofre desactivado");
+            typeof(Chest).GetMethod("Start",BindingFlags.Instance|BindingFlags.NonPublic).Invoke(chest,null);
+            apply.Invoke(world,new object[] {new MultiplayerWorldMessage {op="chest",id="chest-test:chest:0",revision=6}});
+            Check(chest.chestInteracted,"Start y mensajes atrasados no vuelven a cerrar el cofre");
         }
         finally { EditorSceneManager.ClosePreviewScene(preview); }
     }

@@ -78,7 +78,9 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
         if (!world.Playing || !player.enabled || player.IsExternalUIBlocked && !ownBlock) return;
         if (player.inventory.action.WasPressedThisFrame() && player.IsInventoryOpen) CancelDrag();
         CaptureStable();
-        if (!player.IsInventoryOpen && player.interact.action.WasPressedThisFrame() && player.nearChest == null && player.nearestWeapon != null)
+        Chest nearbyChest = player.nearChest != null ? player.nearChest.GetComponent<Chest>() : null;
+        bool unopenedChest = nearbyChest != null && !nearbyChest.chestInteracted;
+        if (!player.IsInventoryOpen && player.interact.action.WasPressedThisFrame() && !unopenedChest && player.nearestWeapon != null)
         {
             // Consume tambien el intento rechazado: el metodo original nunca puede recoger sin permiso.
             Block(); world.Loot.TryClaim(player.nearestWeapon);
@@ -167,8 +169,18 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
     {
         if (!bound) return;
         CancelDrag();
-        if (inventory.Loot.Count > 0) inventory.RemoveWeaponFromChestLootGrid(player.transform.position);
+        MultiplayerDeathSession deaths = MultiplayerDeathSession.Instance;
+        if (inventory.Loot.Count > 0 && (deaths == null || deaths.IsAlive(MultiplayerGameplayProtocol.LocalActor)))
+            inventory.RemoveWeaponFromChestLootGrid(player.transform.position);
         inventory.gameObject.SetActive(false); player.EndAttack(); Block();
+    }
+    public void CloseForDeath()
+    {
+        if (!bound) return;
+        CancelDrag();
+        inventory.gameObject.SetActive(false);
+        player.EndAttack();
+        Block();
     }
     private static void ClearCells(List<List<int>> grid, int id)
     { if (id <= 0) return; foreach (var row in grid) for (int i = 0; i < row.Count; i++) if (row[i] == id) row[i] = 0; }

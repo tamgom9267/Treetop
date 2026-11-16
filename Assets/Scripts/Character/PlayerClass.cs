@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using System.Collections;
+using NUnit.Framework.Internal;
+using System.Xml;
 
 
 public class PlayerClass : MonoBehaviour
@@ -36,6 +38,7 @@ public class PlayerClass : MonoBehaviour
 
     // Patron observer - cuando cambia la vida notifica al HUD
     public event Action<int, int, int, int> OnStatsChanged;
+    public event Action OnDied;
 
     [Header("Feedback Visual")]
     // [SerializeField] private Renderer playerRenderer;
@@ -64,6 +67,16 @@ public class PlayerClass : MonoBehaviour
     [SerializeField] private ParticleSystem healingParticles;
     private ParticleSystem activeHealingParticles;
 
+    [Header("Feedback de mana")]
+    [SerializeField, ColorUsage(true, true)]
+    private Color manaEmissionColor = new Color(0.1f, 0.5f, 1f, 1f);
+    
+    [SerializeField] private float manaFlashDuracion = 4f; // tiene que durar lo mismo que la particula
+    [SerializeField] private ParticleSystem manaParticles;
+
+    private ParticleSystem activeManaParticles;
+
+
     private MaterialPropertyBlock[] originalPropertyBlocks;
     private MaterialPropertyBlock emissionPropertyBlock;
 
@@ -89,6 +102,11 @@ public class PlayerClass : MonoBehaviour
        playerController = GetComponent<PlayerController>();
 
        InitializeEmissionFeedback();
+    }
+
+    private void OnDisable()
+    {
+        ResetFeedback();
     }
 
     // void Start()
@@ -154,7 +172,7 @@ public class PlayerClass : MonoBehaviour
 
         // feedback visual
         // TriggerHitFeedback();
-        TriggerEmissionFeedback(damageEmissionColor, damageFlashDuration, 2);
+        TriggerEmissionFeedback(damageEmissionColor, damageFlashDuration, 3);
 
         //Screen Shake
         if (cameraFollow != null) cameraFollow.Shake();
@@ -167,11 +185,14 @@ public class PlayerClass : MonoBehaviour
 
         // para observer
         NotifyStatsChanged();
+
+        if (health == 0)
+            OnDied?.Invoke();
     }
 
     public void Heal(int cantidad)
     {
-        if (cantidad <= 0) return;
+        if (cantidad <= 0 || health <= 0) return;
 
         int previousHealth = health;
 
@@ -190,6 +211,15 @@ public class PlayerClass : MonoBehaviour
         NotifyStatsChanged();
     }
 
+    public void ReviveForNextFloor(int life)
+    {
+        if (health > 0 || life <= 0) return;
+        ResetFeedback();
+        health = Mathf.Min(maxHealth, life);
+        MP = maxMP;
+        NotifyStatsChanged();
+    }
+
     public void SpendMP(int cantidad)
     {
         if (cantidad <= 0) { return; }
@@ -202,9 +232,17 @@ public class PlayerClass : MonoBehaviour
 
     public void RestoreMP(int cantidad)
     {
-        if (cantidad <= 0) { return; }
+        if (cantidad <= 0 || health <= 0) { return; }
+
+        int prevMP = MP;
 
         MP = Mathf.Min(maxMP, MP + cantidad);
+
+        if (MP > prevMP)
+        {
+            TriggerEmissionFeedback(manaEmissionColor, manaFlashDuracion, 2);
+            StartManaParticles();
+        }
 
         NotifyStatsChanged();
     }
@@ -315,16 +353,27 @@ public class PlayerClass : MonoBehaviour
             yield return null;
         }
 
-        // restaurar al brillo normal
-        for (int i = 0; i < originalPropertyBlocks.Length; i++)
-        {
-            playerRenderer.SetPropertyBlock(originalPropertyBlocks[i], i);
-        }
-        // parar el efecto
-        StopHealingParticles();
-
-        currentFeedbackPriority = 0;
         emissionCoroutine = null;
+        ResetFeedback();
+    }
+
+    private void ResetFeedback()
+    {
+        if (emissionCoroutine != null)
+        {
+            StopCoroutine(emissionCoroutine);
+            emissionCoroutine = null;
+        }
+
+        if (playerRenderer != null && originalPropertyBlocks != null)
+            for (int i = 0; i < originalPropertyBlocks.Length; i++)
+                playerRenderer.SetPropertyBlock(originalPropertyBlocks[i], i);
+
+        StopHealingParticles();
+        StopManaParticles();
+        currentFeedbackPriority = 0;
+        emissionEndTime = 0f;
+        currentEmissionColor = default;
     }
 
     private void StartHealingParticle()
@@ -342,7 +391,36 @@ public class PlayerClass : MonoBehaviour
     {
         if (activeHealingParticles == null) return;
 
+        activeHealingParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         Destroy(activeHealingParticles.gameObject);
         activeHealingParticles = null;
+    }
+
+    private void StartManaParticles()
+    {
+        if (manaParticles == null) return;
+
+        // si ya existe el efecto no debería de duplicarse
+        if (activeManaParticles != null)
+        {
+            Destroy(activeManaParticles.gameObject);
+            activeManaParticles = null;
+        }
+
+        activeManaParticles = Instantiate(
+            manaParticles, transform.position, Quaternion.identity, transform
+        );
+
+        activeManaParticles.Play();
+    }
+
+    private void StopManaParticles()
+    {
+        if (activeManaParticles == null) return;
+
+        activeManaParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+        Destroy(activeManaParticles.gameObject);
+        activeManaParticles = null;
     }
 }

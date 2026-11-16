@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 
@@ -12,54 +11,79 @@ public class Chest : MonoBehaviour
 
     [SerializeField] GameObject Weapon;
     [SerializeField] GameObject Text;
+    [SerializeField] private bool randomLoot = true;
 
     [Header("Particulas")]
     [SerializeField] private ParticleSystem[] chestParticles;
 
     private void Start()
     {
-        // inicia como falso
-        chestInteracted = false;
-
         animator = GetComponent<Animator>();
+        if (chestInteracted) PresentOpen();
     }
 
     public GameObject hasInteracted()
     {
-        // Activar la animación de abrir cofre
-        animator.SetBool("isOpen", true);
+        var run = MultiplayerRunSession.Instance;
+        if (run != null && run.IsInMultiplayerScene)
+        {
+            if (MultiplayerWorldSession.Instance != null)
+                MultiplayerWorldSession.Instance.RequestChestOpen(this);
+            return null;
+        }
+        if (chestInteracted) return null;
+        GameObject weaponPrefab = ChooseWeaponPrefab();
+        if (weaponPrefab == null) return null;
+        ApplySharedOpen();
 
-        // particulas al abrir el cofre
-        // if (chestParticles != null)
-        // {
-        //     chestParticles.gameObject.SetActive(true);
-        // }
+        GameObject weaponObj = Instantiate(weaponPrefab, transform.position, Quaternion.identity);
+        weaponObj.GetComponent<WeaponObject>().isSelected = true;
+        StartCoroutine(AnimacionArma(weaponObj, LootPosition));
+        return weaponObj;
+    }
 
-        StartCoroutine(ChestGlowEffect());
+    public Vector3 LootPosition => transform.position + Vector3.back * 3f;
 
-        // Se activa el estado de interaccion con el cofre
+    // En multijugador solo el host hace esta seleccion.
+    public GameObject ChooseWeaponPrefab()
+    {
+        GameObject weaponPrefab = Weapon;
+        if (randomLoot)
+        {
+            GameObject[] lootPrefabs = Resources.LoadAll<GameObject>("GeneracionDeCuartos/Armas");
+            if (lootPrefabs.Length == 0)
+            {
+                Debug.LogError("No se encontraron prefabs de loot en Resources/GeneracionDeCuartos/Armas.", this);
+                return null;
+            }
+
+            weaponPrefab = lootPrefabs[Random.Range(0, lootPrefabs.Length)];
+        }
+
+        if (weaponPrefab == null)
+        {
+            Debug.LogError("El cofre no tiene un prefab de arma asignado.", this);
+            return null;
+        }
+
+        return weaponPrefab;
+    }
+
+    public void ApplySharedOpen()
+    {
+        if (chestInteracted) return;
         chestInteracted = true;
-        Text.SetActive(false);
+        PresentOpen();
+    }
 
-        // posicion donde va a estar el arma cuando el jugador la pueda agarrar
-        Vector3 weaponPos = new Vector3(
-            transform.position.x,
-            transform.position.y,
-            transform.position.z - 3
-        ); 
-
-        GameObject WeaponObj = Instantiate(Weapon);
-        WeaponObj.GetComponent<WeaponObject>().isSelected = true;
-
-        // que inicie dentro del cofre el arma
-        WeaponObj.transform.position = transform.position;
-
-        // coroutine para que el arma salte del cofre :D
-        StartCoroutine(AnimacionArma(WeaponObj, weaponPos));
-
-        // implementacion antigua, no tenía la animación de saltar del cofre, borrar despues
-        // WeaponObj.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z-3);
-        return WeaponObj;
+    private void PresentOpen()
+    {
+        if (animator == null) animator = GetComponent<Animator>();
+        if (animator != null) animator.SetBool("isOpen", true);
+        if (Text != null) Text.SetActive(false);
+        if (chestParticles == null) return;
+        foreach (ParticleSystem particle in chestParticles)
+            if (particle != null) particle.gameObject.SetActive(true);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -84,17 +108,9 @@ public class Chest : MonoBehaviour
         {
             Text.SetActive(false);
             PlayerNear = false;
+            var player = other.GetComponent<PlayerController>();
+            if (player != null && player.nearChest == gameObject) player.nearChest = null;
         }
-    }
-
-    private IEnumerator ChestGlowEffect()
-    {
-        foreach (ParticleSystem particle in chestParticles)
-        {
-            if (particle != null) particle.gameObject.SetActive(true);
-        }
-
-        yield return null;
     }
 
     private IEnumerator AnimacionArma(GameObject weaponObj, Vector3 posFinal)

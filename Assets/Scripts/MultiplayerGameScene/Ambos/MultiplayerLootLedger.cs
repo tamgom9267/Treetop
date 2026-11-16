@@ -48,6 +48,10 @@ public sealed class MultiplayerLootRecord
     public Vector3 position;
     public Quaternion rotation = Quaternion.identity;
     public MultiplayerItemData data;
+    // Presentacion inicial del premio; la posicion autoritativa sigue siendo el destino.
+    public bool chestReward;
+    public Vector3 spawnOrigin;
+    public double spawnTime;
     public MultiplayerLootRecord Copy() => JsonUtility.FromJson<MultiplayerLootRecord>(JsonUtility.ToJson(this));
 }
 [Serializable]
@@ -84,7 +88,8 @@ public sealed class MultiplayerLootLedger
         {
             if (current != null) return current;
             if (incoming.data == null || !incoming.data.Valid() || string.IsNullOrEmpty(incoming.type) || incoming.type.Length > 128 ||
-                !MultiplayerGameplayProtocol.Finite(incoming.position) || !MultiplayerGameplayProtocol.Rotation(incoming.rotation)) return null;
+                !MultiplayerGameplayProtocol.Finite(incoming.position) || !MultiplayerGameplayProtocol.Rotation(incoming.rotation) ||
+                incoming.chestReward && (!MultiplayerGameplayProtocol.Finite(incoming.spawnOrigin) || double.IsNaN(incoming.spawnTime) || double.IsInfinity(incoming.spawnTime))) return null;
             current = incoming.Copy(); current.owner = incoming.location == MultiplayerItemLocation.World ? 0 : actor;
             current.location = current.owner == 0 ? MultiplayerItemLocation.World : MultiplayerItemLocation.Inventory;
             current.floor = floor; current.revision = ++revision; Records.Add(current.id, current);
@@ -101,7 +106,11 @@ public sealed class MultiplayerLootLedger
         {
             current.location = MultiplayerItemLocation.World; current.owner = 0; current.floor = floor;
             current.position = incoming.position; current.rotation = incoming.rotation; current.data = incoming.data;
+            current.chestReward = false;
         }
+        else if (message.op == "remove" && current.owner == actor &&
+            (current.location == MultiplayerItemLocation.Inventory || current.location == MultiplayerItemLocation.Reserved))
+        { current.location = MultiplayerItemLocation.Removed; current.owner = 0; }
         else return current;
         current.revision = ++revision;
         return current;
@@ -116,6 +125,6 @@ public sealed class MultiplayerLootLedger
     {
         foreach (var item in Records.Values)
             if (item.owner == actor && item.location == MultiplayerItemLocation.Reserved)
-            { item.owner = 0; item.location = MultiplayerItemLocation.World; item.position = position; item.floor = floor; item.revision = ++revision; }
+            { item.owner = 0; item.location = MultiplayerItemLocation.World; item.position = position; item.floor = floor; item.chestReward = false; item.revision = ++revision; }
     }
 }

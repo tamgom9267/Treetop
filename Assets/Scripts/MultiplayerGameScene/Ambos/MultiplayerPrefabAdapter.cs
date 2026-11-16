@@ -43,16 +43,10 @@ public static class MultiplayerPrefabAdapter
         return spawn;
     }
 
-    public static void PreparePortal(GameObject portal, bool host)
+    public static void PreparePortal(GameObject portal)
     {
         foreach (FloorPortal original in portal.GetComponentsInChildren<FloorPortal>(true))
         { original.enabled = false; Object.Destroy(original); }
-        if (host)
-        {
-            if (portal.GetComponent<HostFloorPortal>() == null) portal.AddComponent<HostFloorPortal>();
-        }
-        else
-            foreach (HostFloorPortal hostPortal in portal.GetComponentsInChildren<HostFloorPortal>(true))
-            { hostPortal.enabled = false; Object.Destroy(hostPortal); }
+        if (portal.GetComponent<HostFloorPortal>() == null) portal.AddComponent<HostFloorPortal>();
     }
 }
