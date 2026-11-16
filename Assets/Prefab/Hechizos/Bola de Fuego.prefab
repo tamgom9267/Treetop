@@ -394,8 +394,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76484781fbf4d7244a8e174369581046, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FireBallSpell
-  Name: 
-  Objectname: 
+  Name: FireBall
+  Objectname: FireBall
   ID: 0
   weight: 0
   isSelected: 0

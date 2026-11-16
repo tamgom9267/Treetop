@@ -5329,6 +5329,67 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1130467435}
   m_CullTransparentMesh: 1
+--- !u!1001 &1135120530
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -7.01686
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.325
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -20.92466
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769754801794997848, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4547242166365193442, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_Name
+      value: Bola de Fuego
+      objectReference: {fileID: 0}
+    - target: {fileID: 9082054921141159670, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: Objectname
+      value: FireBall
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
 --- !u!1 &1139562621
 GameObject:
   m_ObjectHideFlags: 0
@@ -10846,9 +10907,9 @@ MonoBehaviour:
   InventoryLoot: {fileID: 1817209397}
   ChestLoot: {fileID: 2088369571}
   ChestLootImages: {fileID: 1565841469}
-  UISlot1: {fileID: 0}
-  UISlot2: {fileID: 0}
-  UISlot3: {fileID: 0}
+  UISlot1: {fileID: 1206166947}
+  UISlot2: {fileID: 197407224}
+  UISlot3: {fileID: 1931870754}
   cursor: {fileID: 0}
   LootObject: {fileID: 0}
   row: 4
@@ -20783,3 +20844,4 @@ SceneRoots:
   - {fileID: 2002834653244641906}
   - {fileID: 4958045809141698885}
   - {fileID: 351016932939261081}
+  - {fileID: 1135120530}

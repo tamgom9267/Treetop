@@ -390,7 +390,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DashSpell
   Name: Dash
-  Objectname: 
+  Objectname: Dash
   ID: 0
   weight: 0
   isSelected: 0

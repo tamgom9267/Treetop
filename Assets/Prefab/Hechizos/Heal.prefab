@@ -395,7 +395,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealSpell
   Name: Heal
-  Objectname: 
+  Objectname: Heal
   ID: 0
   weight: 1
   isSelected: 0
