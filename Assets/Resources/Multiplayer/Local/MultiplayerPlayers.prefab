@@ -111,6 +111,11 @@ MonoBehaviour:
     weapon: {fileID: 0}
     objectName: 
     icon: {fileID: 0}
+  - type: 9954f0147af6c024c9b903c88e7271ef
+    prefab: {fileID: 1903786396606084534, guid: f114e95060b74bb4f86b1795cb907b70, type: 3}
+    weapon: {fileID: 0}
+    objectName: 
+    icon: {fileID: 0}
 --- !u!114 &8318190442623539677
 MonoBehaviour:
   m_ObjectHideFlags: 0

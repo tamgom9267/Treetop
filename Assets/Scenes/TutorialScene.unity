@@ -5121,11 +5121,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 35113454}
   m_CullTransparentMesh: 1
---- !u!1 &37040407 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4547242166365193442, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
-  m_PrefabInstance: {fileID: 6257425675903214683}
-  m_PrefabAsset: {fileID: 0}
 --- !u!65 &38341238
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -82152,13 +82147,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bola de Fuego
       objectReference: {fileID: 0}
+    - target: {fileID: 9082054921141159670, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 707366305}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4547242166365193442, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7891591151899321327}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
 --- !u!1 &6352670010652964247
 GameObject:
@@ -90777,33 +90773,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.023049073, y: 0.020881638, z: 0.059410963}
   m_Center: {x: -0.0015246569, y: -0.00044082277, z: -0.003129648}
---- !u!114 &7891591151899321327
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 37040407}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76484781fbf4d7244a8e174369581046, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FireBallSpell
-  Name: 
-  Objectname: 
-  ID: 0
-  weight: 0
-  isSelected: 0
-  player: {fileID: 707366305}
-  spellData: {fileID: 11400000, guid: ddf25929ba2ed334f9193f684c3c57f6, type: 2}
-  health: 0
-  MP: 0
-  defense: 0
-  WD: 0
-  PD: 0
-  HB: 0
-  speed: 0
-  FireBallParticle: {fileID: 524161754534769769, guid: 126cb3d6ae08dfd4dbdf83c2daf2e1b7, type: 3}
 --- !u!33 &7892493957853851545
 MeshFilter:
   m_ObjectHideFlags: 0

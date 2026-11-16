@@ -320,6 +320,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8647b0bed67d2369e8dc771badacf893, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6750393071832052561}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8647b0bed67d2369e8dc771badacf893, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9082054921141159670}
   m_SourcePrefab: {fileID: 100100000, guid: 8647b0bed67d2369e8dc771badacf893, type: 3}
 --- !u!4 &3769754801794997848 stripped
 Transform:
@@ -379,3 +382,30 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.2
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &9082054921141159670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4547242166365193442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76484781fbf4d7244a8e174369581046, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FireBallSpell
+  Name: 
+  Objectname: 
+  ID: 0
+  weight: 0
+  isSelected: 0
+  player: {fileID: 0}
+  spellData: {fileID: 11400000, guid: ddf25929ba2ed334f9193f684c3c57f6, type: 2}
+  health: 0
+  MP: 0
+  defense: 0
+  WD: 0
+  PD: 0
+  HB: 0
+  speed: 0
+  FireBallParticle: {fileID: 524161754534769769, guid: 126cb3d6ae08dfd4dbdf83c2daf2e1b7, type: 3}
