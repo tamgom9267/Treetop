@@ -25,4 +25,9 @@ MonoBehaviour:
   PD: 5
   HB: 0
   speed: 0
-  additionalEffects: []
+  additionalEffects:
+  - type: 1
+    damagePerTick: 0
+    duration: 0
+    tickInterval: 2
+    manaPerTick: 1

@@ -35,7 +35,8 @@ public class ObjectData : ScriptableObject
 
 public enum WeaponEffectType
 {
-    Bleed
+    Bleed,
+    ManaRegeneration
 }
 
 [Serializable]
@@ -45,4 +46,5 @@ public sealed class WeaponEffectData
     public int damagePerTick = 1;
     public float duration = 3f;
     public float tickInterval = 1f;
+    public int manaPerTick = 1;
 }

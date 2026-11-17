@@ -562,6 +562,7 @@ public class PlayerController : MonoBehaviour
         if (pickup != null) pickup.enabled = false;
         equippedWeaponCollider = instance.GetComponent<BoxCollider>();
         if (equippedWeaponCollider != null) equippedWeaponCollider.enabled = false;
+        WeaponEffectController.StartEquippedEffects(equippedWeapon, playerClass);
         RefreshEquippedWeaponUI();
     }
 

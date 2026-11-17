@@ -241,13 +241,18 @@ public class PlayerClass : MonoBehaviour
 
     public void RestoreMP(int cantidad)
     {
+        RestoreMP(cantidad, showFeedback: true);
+    }
+
+    public void RestoreMP(int cantidad, bool showFeedback)
+    {
         if (cantidad <= 0 || health <= 0) { return; }
 
         int prevMP = MP;
 
         MP = Mathf.Min(maxMP, MP + cantidad);
 
-        if (MP > prevMP)
+        if (showFeedback && MP > prevMP)
         {
             TriggerEmissionFeedback(manaEmissionColor, manaFlashDuracion, 2);
             StartManaParticles();
