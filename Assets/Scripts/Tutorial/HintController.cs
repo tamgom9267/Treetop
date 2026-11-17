@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class HintController : MonoBehaviour
 {
@@ -14,8 +15,12 @@ public class HintController : MonoBehaviour
     // Texto de instucciones en HintCanvas
     [SerializeField] private TMP_Text hintText;
 
+    [SerializeField] Slider TimeValue;
+
     private InputAction CloseHintAction;
     private bool hintActive;
+
+    float value = 5.0f;
 
 
     private void Start()
@@ -40,21 +45,25 @@ public class HintController : MonoBehaviour
         {
             DeactivateHint();
         }
+
+        value -= 1f * Time.deltaTime;
+        TimeValue.value = value;
+        
+
+        if(value <= 0)
+        {
+            DeactivateHint();
+        }
     }
 
     public void ActivateHint(string newtext)
     {
+        value = 5;
         // Cambiamos el texto de el hint
         hintText.text = newtext;
 
         // Marcamos el hint como activo
         hintActive = true;
-
-        // Detenemos el timepo para que no haya problemas con la escena
-        Time.timeScale = 0f;
-
-        // Ocultamos la barra de vida
-        HealthCanvas.SetActive(false);
 
         // Mostramos el hint
         HintCanvas.SetActive(true);
@@ -64,12 +73,6 @@ public class HintController : MonoBehaviour
     {
         // Marcamos el hint como inactivo
         hintActive = false;
-
-        // Detenemos el timepo para que no haya problemas con la escena
-        Time.timeScale = 1f;
-
-        // Ocultamos la barra de vida
-        HealthCanvas.SetActive(true);
 
         // Mostramos el hint
         HintCanvas.SetActive(false);

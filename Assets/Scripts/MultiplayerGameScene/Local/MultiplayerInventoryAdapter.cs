@@ -115,16 +115,25 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
                 if (item.requieredCells[c][r] == 1) inventory.lootgrid[c][r] = item.ID;
         GameObject image = Instantiate(itemPanelPrefab, inventory.transform.Find(lootImagesPath));
         PanelManager panel = image.GetComponent<PanelManager>(); panel.WeaponID = item.ID; panel.itemObj = item.gameObject;
+
+        (int maxRow, int maxColumn, int minRow, int minColumn) = inventory.GetShapeSize(item.gameObject);
+
+        RectTransform rect = image.GetComponent<RectTransform>();
+        rect.sizeDelta = new Vector2(rect.sizeDelta.x * (maxRow - minRow + 1), rect.sizeDelta.y * (maxColumn - minColumn + 1));
+
+        float margin = 10f;
         var box = image.GetComponent<BoxCollider2D>();
-        box.size = new Vector2(120 * (fit.scalewidth + 1), 150 * (fit.scaleheight + 1));
-        box.offset = new Vector2(box.size.x * 0.66f, box.size.y / -2 - 5 * fit.scaleheight);
+        box.size = new Vector2(rect.sizeDelta.x - margin * 2, rect.sizeDelta.y - margin * 2);
+        box.offset = new Vector2((0.5f - rect.pivot.x) * rect.sizeDelta.x, (0.5f - rect.pivot.y) * rect.sizeDelta.y);
+
         foreach (Transform slot in inventory.transform.Find(lootSlotsPath))
             if (slot.GetComponent<PanelManager>().location == fit.ObjImagePosition[0])
-                image.GetComponent<RectTransform>().anchoredPosition = slot.GetComponent<RectTransform>().anchoredPosition;
-        if (item is WeaponObject weapon) icon = weapon.weaponData.UIsprite;
-        image.GetComponent<Image>().sprite = icon;
-        RectTransform rect = image.GetComponent<RectTransform>();
-        rect.sizeDelta = new Vector2(rect.sizeDelta.x * (fit.scalewidth + 1), rect.sizeDelta.y * (fit.scaleheight + 1));
+                rect.anchoredPosition = slot.GetComponent<RectTransform>().anchoredPosition;
+
+        Sprite sprite = item.GetUISprite();
+        if (sprite == null) sprite = icon;
+        image.GetComponent<Image>().sprite = sprite;
+
         inventory.gameObject.SetActive(true); CaptureStable(); return true;
     }
     // El loot tiene dos columnas: una espada soltada horizontal debe poder inspeccionarse otra vez.
@@ -195,7 +204,7 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
             ClearCells(inventory.grid, item.ID); ClearCells(inventory.lootgrid, item.ID);
             if (inventory.SelectedObject == item) inventory.SelectedObject = null;
             if (inventory.LootObject == item) inventory.LootObject = null;
-            if (player.Slot1 == item) player.Slot1 = null; if (player.Slot2 == item) player.Slot2 = null; if (player.Slot3 == item) player.Slot3 = null;
+            player.UnequipSpell(target);
             if (player.SelectedItem == item) player.SelectedItem = null;
             player.nearWeapons.RemoveAll(x => x == target);
             if (player.nearestWeapon == target || player.nearestWeaponObj == item) { player.nearestWeapon = null; player.nearestWeaponObj = null; }
