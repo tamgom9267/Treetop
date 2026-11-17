@@ -26,8 +26,4 @@ MonoBehaviour:
   HB: 0
   speed: 0
   additionalEffects:
-  - type: 1
-    damagePerTick: 0
-    duration: 0
-    tickInterval: 2
-    manaPerTick: 1
+  - {fileID: 11400000, guid: 9821316ea84140e6a86c6d746d27e45a, type: 2}

@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "ObjectData", menuName = "Scriptable Objects/Weapon")]
 public class ObjectData : ScriptableObject
@@ -30,21 +27,5 @@ public class ObjectData : ScriptableObject
     public int speed;
 
     [Header("Efectos adicionales")]
-    public List<WeaponEffectData> additionalEffects = new List<WeaponEffectData>();
-}
-
-public enum WeaponEffectType
-{
-    Bleed,
-    ManaRegeneration
-}
-
-[Serializable]
-public sealed class WeaponEffectData
-{
-    public WeaponEffectType type;
-    public int damagePerTick = 1;
-    public float duration = 3f;
-    public float tickInterval = 1f;
-    public int manaPerTick = 1;
+    public List<WeaponEffect> additionalEffects = new List<WeaponEffect>();
 }

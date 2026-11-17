@@ -215,7 +215,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         SetPhysics(SimulatesMotion);
         if (SimulatesMotion) ApplyImpulse(origin);
     }
-    public void ApplyWeaponEffects(IList<WeaponEffectData> effects)
+    public void ApplyWeaponEffects(IList<WeaponEffect> effects)
     {
         if (CanReceiveWeaponEffects && weaponEffectController != null)
             weaponEffectController.Apply(effects);
