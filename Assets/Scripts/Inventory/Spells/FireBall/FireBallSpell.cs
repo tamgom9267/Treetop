@@ -1,17 +1,15 @@
 using UnityEngine;
 using System.Collections;
-using Unity.VisualScripting;
 
 public class FireBallSpell : SpellObject
 {
     [SerializeField] GameObject FireBallParticle;
-    GameObject Fireball;
 
     bool onCooldown = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void SpellEffect()
     {
-        PlayerClass playerClass = player.GetComponent<PlayerController>().playerClass;
+        PlayerClass playerClass = player.playerClass;
         if(playerClass.MP - 10 < 0)
         {
             return;
@@ -20,9 +18,8 @@ public class FireBallSpell : SpellObject
         onCooldown = true;
 
         playerClass.SpendMP(10);
-        Fireball = Instantiate(FireBallParticle, player.transform.position, player.transform.rotation);
-        Fireball.transform.position = player.transform.position + Vector3.up;
-        Rigidbody rigidbody = Fireball.GetComponent<Rigidbody>();
+        GameObject fireball = SpawnProjectile(FireBallParticle, player.transform.position + Vector3.up);
+        Rigidbody rigidbody = fireball.GetComponent<Rigidbody>();
         rigidbody.AddForce(player.transform.forward*15,ForceMode.VelocityChange);
 
     

@@ -4859,7 +4859,7 @@ GameObject:
   - component: {fileID: 7988709886525589925}
   m_Layer: 0
   m_Name: Bola de Fuego Activa
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4944,7 +4944,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0e7cc6a98bf1f4438b127efca757499, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ActiveFireBall
+  m_EditorClassIdentifier: Assembly-CSharp::SpellProjectile
 --- !u!1 &842558600800451523
 GameObject:
   m_ObjectHideFlags: 0

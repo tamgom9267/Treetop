@@ -22,6 +22,17 @@ public abstract class SpellObject : InventoryObject
 
     public abstract void SpellEffect();
 
+    protected GameObject SpawnProjectile(GameObject prefab, Vector3 position)
+    {
+        WeaponObject equippedWeapon = player.EquippedWeaponInstance;
+        int weaponPD = equippedWeapon != null ? equippedWeapon.PD : 0;
+        int damage = player.playerClass.PD + PD + weaponPD;
+
+        GameObject projectile = Instantiate(prefab, position, player.transform.rotation);
+        projectile.GetComponent<SpellProjectile>().Initialize(damage);
+        return projectile;
+    }
+
     public virtual IEnumerator EndEffect(float num)
     {
         yield return new WaitForSeconds(num);

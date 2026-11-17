@@ -22,6 +22,7 @@ MonoBehaviour:
   MP: 0
   defense: 0
   WD: 0
-  PD: 0
+  PD: 3
   HB: 0
   speed: 0
+  additionalEffects: []

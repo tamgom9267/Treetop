@@ -50,7 +50,6 @@ public class EnemyCombat : MonoBehaviour
     [Header("Referencias")]
     private Rigidbody rb;
     private Animator animator;
-    private PlayerClass playerClass;
     private WeaponEffectController weaponEffectController;
 
     public bool CanReceiveWeaponEffects => isActive && !isDead;
@@ -90,16 +89,6 @@ public class EnemyCombat : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-
-        if (player != null)
-        {
-            playerClass = player.GetComponent<PlayerClass>();
-        }
-    }
-
     // permite activar o desactivar combate con enemigos
     public void SetCombatActive(bool active)
     {
@@ -108,6 +97,17 @@ public class EnemyCombat : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.CompareTag("Projectile"))
+        {
+            if (!other.TryGetComponent(out SpellProjectile projectile) ||
+                !projectile.TryConsume(out int damage) || !isActive || isDead) return;
+
+            SpawnHitEffect(other);
+            TakeDamage(damage);
+            ApplyKnockback(other.transform.position, projectileKnockbackMultiplier);
+            return;
+        }
+
         if (!isActive || isDead) return;
 
         // ataque con espada
@@ -141,20 +141,6 @@ public class EnemyCombat : MonoBehaviour
             StartCoroutine(ApplyKnockbackAfterHitStop
                 (other.transform.position,
                 weaponKnockbackMultiplier));
-        }
-        // ataque con proyectil
-        else if (other.CompareTag("Projectile"))
-        {
-            if (playerClass == null) return;
-
-            // efectos de golpe
-            SpawnHitEffect(other);
-
-            TakeDamage(playerClass.PD);
-
-            ApplyKnockback
-            (other.transform.position,
-            projectileKnockbackMultiplier);
         }
     }
 
