@@ -221,7 +221,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
   maxHealth: 10
-  contactDamage: 5
+  contactDamage: 7
+  destroyTarget: {fileID: 0}
   knockbackForce: 5
   knockbackUpForce: 2
   weaponKnockbackMultiplier: 1

@@ -11458,8 +11458,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f95dec9e45e84d5486b4a26f1f718afe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MultiplayerEnemy
+  startsActive: 0
+  deathAnimationState: Base Layer.SlimeBossDeath
   maxHealth: 50
-  contactDamage: 15
+  contactDamage: 20
   knockbackForce: 5
   knockbackUpForce: 2
   weaponKnockbackMultiplier: 0.33
@@ -11470,8 +11472,6 @@ MonoBehaviour:
   deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
   deathEffectOffset: {x: 0, y: 0, z: 0}
   authority: 0
-  startsActive: 0
-  deathAnimationState: Base Layer.SlimeBossDeath
 --- !u!1 &3216482126561707445
 GameObject:
   m_ObjectHideFlags: 0

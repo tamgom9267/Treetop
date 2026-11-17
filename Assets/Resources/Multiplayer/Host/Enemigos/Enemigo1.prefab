@@ -202,8 +202,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f95dec9e45e84d5486b4a26f1f718afe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MultiplayerEnemy
+  startsActive: 1
+  deathAnimationState: Base Layer.SlimeDeath
   maxHealth: 10
-  contactDamage: 5
+  contactDamage: 7
   knockbackForce: 5
   knockbackUpForce: 2
   weaponKnockbackMultiplier: 1

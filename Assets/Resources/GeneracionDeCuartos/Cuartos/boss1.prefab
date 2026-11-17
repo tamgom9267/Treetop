@@ -7292,11 +7292,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
   maxHealth: 50
-  contactDamage: 15
+  contactDamage: 20
+  destroyTarget: {fileID: 0}
   knockbackForce: 5
   knockbackUpForce: 2
   weaponKnockbackMultiplier: 0.33
-  projectileKnockbackMultiplier: 0.33333334
+  projectileKnockbackMultiplier: 0
   rend: {fileID: 5625381732794829713}
   flashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.1
