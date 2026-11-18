@@ -112,9 +112,9 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: c85282c0e7eacb04ca1d535e25191028, type: 3}
   - type: e797e4bb67949514e994b86dfeac5cba
     prefab: {fileID: 1995249544943147221, guid: eee8e3db73107cd45ac1566b34caf490, type: 3}
-    weapon: {fileID: 11400000, guid: e8ac51720ecffa74eb98798d2f4f6485, type: 2}
-    objectName: 
-    icon: {fileID: 8583323054461502815, guid: 3c613c6fff530bd4eaca7209ced08b99, type: 3}
+    weapon: {fileID: 0}
+    objectName: Heal
+    icon: {fileID: 0}
   - type: 5ed751d2c05f647468915e065607f6c1
     prefab: {fileID: 7841330066653735437, guid: 878cdef31265e74408e43947269dcad4, type: 3}
     weapon: {fileID: 11400000, guid: 56ad6963cecf69b439e2a635d6820820, type: 2}
@@ -133,7 +133,12 @@ MonoBehaviour:
   - type: 9954f0147af6c024c9b903c88e7271ef
     prefab: {fileID: 1903786396606084534, guid: f114e95060b74bb4f86b1795cb907b70, type: 3}
     weapon: {fileID: 0}
-    objectName: 
+    objectName: FireBall
+    icon: {fileID: 0}
+  - type: b7578f6edf9a35b42a11cda900d1bc54
+    prefab: {fileID: 680510687064729594, guid: 7009f61e1893b794682ae48b443074d5, type: 3}
+    weapon: {fileID: 0}
+    objectName: Dash
     icon: {fileID: 0}
 --- !u!114 &7218469150914871389
 MonoBehaviour:
