@@ -147,7 +147,8 @@ internal sealed class MultiplayerTrafficTunerInspector : UnityEditor.Editor
         using (new UnityEditor.EditorGUI.DisabledScope(true))
         {
             UnityEditor.EditorGUILayout.FloatField("Jugadores (Hz)", rates.playerStateSendHz);
-            UnityEditor.EditorGUILayout.FloatField("Enemigos (Hz)", rates.enemyStateSendHz);
+            UnityEditor.EditorGUILayout.FloatField("Enemigos del host (Hz)", rates.enemyStateSendHz);
+            UnityEditor.EditorGUILayout.FloatField("Empujes simulados por clientes (Hz)", rates.ownedEnemyMotionSendHz);
             UnityEditor.EditorGUILayout.FloatField("Comprobar equipo (Hz)", rates.equipmentCheckHz);
             UnityEditor.EditorGUILayout.FloatField("Presencia por cuarto (Hz)", rates.roomPresenceSendHz);
             UnityEditor.EditorGUILayout.FloatField("Solicitar mundo (Hz)", rates.worldSnapshotRequestHz);

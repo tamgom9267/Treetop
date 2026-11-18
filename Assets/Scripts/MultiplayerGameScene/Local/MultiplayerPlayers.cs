@@ -13,8 +13,10 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
     // [Serializable]
     public readonly struct TrafficRates
     {
+        public const float HostEnemyStateHz = 30f;
         public float playerStateSendHz => 90f;
-        public float enemyStateSendHz => 90f;
+        public float enemyStateSendHz => HostEnemyStateHz;
+        public float ownedEnemyMotionSendHz => 90f;
         public float equipmentCheckHz => 10f;
         public float roomPresenceSendHz => 4f;
         public float worldSnapshotRequestHz => 1f / 3f;

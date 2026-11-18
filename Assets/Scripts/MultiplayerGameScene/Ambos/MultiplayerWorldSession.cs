@@ -19,6 +19,8 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     private readonly Dictionary<int, Vector3> positions = new Dictionary<int, Vector3>();
     private readonly Dictionary<int, double> poseTimes = new Dictionary<int, double>();
     private readonly Dictionary<int, MultiplayerAttackWindow> attacks = new Dictionary<int, MultiplayerAttackWindow>();
+    private readonly List<MultiplayerWorldMessage> enemyFrames = new List<MultiplayerWorldMessage>();
+    private readonly List<MultiplayerSlimeMotion> ownedFrames = new List<MultiplayerSlimeMotion>();
     private MultiplayerRunSession session;
     private MultiplayerPlayers players;
     private PlayerController player;
@@ -186,13 +188,12 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
             foreach (MultiplayerEnemy enemy in enemies.Values) if (enemy != null &&
                 enemy.NeedsHostRecovery(now, MultiplayerGameplayProtocol.Participant(enemy.MotionActor)))
             { enemy.RecoverMotionToHost(); PublishEnemyState(enemy); }
-        if (ownedMotionClock.Tick(now, traffic.enemyStateSendHz))
+        if (!MultiplayerGameplayProtocol.Host && ownedMotionClock.Tick(now, traffic.ownedEnemyMotionSendHz))
         {
-            var owned = new List<MultiplayerSlimeMotion>();
             foreach (MultiplayerEnemy enemy in enemies.Values)
-                if (enemy != null && enemy.PublishesMotion) owned.Add(enemy.CaptureMotion());
-            if (owned.Count > 0) MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.SlimeMotion,
-                new MultiplayerSlimeMotionBatch { entries = owned.ToArray() }, false);
+                if (enemy != null && enemy.PublishesMotion) ownedFrames.Add(enemy.CaptureMotion());
+            MultiplayerGameplayProtocol.SendMotionFrames(MultiplayerGameplayProtocol.SlimeMotion, ownedFrames);
+            ownedFrames.Clear();
         }
         if (player == null) return;
         bool localAlive = MultiplayerDeathSession.Instance == null ||
@@ -234,11 +235,11 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         }
         if (frameClock.Tick(now, traffic.enemyStateSendHz))
         {
-            var frames = new List<MultiplayerWorldMessage>();
             foreach (MultiplayerEnemy enemy in enemies.Values)
-                if (enemy != null && enemy.MotionActor == MultiplayerGameplayProtocol.HostActor) frames.Add(enemy.Capture(++revision));
-            if (frames.Count > 0) MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.EnemyFrames,
-                new MultiplayerWorldBatch { op = "frames", entries = frames.ToArray() }, false);
+                if (enemy != null && enemy.CombatActive && enemy.MotionActor == MultiplayerGameplayProtocol.HostActor)
+                    enemyFrames.Add(enemy.Capture(++revision));
+            MultiplayerGameplayProtocol.SendMotionFrames(MultiplayerGameplayProtocol.EnemyFrames, enemyFrames);
+            enemyFrames.Clear();
         }
     }
     private void Activate(MultiplayerRoomController room)

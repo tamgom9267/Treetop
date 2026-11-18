@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using Photon.Pun;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -95,6 +96,7 @@ public static class MultiplayerCombatVerification
     private static IEnumerator Verify()
     {
         CheckClocks();
+        CheckMotionBatches();
         var scene = SceneManager.CreateScene("MultiplayerGameScene"); SceneManager.SetActiveScene(scene);
         var sessionRoot = new GameObject("Combat verification session"); sessionRoot.SetActive(false);
         var service = sessionRoot.AddComponent<PhotonPartyService>();
@@ -110,7 +112,8 @@ public static class MultiplayerCombatVerification
         var players = root.GetComponent<MultiplayerPlayers>();
         Check(players.Initialize(run, out string error), "Coordinador inicializa sin medidor: " + error);
         Check(PhotonNetwork.SendRate == 125, "Salida solicitada 120 se representa como 125 Hz (8 ms)");
-        Check(players.Traffic.playerStateSendHz == 90f && players.Traffic.enemyStateSendHz == 90f, "Jugadores y enemigos fijos a 90 Hz");
+        Check(players.Traffic.playerStateSendHz == 90f && players.Traffic.ownedEnemyMotionSendHz == 90f &&
+            players.Traffic.enemyStateSendHz == 30f, "El host envia enemigos a 30 Hz y se conserva la cadencia del jugador y sus empujes");
         tuner = root.AddComponent<MultiplayerTrafficTuner>();
         var serialized = new SerializedObject(tuner);
         Check(serialized.FindProperty("rates") == null && serialized.FindProperty("photonSendRateHz") == null &&
@@ -127,7 +130,7 @@ public static class MultiplayerCombatVerification
         var slimeChecks = MultiplayerSlimeVerification.CheckSlimes(world);
         while (slimeChecks.MoveNext()) yield return slimeChecks.Current;
         Property(run, "FloorNumber", 2); players.BeginFloor(run.RunId, 2);
-        Check(players.Traffic.enemyStateSendHz == 90f && PhotonNetwork.SendRate == 125, "Cambiar de piso conserva frecuencias fijas");
+        Check(players.Traffic.enemyStateSendHz == 30f && PhotonNetwork.SendRate == 125, "Cambiar de piso conserva frecuencias fijas");
         players.Shutdown(); Check(PhotonNetwork.SendRate == 25, "Cerrar coordinador restaura salida previa");
         Object.DestroyImmediate(root); Check(PhotonNetwork.SendRate == 25, "Destruccion repetida no cambia salida restaurada");
         service.LeaveParty(); PhotonNetwork.Disconnect(); Object.DestroyImmediate(sessionRoot);
@@ -145,6 +148,31 @@ public static class MultiplayerCombatVerification
             Check(Math.Abs(count - Math.Min(fps, 90) * 10) <= 1, "Cadencia efectiva a " + fps + " FPS: " + count / 10f + " Hz");
             Check(clock.Tick(1000d, 90f) && !clock.Tick(1000d, 90f), "Tras pausa a " + fps + " FPS no recupera envios en rafaga");
         }
+    }
+
+    private static void CheckMotionBatches()
+    {
+        const int budget = 1000;
+        var frames = new List<MultiplayerWorldMessage>();
+        for (int i = 0; i < 5; i++)
+            frames.Add(new MultiplayerWorldMessage { op = "enemy", id = "sótano:" + i, revision = i + 1 });
+
+        var pack = typeof(MultiplayerGameplayProtocol).GetMethod("PackMotionFrames", BindingFlags.Static | BindingFlags.NonPublic)
+            .MakeGenericMethod(typeof(MultiplayerWorldMessage));
+        var batches = (IEnumerable<string>)pack.Invoke(null, new object[] { frames, budget });
+        int count = 0, nextFrame = 0;
+        foreach (string batch in batches)
+        {
+            count++;
+            Check(Encoding.UTF8.GetByteCount(batch) <= budget, "Cada lote de movimiento respeta el presupuesto UTF-8");
+            foreach (var frame in JsonUtility.FromJson<MultiplayerWorldBatch>(batch).entries)
+            {
+                var expected = frames[nextFrame++];
+                Check(frame.id == expected.id && frame.revision == expected.revision,
+                    "Los lotes conservan cada movimiento y su orden");
+            }
+        }
+        Check(count > 1 && nextFrame == frames.Count, "Los movimientos grandes se reparten sin perder datos");
     }
 
     private static void Check(bool condition, string message)

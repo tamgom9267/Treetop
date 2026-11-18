@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -34,9 +35,49 @@ public static class MultiplayerGameplayProtocol
     public static int HostActor => PhotonPartyService.Instance != null ? PhotonPartyService.Instance.OriginalHostActorNumber : 0;
     public static bool Send<T>(byte code, T message, bool reliable, int target = 0, bool flush = false)
     {
+        return SendJson(code, JsonUtility.ToJson(message), reliable, target, flush);
+    }
+    internal static void SendMotionFrames<T>(byte code, IReadOnlyList<T> frames)
+    {
+        if (frames.Count == 0) return;
+
+        // Reserva espacio para la cabecera de Photon y el identificador de partida.
+        int jsonBudget = Mathf.Min(1000, PhotonNetwork.NetworkingClient.LoadBalancingPeer.MaximumTransferUnit - 200);
+        foreach (string batch in PackMotionFrames(frames, jsonBudget))
+            SendJson(code, batch, false, 0, false);
+    }
+    internal static IEnumerable<string> PackMotionFrames<T>(IReadOnlyList<T> frames, int jsonBudget)
+    {
+        const string start = "{\"entries\":[";
+        const string end = "]}";
+        int envelopeSize = start.Length + end.Length;
+        var batch = new StringBuilder(start);
+        int size = envelopeSize;
+        foreach (T frame in frames)
+        {
+            string json = JsonUtility.ToJson(frame);
+            int frameSize = Encoding.UTF8.GetByteCount(json);
+            if (size + 1 + frameSize > jsonBudget && size > envelopeSize)
+            {
+                yield return batch.Append(end).ToString();
+                batch.Clear().Append(start);
+                size = envelopeSize;
+            }
+            if (size > envelopeSize)
+            {
+                batch.Append(',');
+                size++;
+            }
+            batch.Append(json);
+            size += frameSize;
+        }
+        if (size > envelopeSize) yield return batch.Append(end).ToString();
+    }
+    private static bool SendJson(byte code, string json, bool reliable, int target, bool flush)
+    {
         MultiplayerRunSession session = MultiplayerRunSession.Instance;
         if (session == null || !session.IsRunning || !PhotonNetwork.InRoom) return false;
-        bool sent = PhotonNetwork.RaiseEvent(code, new object[] { Version, session.RunId, session.FloorNumber, JsonUtility.ToJson(message) },
+        bool sent = PhotonNetwork.RaiseEvent(code, new object[] { Version, session.RunId, session.FloorNumber, json },
             target > 0 ? new RaiseEventOptions { TargetActors = new[] { target } } : new RaiseEventOptions { Receivers = ReceiverGroup.Others },
             new SendOptions { Reliability = reliable });
         if (sent && flush) PhotonNetwork.SendAllOutgoingCommands();
@@ -62,7 +103,7 @@ public sealed class MultiplayerWorldMessage
 {
     public string op, room, id, item;
     public int revision, stage, type, health, hit, animation, attack, damage, actor;
-    public int motionActor, motionAttack, motionVersion, motionSequence;
+    public int motionActor, motionAttack, motionVersion, motionSequence, ghostAppearance;
     public float normalizedTime;
     public double time;
     public Vector3 position, velocity, angularVelocity;

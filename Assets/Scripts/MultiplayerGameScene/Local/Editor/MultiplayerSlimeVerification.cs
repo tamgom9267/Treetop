@@ -322,8 +322,19 @@ public static class MultiplayerSlimeVerification
                 "Un paquete atrasado no vuelve a mostrar al fantasma y ocultarse bloquea el daño");
 
             Call(host, "SetGhostHidden", false);
-            host.TakeAuthoritativeHit(100, origin);
             client.Receive(host.Capture(4));
+            Call(host, "SetGhostHidden", true);
+            var nextHidden = host.Capture(5);
+            Vector3 nextSpawn = spawn + Vector3.forward * 4f;
+            host.GetComponent<Rigidbody>().position = nextSpawn;
+            Call(host, "SetGhostHidden", false);
+            client.Receive(host.Capture(6));
+            client.Receive(nextHidden);
+            Check(!client.GhostHidden && client.transform.position == nextSpawn,
+                "El cliente salta a la nueva pose aunque no reciba la fase oculta a tiempo");
+
+            host.TakeAuthoritativeHit(100, origin);
+            client.Receive(host.Capture(7));
             Check(host.Health == 0 && client.Health == 0 && !host.SimulatesMotion,
                 "La muerte del fantasma se replica sin Animator");
         }

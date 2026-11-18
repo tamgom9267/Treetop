@@ -35,6 +35,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     private int localActor, hostActor, frameRevision, lastAnimation, lastHitActor, lastHitAttack;
     private int motionActor, motionAttack, motionVersion, receivedSequence, localSequence;
     private int pendingAttack, pendingBaseVersion;
+    private int ghostAppearance;
     private bool knockbackActive, localLanded, suspended, deathStarted, deathEffectSpawned, leftGround, motionBlocked;
     private float deathAge;
     private double pendingAt, delegatedAt, lastMotionAt, impulseFixedAt, lastGroundAt = double.NegativeInfinity;
@@ -133,6 +134,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
             body.angularVelocity = Vector3.zero;
         }
         ApplyGhostVisibility(hidden);
+        if (!hidden) ghostAppearance++;
         SetPhysics(SimulatesMotion);
         world.PublishEnemyState(this);
     }
@@ -297,7 +299,8 @@ public sealed class MultiplayerEnemy : MonoBehaviour
             health = Health, hit = HitRevision, actor = lastHitActor, attack = lastHitAttack,
             hitOrigin = lastHitOrigin, hasHitOrigin = HitRevision > 0,
             motionActor = motionActor, motionAttack = motionAttack, motionVersion = motionVersion,
-            motionSequence = remote ? receivedSequence : revision, knockbackActive = knockbackActive, ghostHidden = GhostHidden,
+            motionSequence = remote ? receivedSequence : revision, knockbackActive = knockbackActive,
+            ghostHidden = GhostHidden, ghostAppearance = ghostAppearance,
             position = remote ? latestMotion.position : body.position, rotation = remote ? latestMotion.rotation : body.rotation,
             velocity = remote ? latestMotion.velocity : body.isKinematic ? Vector3.zero : body.linearVelocity,
             angularVelocity = remote ? latestMotion.angularVelocity : body.isKinematic ? Vector3.zero : body.angularVelocity,
@@ -313,12 +316,14 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         bool anticipated = anticipatedHits.Contains(Key(state.actor, state.attack));
         if (state.hit > 0 && presentedHits.Add(state.hit) && !anticipated && !deathStarted)
             ShowHit(state.hasHitOrigin && MultiplayerGameplayProtocol.Finite(state.hitOrigin) ? state.hitOrigin : transform.position);
-        if (isGhost && !deathStarted && state.revision > frameRevision && (GhostHidden != state.ghostHidden || state.health == 0))
+        if (isGhost && !deathStarted && state.revision > frameRevision &&
+            (GhostHidden != state.ghostHidden || ghostAppearance != state.ghostAppearance || state.health == 0))
         {
             // El teletransporte cambia la pose antes de volver a habilitar la malla y los colliders.
             frames.Clear();
             SetBody(FromHost(state));
             correctionAt = double.NegativeInfinity;
+            ghostAppearance = state.ghostAppearance;
             ApplyGhostVisibility(state.ghostHidden);
         }
         Health = Mathf.Min(Health, state.health);
@@ -480,7 +485,8 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (!authority && SimulatesMotion && KnockbackActive && Time.timeScale <= 0f)
         { FinishKnockback(false); return; }
         if (SimulatesMotion || frames.Count == 0) return;
-        double render = PhotonNetwork.Time - 0.1d;
+        double interpolationDelay = isGhost ? 2d / MultiplayerPlayers.TrafficRates.HostEnemyStateHz : 0.1d;
+        double render = PhotonNetwork.Time - interpolationDelay;
         while (frames.Count > 2 && frames[1].time <= render) frames.RemoveAt(0);
         var from = frames[0]; var to = frames.Count > 1 ? frames[1] : from;
         float fraction = to.time > from.time ? Mathf.Clamp01((float)((render - from.time) / (to.time - from.time))) : 1f;
