@@ -17628,105 +17628,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!1 &677982647 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-  m_PrefabInstance: {fileID: 1180745855}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &677982648
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677982647}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c6ccc2ff46652f49ab698c6bd158a9b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::fnatasmaenemigo
-  minHiddenTime: 1.5
-  maxHiddenTime: 2.8
-  teleportDistance: 3.5
-  navMeshSampleRadius: 1.5
-  moveSpeed: 5
-  turnSpeed: 720
-  missileSpinSpeed: 900
-  visibleDuration: 2
---- !u!54 &677982650
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677982647}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!114 &677982655
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677982647}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
-  maxHealth: 10
-  contactDamage: 5
-  destroyTarget: {fileID: 0}
-  knockbackForce: 5
-  knockbackUpForce: 2
-  weaponKnockbackMultiplier: 1
-  projectileKnockbackMultiplier: 0.33333334
-  rend: {fileID: 0}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
-  startsActive: 1
-  hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
-  deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
---- !u!65 &677982656
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677982647}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.23082417, y: 0.24900207, z: 0.18671419}
-  m_Center: {x: -0.029099986, y: 0.021415567, z: -0.050297566}
 --- !u!114 &692149276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17904,9 +17805,22 @@ MonoBehaviour:
   healingEmissionColor: {r: 0.21960784, g: 1, b: 0.2, a: 0.3137255}
   healingFlashDuration: 0.6
   healingParticles: {fileID: 7884627245462379932, guid: 7086937ad0447a644890084c5406657d, type: 3}
-  manaEmissionColor: {r: 0.1, g: 0.5, b: 1, a: 1}
-  manaFlashDuracion: 4
-  manaParticles: {fileID: 0}
+--- !u!114 &707366308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 707366300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f5a99e4a39f4c749b1e63f11a08cb23, type: 3}
+  m_Name: ''
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathScreen
+  tutorialMessage: Has muerto en el tutorial
+  tutorialButtonText: Reiniciar
+  soloMessage: Has muerto en la mazmorra
+  soloButtonText: Volver
 --- !u!114 &707366305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17923,7 +17837,6 @@ MonoBehaviour:
   playerClass: {fileID: 707366304}
   Inventory: {fileID: 1309465091}
   playerAnimation: {fileID: 707366302}
-  nearManaFountain: {fileID: 0}
   receivedHitStopDuration: 0.08
   isAttacking: 0
   turnSpeed: 720
@@ -17999,22 +17912,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &707366308
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 707366300}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f5a99e4a39f4c749b1e63f11a08cb23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathScreen
-  tutorialMessage: Has muerto en el tutorial
-  tutorialButtonText: Reiniciar
-  soloMessage: Has muerto en la mazmorra
-  soloButtonText: Volver
 --- !u!1 &713041714
 GameObject:
   m_ObjectHideFlags: 0
@@ -25093,91 +24990,6 @@ Transform:
   - {fileID: 543450653182188819}
   m_Father: {fileID: 1532695840}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1180745855
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 6.9883204
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 6.9883204
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 17.974367
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -18.83257
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.8927195
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 19.11978
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.023324631
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0.99950707
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.0122262
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0.01709155
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -2.696
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 178.073
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -181.356
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_Name
-      value: fantasmaSmooth
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_TagString
-      value: PhysicalEnemy
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 677982650}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 677982648}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 677982655}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 677982656}
-  m_SourcePrefab: {fileID: 100100000, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
 --- !u!1 &1183260744
 GameObject:
   m_ObjectHideFlags: 0
@@ -61357,7 +61169,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
   maxHealth: 10
   contactDamage: 5
-  destroyTarget: {fileID: 0}
   knockbackForce: 5
   knockbackUpForce: 2
   weaponKnockbackMultiplier: 1
@@ -61415,7 +61226,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
   maxHealth: 10
   contactDamage: 5
-  destroyTarget: {fileID: 0}
   knockbackForce: 5
   knockbackUpForce: 2
   weaponKnockbackMultiplier: 1
@@ -61465,7 +61275,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
   maxHealth: 50
   contactDamage: 8
-  destroyTarget: {fileID: 0}
   knockbackForce: 5
   knockbackUpForce: 2
   weaponKnockbackMultiplier: 1
@@ -61531,7 +61340,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
   maxHealth: 10
   contactDamage: 5
-  destroyTarget: {fileID: 0}
   knockbackForce: 5
   knockbackUpForce: 2
   weaponKnockbackMultiplier: 1
@@ -61613,7 +61421,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
   maxHealth: 10
   contactDamage: 5
-  destroyTarget: {fileID: 0}
   knockbackForce: 5
   knockbackUpForce: 2
   weaponKnockbackMultiplier: 1
@@ -86303,7 +86110,7 @@ Transform:
   m_GameObject: {fileID: 266159116255672257}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: -30.4, y: 0, z: -0}
+  m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -86579,7 +86386,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
   maxHealth: 10
   contactDamage: 5
-  destroyTarget: {fileID: 0}
   knockbackForce: 5
   knockbackUpForce: 2
   weaponKnockbackMultiplier: 1
@@ -92533,4 +92339,3 @@ SceneRoots:
   - {fileID: 8879453900398899833}
   - {fileID: 186174604}
   - {fileID: 6257425675903214683}
-  - {fileID: 1180745855}

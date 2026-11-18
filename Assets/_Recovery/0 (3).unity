@@ -6025,8 +6025,6 @@ MonoBehaviour:
   player: {fileID: 707366301}
   offset: {x: 0, y: 10, z: -8}
   cameraRotation: {x: 45, y: 0, z: 0}
-  shakeDuration: 0.15
-  shakeMagnitude: 0.15
 --- !u!1001 &61481308
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8599,9 +8597,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2b0e98fcff593237380c4c2bfaa8d061, type: 3}
       insertIndex: -1
       addedObject: {fileID: 244622941}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2b0e98fcff593237380c4c2bfaa8d061, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 244622947}
   m_SourcePrefab: {fileID: 100100000, guid: 2b0e98fcff593237380c4c2bfaa8d061, type: 3}
 --- !u!4 &244622939 stripped
 Transform:
@@ -8665,6 +8660,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9679eeb823c42ce44bc877eb69d6c3f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeBoss
+  vidaSlime: 50
+  contactDamage: 5
+  knockbackForce: 5
+  knockbackUpForce: 2
   isActive: 0
 --- !u!54 &244622944
 Rigidbody:
@@ -8735,32 +8734,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.08, y: 0.07, z: 0.093}
   m_Center: {x: 0, y: 0.035, z: 0}
---- !u!114 &244622947
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 244622940}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
-  maxHealth: 10
-  contactDamage: 5
-  destroyTarget: {fileID: 0}
-  knockbackForce: 5
-  knockbackUpForce: 2
-  weaponKnockbackMultiplier: 1
-  projectileKnockbackMultiplier: 0.33333334
-  rend: {fileID: 0}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
-  startsActive: 1
-  hitEffectPrefab: {fileID: 0}
-  deathEffectPrefab: {fileID: 0}
 --- !u!1001 &250597821
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14439,9 +14412,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 604066501}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 604066507}
   m_SourcePrefab: {fileID: 100100000, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
 --- !u!4 &604066499 stripped
 Transform:
@@ -14483,6 +14453,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
+  vidaSlime: 10
+  contactDamage: 5
+  knockbackForce: 8
+  knockbackUpForce: 3
   isActive: 0
 --- !u!54 &604066503
 Rigidbody:
@@ -14575,32 +14549,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
   m_Center: {x: 0, y: 0.035, z: 0}
---- !u!114 &604066507
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 604066500}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
-  maxHealth: 10
-  contactDamage: 5
-  destroyTarget: {fileID: 0}
-  knockbackForce: 5
-  knockbackUpForce: 2
-  weaponKnockbackMultiplier: 1
-  projectileKnockbackMultiplier: 0.33333334
-  rend: {fileID: 0}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
-  startsActive: 1
-  hitEffectPrefab: {fileID: 0}
-  deathEffectPrefab: {fileID: 0}
 --- !u!1001 &606854750
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16106,16 +16054,6 @@ MonoBehaviour:
   speed: 0
   enemyKnockbackForce: 8
   enemyKnockbackUpForce: 3
-  playerRenderer: {fileID: 0}
-  cameraFollow: {fileID: 0}
-  damageEmissionColor: {r: 1, g: 1, b: 1, a: 1}
-  damageFlashDuration: 0.1
-  healingEmissionColor: {r: 0.7, g: 1, b: 0.2, a: 1}
-  healingFlashDuration: 0.6
-  healingParticles: {fileID: 0}
-  manaEmissionColor: {r: 0.1, g: 0.5, b: 1, a: 1}
-  manaFlashDuracion: 4
-  manaParticles: {fileID: 0}
 --- !u!114 &707366305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16132,12 +16070,8 @@ MonoBehaviour:
   playerClass: {fileID: 707366304}
   Inventory: {fileID: 1309465091}
   playerAnimation: {fileID: 707366302}
-  nearManaFountain: {fileID: 0}
-  receivedHitStopDuration: 0.08
   isAttacking: 0
   turnSpeed: 720
-  attackTurnSpeed: 1440
-  attackRotationThreshold: 2
   weapon: {fileID: 0}
   Slot1: {fileID: 0}
   Slot2: {fileID: 0}
@@ -16147,9 +16081,6 @@ MonoBehaviour:
   interact: {fileID: 1781555164194001046, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   inventory: {fileID: 7186299553699024577, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   rotate: {fileID: -3050445605200399684, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  Spell1: {fileID: 0}
-  Spell2: {fileID: 0}
-  Spell3: {fileID: 0}
   nearestWeapon: {fileID: 0}
   nearestWeaponObj: {fileID: 0}
   SelectedItem: {fileID: 0}
@@ -18535,160 +18466,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 865157780}
   m_CullTransparentMesh: 1
---- !u!1001 &867166446
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5.9337497
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 5.9337497
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 15.26195
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -18.17
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 2.97
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 23.43
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071067
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      propertyPath: m_Name
-      value: fantasmaSmooth
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 867166450}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 867166449}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 867166448}
-  m_SourcePrefab: {fileID: 100100000, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
---- !u!1 &867166447 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 83d31c690a6c8fbbfb56bbc536b55da1, type: 3}
-  m_PrefabInstance: {fileID: 867166446}
-  m_PrefabAsset: {fileID: 0}
---- !u!54 &867166448
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 867166447}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!136 &867166449
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 867166447}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.0891296
-  m_Height: 0.45849305
-  m_Direction: 1
-  m_Center: {x: 0.0034756176, y: 0.042330526, z: -0.050297584}
---- !u!114 &867166450
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 867166447}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c6ccc2ff46652f49ab698c6bd158a9b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::fnatasmaenemigo
-  minHiddenTime: 1.5
-  maxHiddenTime: 2.8
-  teleportDistance: 3.5
-  navMeshSampleRadius: 1.5
-  moveSpeed: 3.5
-  turnSpeed: 720
-  visibleDuration: 2
-  contactDamage: 1
-  damageCooldown: 1
 --- !u!1 &868920455
 GameObject:
   m_ObjectHideFlags: 0
@@ -20011,9 +19788,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1006441012}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1006441018}
   m_SourcePrefab: {fileID: 100100000, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
 --- !u!4 &1006441010 stripped
 Transform:
@@ -20055,6 +19829,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
+  vidaSlime: 10
+  contactDamage: 5
+  knockbackForce: 8
+  knockbackUpForce: 3
   isActive: 0
 --- !u!54 &1006441014
 Rigidbody:
@@ -20147,32 +19925,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
   m_Center: {x: 0, y: 0.035, z: 0}
---- !u!114 &1006441018
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1006441011}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
-  maxHealth: 10
-  contactDamage: 5
-  destroyTarget: {fileID: 0}
-  knockbackForce: 5
-  knockbackUpForce: 2
-  weaponKnockbackMultiplier: 1
-  projectileKnockbackMultiplier: 0.33333334
-  rend: {fileID: 0}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
-  startsActive: 1
-  hitEffectPrefab: {fileID: 0}
-  deathEffectPrefab: {fileID: 0}
 --- !u!1001 &1006766753
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21273,8 +21025,6 @@ MonoBehaviour:
   PlayerNear: 0
   Weapon: {fileID: 137415524845617739, guid: 9f1a5b5d3e51b7648991ba2acaa2b0dc, type: 3}
   Text: {fileID: 228583152}
-  randomLoot: 1
-  chestParticles: []
 --- !u!65 &1096879740
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -21391,9 +21141,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1100221705}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1100221711}
   m_SourcePrefab: {fileID: 100100000, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
 --- !u!4 &1100221703 stripped
 Transform:
@@ -21435,6 +21182,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
+  vidaSlime: 10
+  contactDamage: 5
+  knockbackForce: 8
+  knockbackUpForce: 3
   isActive: 0
 --- !u!54 &1100221707
 Rigidbody:
@@ -21527,32 +21278,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
   m_Center: {x: 0, y: 0.035, z: 0}
---- !u!114 &1100221711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1100221704}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
-  maxHealth: 10
-  contactDamage: 5
-  destroyTarget: {fileID: 0}
-  knockbackForce: 5
-  knockbackUpForce: 2
-  weaponKnockbackMultiplier: 1
-  projectileKnockbackMultiplier: 0.33333334
-  rend: {fileID: 0}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
-  startsActive: 1
-  hitEffectPrefab: {fileID: 0}
-  deathEffectPrefab: {fileID: 0}
 --- !u!1 &1100802642
 GameObject:
   m_ObjectHideFlags: 0
@@ -29767,9 +29492,6 @@ MonoBehaviour:
   InventoryLoot: {fileID: 487757986}
   ChestLoot: {fileID: 1398783794}
   ChestLootImages: {fileID: 972660936}
-  UISlot1: {fileID: 0}
-  UISlot2: {fileID: 0}
-  UISlot3: {fileID: 0}
   cursor: {fileID: 0}
   LootObject: {fileID: 0}
   row: 4
@@ -37003,9 +36725,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1840048240}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1840048246}
   m_SourcePrefab: {fileID: 100100000, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
 --- !u!4 &1840048238 stripped
 Transform:
@@ -37047,6 +36766,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
+  vidaSlime: 10
+  contactDamage: 5
+  knockbackForce: 8
+  knockbackUpForce: 3
   isActive: 0
 --- !u!54 &1840048242
 Rigidbody:
@@ -37139,32 +36862,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
   m_Center: {x: 0, y: 0.035, z: 0}
---- !u!114 &1840048246
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1840048239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
-  maxHealth: 10
-  contactDamage: 5
-  destroyTarget: {fileID: 0}
-  knockbackForce: 5
-  knockbackUpForce: 2
-  weaponKnockbackMultiplier: 1
-  projectileKnockbackMultiplier: 0.33333334
-  rend: {fileID: 0}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
-  startsActive: 1
-  hitEffectPrefab: {fileID: 0}
-  deathEffectPrefab: {fileID: 0}
 --- !u!1 &1850352209
 GameObject:
   m_ObjectHideFlags: 0
@@ -40548,9 +40245,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2104839227}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2104839233}
   m_SourcePrefab: {fileID: 100100000, guid: 4f732c246ca404eb5a55d8ba54917ac9, type: 3}
 --- !u!1 &2104839225 stripped
 GameObject:
@@ -40592,6 +40286,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19fe6461704e37f4fb552329136560cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeEnemy
+  vidaSlime: 10
+  contactDamage: 5
+  knockbackForce: 8
+  knockbackUpForce: 3
   isActive: 0
 --- !u!54 &2104839229
 Rigidbody:
@@ -40684,32 +40382,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.06, y: 0.08, z: 0.08}
   m_Center: {x: 0, y: 0.035, z: 0}
---- !u!114 &2104839233
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104839225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7a7e9ee5dc9c01608a6f0e3865b28a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombat
-  maxHealth: 10
-  contactDamage: 5
-  destroyTarget: {fileID: 0}
-  knockbackForce: 5
-  knockbackUpForce: 2
-  weaponKnockbackMultiplier: 1
-  projectileKnockbackMultiplier: 0.33333334
-  rend: {fileID: 0}
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  hitStopDuration: 0.08
-  startsActive: 1
-  hitEffectPrefab: {fileID: 0}
-  deathEffectPrefab: {fileID: 0}
 --- !u!1001 &2121688846
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -41571,4 +41243,3 @@ SceneRoots:
   - {fileID: 69985746}
   - {fileID: 1151848573}
   - {fileID: 85211658}
-  - {fileID: 867166446}
