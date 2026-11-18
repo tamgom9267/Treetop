@@ -40,6 +40,12 @@ public static class MultiplayerSlimeVerification
             CheckPlacedBosses(world);
             for (int type = 1; type <= 2; type++)
             {
+                var prefab = Resources.Load<GameObject>("Multiplayer/Host/Enemigos/Enemigo" + type);
+                if (prefab.GetComponent<HostGhostMovement>() != null)
+                {
+                    CheckGhost(world, type);
+                    continue;
+                }
                 var host = Spawn(type, true, world, 1);
                 var a = Spawn(type, false, world, 2);
                 var b = Spawn(type, false, world, 3);
@@ -281,6 +287,51 @@ public static class MultiplayerSlimeVerification
         foreach (Collider collider in boss.GetComponents<Collider>()) collider.enabled = false;
         var movement = boss.GetComponent<HostSlimeMovement>(); if (movement != null) movement.enabled = false;
         return room;
+    }
+    private static void CheckGhost(MultiplayerWorldSession world, int type)
+    {
+        var host = Spawn(type, true, world, 1);
+        var client = Spawn(type, false, world, 2);
+        try
+        {
+            Set(host, "motionActor", 1);
+            var renderer = client.GetComponent<Renderer>();
+            var collider = client.GetComponent<Collider>();
+            client.Receive(host.Capture(1));
+            Check(host.GhostHidden && client.GhostHidden && !client.CombatActive && !renderer.enabled && !collider.enabled,
+                "Fantasma inicia oculto en ambos roles");
+
+            Vector3 spawn = host.transform.position + Vector3.right * 3f;
+            host.GetComponent<Rigidbody>().position = spawn;
+            Call(host, "SetGhostHidden", false);
+            var appeared = host.Capture(2);
+            client.Receive(appeared);
+            Check(!client.GhostHidden && client.CombatActive && renderer.enabled && collider.enabled && client.transform.position == spawn,
+                "Cliente recibe el teletransporte y la visibilidad del fantasma");
+
+            Vector3 origin = spawn - Vector3.right * 3f;
+            host.TakeAuthoritativeHit(1, origin, 2, 10);
+            Check(host.Health == 9 && host.MotionActor == 1 && !client.BeginLocalKnockback(2, 10, origin),
+                "El host conserva el movimiento del fantasma durante un golpe remoto");
+
+            Call(host, "SetGhostHidden", true);
+            client.Receive(host.Capture(3));
+            client.Receive(appeared);
+            host.TakeAuthoritativeHit(1, origin);
+            Check(client.GhostHidden && !renderer.enabled && !collider.enabled && host.Health == 9,
+                "Un paquete atrasado no vuelve a mostrar al fantasma y ocultarse bloquea el daño");
+
+            Call(host, "SetGhostHidden", false);
+            host.TakeAuthoritativeHit(100, origin);
+            client.Receive(host.Capture(4));
+            Check(host.Health == 0 && client.Health == 0 && !host.SimulatesMotion,
+                "La muerte del fantasma se replica sin Animator");
+        }
+        finally
+        {
+            Object.DestroyImmediate(host.gameObject);
+            Object.DestroyImmediate(client.gameObject);
+        }
     }
     private static MultiplayerEnemy Spawn(int type, bool host, MultiplayerWorldSession world, int actor)
     {

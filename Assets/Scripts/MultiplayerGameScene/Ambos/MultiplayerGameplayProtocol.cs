@@ -70,7 +70,7 @@ public sealed class MultiplayerWorldMessage
     public Vector3 hitOrigin;
     public bool hasHitOrigin;
     public Quaternion rotation = Quaternion.identity;
-    public bool inside, knockbackActive;
+    public bool inside, knockbackActive, ghostHidden;
 }
 
 // Movimiento exclusivamente: el cliente nunca publica salud ni decisiones de gameplay.

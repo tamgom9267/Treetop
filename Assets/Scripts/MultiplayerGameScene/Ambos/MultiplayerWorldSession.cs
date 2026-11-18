@@ -344,7 +344,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
             else MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldState, enemy.Capture(++revision), true, actor, flush: true);
         }
     }
-    private void PublishEnemyState(MultiplayerEnemy enemy) =>
+    internal void PublishEnemyState(MultiplayerEnemy enemy) =>
         MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldState, enemy.Capture(++revision), true, flush: true);
     public void PublishStatusDamage(MultiplayerEnemy enemy)
     {

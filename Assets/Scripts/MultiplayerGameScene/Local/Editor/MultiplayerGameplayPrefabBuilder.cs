@@ -50,7 +50,7 @@ public static class MultiplayerGameplayPrefabBuilder
         var definitions = BuildLoot();
         ConfigureCoordinator(definitions);
         ValidatePrefabs();
-        Debug.Log("FASE 4: 22 cuartos, 4 slimes, catalogo de loot y coordinador preparados. No se guardaron escenas.");
+        Debug.Log("FASE 4: 22 cuartos, 4 prefabs de enemigos, catalogo de loot y coordinador preparados. No se guardaron escenas.");
     }
     private static void BuildRoom(string id, bool host, string destination)
     {
@@ -122,17 +122,23 @@ public static class MultiplayerGameplayPrefabBuilder
         {
             Unpack(root);
             var combat = root.GetComponent<EnemyCombat>(); var movement = root.GetComponent<SlimeEnemyMovementProcedural>();
+            var ghost = root.GetComponent<fnatasmaenemigo>();
             var enemy = root.AddComponent<MultiplayerEnemy>();
             Copy(combat, enemy, "maxHealth", "contactDamage", "knockbackForce", "knockbackUpForce", "weaponKnockbackMultiplier", "rend", "flashColor", "flashDuration");
             CopyEnemyEffects(combat, enemy);
-            var settings = new SerializedObject(enemy); settings.FindProperty("authority").boolValue = host; settings.ApplyModifiedPropertiesWithoutUndo();
-            if (host) Copy(movement, root.AddComponent<HostSlimeMovement>(), "minJumpCooldown", "maxJumpCooldown", "horizontalJumpForce", "verticalJumpForce", "turnSpeed", "navMeshCheckDistance");
+            var settings = new SerializedObject(enemy);
+            settings.FindProperty("authority").boolValue = host;
+            settings.FindProperty("isGhost").boolValue = ghost != null;
+            settings.ApplyModifiedPropertiesWithoutUndo();
+            if (host && ghost != null)
+                Copy(ghost, root.AddComponent<HostGhostMovement>(), "minHiddenTime", "maxHiddenTime", "teleportDistance", "navMeshSampleRadius", "moveSpeed", "turnSpeed", "missileSpinSpeed", "visibleDuration");
+            else if (host && movement != null)
+                Copy(movement, root.AddComponent<HostSlimeMovement>(), "minJumpCooldown", "maxJumpCooldown", "horizontalJumpForce", "verticalJumpForce", "turnSpeed", "navMeshCheckDistance");
             if (combat != null) Object.DestroyImmediate(combat); if (movement != null) Object.DestroyImmediate(movement);
-            var body = root.GetComponent<Rigidbody>(); body.isKinematic = !host; body.useGravity = host;
-            if (!host)
-            {
-                root.GetComponent<Animator>().updateMode = AnimatorUpdateMode.UnscaledTime;
-            }
+            bool isGhost = ghost != null;
+            if (isGhost) Object.DestroyImmediate(ghost);
+            var body = root.GetComponent<Rigidbody>(); body.isKinematic = !host; body.useGravity = host && !isGhost;
+            if (!host && root.TryGetComponent(out Animator animator)) animator.updateMode = AnimatorUpdateMode.UnscaledTime;
             Save(root, destination);
         }
         finally { PrefabUtility.UnloadPrefabContents(root); }
@@ -338,9 +344,17 @@ public static class MultiplayerGameplayPrefabBuilder
         foreach (string role in new[] { "Host", "Client" }) for (int type = 1; type <= 2; type++)
         {
             GameObject root = AssetDatabase.LoadAssetAtPath<GameObject>(Root + "/" + role + "/Enemigos/Enemigo" + type + ".prefab");
-            if (root == null || root.GetComponent<MultiplayerEnemy>() == null || root.GetComponent<EnemyCombat>() != null || root.GetComponent<SlimeEnemyMovementProcedural>() != null ||
-                (root.GetComponent<HostSlimeMovement>() != null) != (role == "Host") || root.GetComponent<Rigidbody>().isKinematic != (role == "Client"))
-                throw new InvalidOperationException("Slime mal configurado: " + role + "/" + type);
+            GameObject source = AssetDatabase.LoadAssetAtPath<GameObject>(Source + "/Enemigos/Enemigo" + type + ".prefab");
+            bool isGhost = source.GetComponent<fnatasmaenemigo>() != null;
+            bool host = role == "Host";
+            if (root == null || !root.TryGetComponent(out MultiplayerEnemy enemy) || enemy.Authority != host ||
+                new SerializedObject(enemy).FindProperty("isGhost").boolValue != isGhost ||
+                root.GetComponent<EnemyCombat>() != null || root.GetComponent<SlimeEnemyMovementProcedural>() != null ||
+                root.GetComponent<fnatasmaenemigo>() != null ||
+                (root.GetComponent<HostSlimeMovement>() != null) != (host && !isGhost) ||
+                (root.GetComponent<HostGhostMovement>() != null) != (host && isGhost) ||
+                !root.TryGetComponent(out Rigidbody body) || body.isKinematic != !host || (isGhost && body.useGravity))
+                throw new InvalidOperationException("Enemigo mal configurado: " + role + "/" + type);
             if (role == "Client" && (root.transform.Find("CombatVisual") != null || root.GetComponent<MeshRenderer>() == null))
                 throw new InvalidOperationException("Falta restaurar la malla del slime: Client/" + type);
         }

@@ -197,6 +197,11 @@ public class EnemyCombat : MonoBehaviour
         isActive = false;
 
         if (animator != null) animator.SetTrigger("Die");
+
+        if (animator == null)
+        {
+            DestroyEnemy();
+        }
     }
 
     // llamar desde animation event al terminar la animación de muerte

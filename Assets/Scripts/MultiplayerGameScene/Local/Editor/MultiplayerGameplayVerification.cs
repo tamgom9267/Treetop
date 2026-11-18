@@ -18,7 +18,7 @@ public static class MultiplayerGameplayVerification
         passed.Clear();
         try
         {
-            MultiplayerGameplayPrefabBuilder.ValidatePrefabs(); Check(true, "22 cuartos y 4 slimes configurados por rol");
+            MultiplayerGameplayPrefabBuilder.ValidatePrefabs(); Check(true, "22 cuartos y 4 prefabs de enemigos configurados por rol");
             CheckWorldSerialization(); CheckPresence(); CheckAttacks(); CheckLoot(); CheckRooms(); CheckInventory();
             MultiplayerPlayerVerification.RunChecks(); Check(true, "Regresion de las pruebas nativas de fase 3");
             Write(true, null); Debug.Log("FASE 4: " + passed.Count + " comprobaciones correctas. Temp/phase4-verification/editor-tests.json");

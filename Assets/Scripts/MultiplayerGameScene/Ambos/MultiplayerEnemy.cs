@@ -21,9 +21,13 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     [SerializeField] private GameObject hitEffectPrefab, deathEffectPrefab;
     [SerializeField] private Vector3 deathEffectOffset = Vector3.zero;
     [SerializeField] private bool authority;
+    [SerializeField] private bool isGhost;
 
     private Rigidbody body;
     private Animator animator;
+    private HostGhostMovement ghostMovement;
+    private Renderer[] ghostRenderers;
+    private Collider[] ghostColliders;
     private MultiplayerWorldSession world;
     private Material[] materials;
     private Color[] colors;
@@ -59,10 +63,13 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     public int MotionAttack => motionAttack;
     public int MotionVersion => motionVersion;
     public bool KnockbackActive => knockbackActive || pendingAttack > 0;
-    public bool CombatActive => combatActive && world != null && Health > 0 && !deathStarted;
+    public bool GhostHidden { get; private set; }
+    public bool CombatActive => combatActive && !GhostHidden && world != null && Health > 0 && !deathStarted;
     public bool SimulatesMotion => CombatActive && !suspended && !deathStarted && !localLanded && !motionBlocked &&
         (pendingAttack > 0 || motionActor == localActor);
     public bool CanRunHostAI => authority && SimulatesMotion && !KnockbackActive;
+    internal bool CanRunGhostAI => isGhost && authority && combatActive && !suspended &&
+        Health > 0 && world != null && world.Playing;
     public bool PublishesMotion => !authority && SimulatesMotion && KnockbackActive;
     public Vector3 MotionPosition => SimulatesMotion ? body.position : latestMotion != null ? latestMotion.position : transform.position;
     public float AttackReach => 6f + GetComponent<Collider>().bounds.extents.magnitude;
@@ -75,12 +82,19 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (componentsInitialized) return;
         componentsInitialized = true; combatActive = startsActive;
         body = GetComponent<Rigidbody>(); animator = GetComponent<Animator>(); Health = maxHealth;
+        if (isGhost)
+        {
+            ghostMovement = GetComponent<HostGhostMovement>();
+            ghostRenderers = GetComponentsInChildren<Renderer>();
+            ghostColliders = GetComponentsInChildren<Collider>();
+            ApplyGhostVisibility(true);
+        }
         weaponEffectController = GetComponent<WeaponEffectController>();
         if (weaponEffectController == null)
             weaponEffectController = gameObject.AddComponent<WeaponEffectController>();
         weaponEffectController.Initialize(this);
         SetPhysics(false);
-        if (!authority) animator.updateMode = AnimatorUpdateMode.UnscaledTime;
+        if (!authority && animator != null) animator.updateMode = AnimatorUpdateMode.UnscaledTime;
         if (rend != null)
         {
             materials = rend.materials; colors = new Color[materials.Length];
@@ -107,13 +121,32 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (deathStarted || combatActive == active) return;
         combatActive = active;
         SetPhysics(SimulatesMotion);
-        if (active && !startsActive) animator.SetTrigger("Activate");
+        if (active && !startsActive && animator != null) animator.SetTrigger("Activate");
+    }
+    internal void SetGhostHidden(bool hidden)
+    {
+        if (!CanRunGhostAI || GhostHidden == hidden) return;
+
+        if (!body.isKinematic)
+        {
+            body.linearVelocity = Vector3.zero;
+            body.angularVelocity = Vector3.zero;
+        }
+        ApplyGhostVisibility(hidden);
+        SetPhysics(SimulatesMotion);
+        world.PublishEnemyState(this);
+    }
+    private void ApplyGhostVisibility(bool hidden)
+    {
+        GhostHidden = hidden;
+        foreach (Renderer renderer in ghostRenderers) renderer.enabled = !hidden;
+        foreach (Collider collider in ghostColliders) collider.enabled = !hidden;
     }
     private static long Key(int actor, int attack) => ((long)actor << 32) | (uint)attack;
     private void SetPhysics(bool simulate)
     {
         if (body == null) return;
-        body.isKinematic = !simulate; body.useGravity = simulate;
+        body.isKinematic = !simulate; body.useGravity = simulate && !isGhost;
         body.interpolation = simulate && KnockbackActive ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None;
     }
     private void OnTriggerEnter(Collider other)
@@ -166,7 +199,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     }
     private void ResumeAI(bool landed)
     {
-        if (landed) animator.SetTrigger("Land");
+        if (landed && animator != null && !isGhost) animator.SetTrigger("Land");
         var movement = GetComponent<HostSlimeMovement>();
         if (movement != null) movement.ResumeAfterKnockback();
     }
@@ -186,7 +219,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     }
     public bool BeginLocalKnockback(int actor, int attack, Vector3 origin)
     {
-        if (authority || !CombatActive || suspended || actor != localActor || actor <= 0 || attack <= 0 ||
+        if (authority || isGhost || !CombatActive || suspended || actor != localActor || actor <= 0 || attack <= 0 ||
             !MultiplayerGameplayProtocol.Finite(origin) || !anticipatedHits.Add(Key(actor, attack))) return false;
         pendingAttack = attack; pendingBaseVersion = motionVersion; pendingAt = Time.realtimeSinceStartupAsDouble;
         localSequence = 0; localLanded = false; localFinal = null; motionBlocked = false; frames.Clear(); correctionAt = double.NegativeInfinity;
@@ -203,6 +236,19 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         Health = Mathf.Max(0, Health - damage); HitRevision++;
         lastHitActor = actor; lastHitAttack = attack; lastHitOrigin = origin; ShowHit(origin);
         if (Health == 0) { BeginConfirmedDeath(); return; }
+        if (isGhost)
+        {
+            // El fantasma permanece en el host durante el empuje y conserva su altura.
+            if (!body.isKinematic)
+            {
+                Vector3 direction = body.position - origin;
+                direction.y = 0f;
+                body.linearVelocity = Vector3.zero;
+                body.AddForce(direction.normalized * (knockbackForce * weaponKnockbackMultiplier), ForceMode.Impulse);
+                if (ghostMovement != null) ghostMovement.PauseForKnockback();
+            }
+            return;
+        }
         RetireCurrentControl();
         motionActor = actor; motionAttack = attack; motionVersion++; knockbackActive = true;
         receivedSequence = localSequence = 0; localLanded = false; motionBlocked = false;
@@ -234,7 +280,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     }
     public MultiplayerSlimeMotion CaptureMotion(bool landed = false)
     {
-        var state = animator.GetCurrentAnimatorStateInfo(0);
+        var state = animator != null ? animator.GetCurrentAnimatorStateInfo(0) : default;
         return new MultiplayerSlimeMotion { id = Id, actor = localActor,
             attack = pendingAttack > 0 ? pendingAttack : motionAttack, sequence = ++localSequence,
             time = PhotonNetwork.Time, position = body.position, rotation = body.rotation,
@@ -244,18 +290,19 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     }
     public MultiplayerWorldMessage Capture(int revision)
     {
-        var state = animator.GetCurrentAnimatorStateInfo(0);
+        var state = animator != null ? animator.GetCurrentAnimatorStateInfo(0) : default;
+        int deathAnimation = animator != null ? DeathAnimation : 0;
         bool remote = motionActor != hostActor && latestMotion != null;
         return new MultiplayerWorldMessage { op = "enemy", id = Id, room = RoomId, type = Type, revision = revision,
             health = Health, hit = HitRevision, actor = lastHitActor, attack = lastHitAttack,
             hitOrigin = lastHitOrigin, hasHitOrigin = HitRevision > 0,
             motionActor = motionActor, motionAttack = motionAttack, motionVersion = motionVersion,
-            motionSequence = remote ? receivedSequence : revision, knockbackActive = knockbackActive,
+            motionSequence = remote ? receivedSequence : revision, knockbackActive = knockbackActive, ghostHidden = GhostHidden,
             position = remote ? latestMotion.position : body.position, rotation = remote ? latestMotion.rotation : body.rotation,
             velocity = remote ? latestMotion.velocity : body.isKinematic ? Vector3.zero : body.linearVelocity,
             angularVelocity = remote ? latestMotion.angularVelocity : body.isKinematic ? Vector3.zero : body.angularVelocity,
-            animation = Health == 0 ? DeathAnimation : remote ? latestMotion.animation : state.fullPathHash,
-            normalizedTime = Health == 0 && state.fullPathHash != DeathAnimation ? 0f : remote ? latestMotion.normalizedTime : state.normalizedTime,
+            animation = Health == 0 ? deathAnimation : remote ? latestMotion.animation : state.fullPathHash,
+            normalizedTime = Health == 0 && state.fullPathHash != deathAnimation ? 0f : remote ? latestMotion.normalizedTime : state.normalizedTime,
             time = remote ? latestMotion.time : PhotonNetwork.Time };
     }
     public void Receive(MultiplayerWorldMessage state)
@@ -266,6 +313,14 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         bool anticipated = anticipatedHits.Contains(Key(state.actor, state.attack));
         if (state.hit > 0 && presentedHits.Add(state.hit) && !anticipated && !deathStarted)
             ShowHit(state.hasHitOrigin && MultiplayerGameplayProtocol.Finite(state.hitOrigin) ? state.hitOrigin : transform.position);
+        if (isGhost && !deathStarted && state.revision > frameRevision && (GhostHidden != state.ghostHidden || state.health == 0))
+        {
+            // El teletransporte cambia la pose antes de volver a habilitar la malla y los colliders.
+            frames.Clear();
+            SetBody(FromHost(state));
+            correctionAt = double.NegativeInfinity;
+            ApplyGhostVisibility(state.ghostHidden);
+        }
         Health = Mathf.Min(Health, state.health);
         if (Health == 0) { BeginConfirmedDeath(); return; }
         bool acknowledged = pendingAttack > 0 && state.actor == localActor && state.attack == pendingAttack && state.hit > 0;
@@ -321,7 +376,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     };
     public bool ReceiveMotion(int sender, MultiplayerSlimeMotion frame)
     {
-        if (!CombatActive || suspended || frame == null || !frame.IsValid || frame.id != Id || sender != frame.actor ||
+        if (isGhost || !CombatActive || suspended || frame == null || !frame.IsValid || frame.id != Id || sender != frame.actor ||
             retiredControls.Contains(Key(frame.actor, frame.attack))) return false;
         if (!knockbackActive || frame.actor != motionActor || frame.attack != motionAttack)
         {
@@ -380,7 +435,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         MultiplayerSlimeMotion final = CaptureMotion(landed); final.finished = true;
         localFinal = final;
         localLanded = true;
-        if (landed) animator.SetTrigger("Land");
+        if (landed && animator != null) animator.SetTrigger("Land");
         if (authority) world.CompleteSlimeMotion(this, final, landed);
         else
         {
@@ -418,8 +473,8 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     {
         ExpireCandidates();
         if (authority && deathStarted && world != null && world.Playing)
-        { deathAge += Time.deltaTime; if (deathAge > 3f) DestroyEnemy(); }
-        if (!CombatActive || !world.Playing || suspended) return;
+        { deathAge += Time.deltaTime; if (animator == null || deathAge > 3f) DestroyEnemy(); }
+        if (world == null || !world.Playing || suspended || !CombatActive) return;
         if (pendingAttack > 0 && Time.realtimeSinceStartupAsDouble - pendingAt >= 5d)
             RejectLocalKnockback(localActor, pendingAttack);
         if (!authority && SimulatesMotion && KnockbackActive && Time.timeScale <= 0f)
@@ -434,7 +489,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         float correction = Mathf.Clamp01((float)(Time.realtimeSinceStartupAsDouble - correctionAt) / 0.1f);
         transform.SetPositionAndRotation(Vector3.Lerp(correctionFrom, position, correction), Quaternion.Slerp(correctionRotation, rotation, correction));
         var state = fraction < 1f ? from : to;
-        if (state.animation != 0 && state.animation != DeathAnimation && (lastAnimation != state.animation ||
+        if (animator != null && state.animation != 0 && state.animation != DeathAnimation && (lastAnimation != state.animation ||
             Mathf.Abs(animator.GetCurrentAnimatorStateInfo(0).normalizedTime - state.normalizedTime) > 0.3f))
         { animator.Play(state.animation, 0, state.normalizedTime); lastAnimation = state.animation; }
     }
@@ -445,12 +500,14 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         candidates.Clear(); frames.Clear(); localLanded = false; PauseAI();
         if (!body.isKinematic) { body.linearVelocity = Vector3.zero; body.angularVelocity = Vector3.zero; }
         SetPhysics(false);
+        if (animator == null) return;
         animator.ResetTrigger("StartJump"); animator.ResetTrigger("Land"); animator.ResetTrigger("Die");
         animator.Play(DeathAnimation, 0, 0f); lastAnimation = DeathAnimation;
     }
     public void ApplyJumpForce()
     {
-        if (CanRunHostAI && world != null && world.Playing) GetComponent<HostSlimeMovement>().Launch();
+        if (CanRunHostAI && world != null && world.Playing && TryGetComponent(out HostSlimeMovement movement))
+            movement.Launch();
     }
     public void DestroyEnemy()
     {
