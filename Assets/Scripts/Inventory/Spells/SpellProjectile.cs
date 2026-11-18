@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class SpellProjectile : MonoBehaviour
 {
+    // efecto de colisión
+    [SerializeField] private GameObject impactEffect;
+
     private int damage;
     private bool isInitialized;
     private bool isConsumed;
@@ -18,6 +21,14 @@ public class SpellProjectile : MonoBehaviour
         if (isConsumed) return false;
 
         isConsumed = true;
+
+        // efectos de colisión
+        if (impactEffect != null){
+            Instantiate(
+                impactEffect, transform.position, Quaternion.identity
+            );
+        }
+
         Destroy(gameObject);
         return isInitialized;
     }
