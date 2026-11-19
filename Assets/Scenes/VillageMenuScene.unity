@@ -7720,7 +7720,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbb160cb1ed9c4e4289e34d5209376b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerClass
-  TakeDamageSound: {fileID: 0}
+  TakeDamageSound: {fileID: 8300000, guid: b05503b73739dc04b8e2c19efebce980, type: 3}
   classStats: {fileID: 11400000, guid: 4c856cbb514d0704cac4a42fc011a5bf, type: 2}
   maxHealth: 0
   health: 0
