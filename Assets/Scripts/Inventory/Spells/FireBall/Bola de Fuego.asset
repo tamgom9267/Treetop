@@ -15,7 +15,7 @@ MonoBehaviour:
   Name: Bola de Fuego
   model: {fileID: 524161754534769769, guid: 126cb3d6ae08dfd4dbdf83c2daf2e1b7, type: 3}
   prefab: {fileID: 4547242166365193442, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
-  UIsprite: {fileID: 1860478435079973374, guid: 16d5c8f533615d540a7eb184a01b7755, type: 3}
+  UIsprite: {fileID: 21300000, guid: cf39f1bc7f8500c31b49321c8b33b39b, type: 3}
   weight: 0
   requiredCells: 01000000010000000100000001000000
   health: 0

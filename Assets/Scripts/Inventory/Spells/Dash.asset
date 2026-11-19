@@ -15,7 +15,7 @@ MonoBehaviour:
   Name: Dash
   model: {fileID: 0}
   prefab: {fileID: 8117721023256671360, guid: b7578f6edf9a35b42a11cda900d1bc54, type: 3}
-  UIsprite: {fileID: 8148620385725361733, guid: 054e47dd39ba4ae428dedcb6479c3880, type: 3}
+  UIsprite: {fileID: 21300000, guid: 865e64e525aaab2239d84b9527f4b12a, type: 3}
   weight: 0
   requiredCells: 0100000000000000
   health: 0
@@ -25,3 +25,4 @@ MonoBehaviour:
   PD: 0
   HB: 0
   speed: 0
+  additionalEffects: []

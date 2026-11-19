@@ -7780,6 +7780,7 @@ MonoBehaviour:
   SelectedItem: {fileID: 0}
   isSelected: 0
   nearChest: {fileID: 0}
+  hotbarDisplay: {fileID: 3906212851406708582}
   InventoryUI: {fileID: 2040965466}
   handObj: {fileID: 1897004324}
   nearWeapons: []
@@ -15727,6 +15728,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: HUD
       objectReference: {fileID: 0}
+    - target: {fileID: 1455885289304584805, guid: b90d22db1d25b2092bf6253974dc310c, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 1408362007}
     - target: {fileID: 6705876818345292063, guid: b90d22db1d25b2092bf6253974dc310c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -15812,6 +15817,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b90d22db1d25b2092bf6253974dc310c, type: 3}
+--- !u!114 &3906212851406708582 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1455885289304584805, guid: b90d22db1d25b2092bf6253974dc310c, type: 3}
+  m_PrefabInstance: {fileID: 3906212851406708581}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe4e9c991e80c62aa8d2d4a0b58598d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HotbarDisplay
 --- !u!1 &3917465195504285497
 GameObject:
   m_ObjectHideFlags: 0

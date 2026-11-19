@@ -81,6 +81,9 @@ public class PlayerController : MonoBehaviour
 
     public GameObject nearChest;
 
+    // para el HUD
+    [SerializeField] private HotbarDisplay hotbarDisplay;
+
     [SerializeField] GameObject InventoryUI;
 
     public bool IsInventoryOpen => InventoryUI != null && InventoryUI.activeInHierarchy;
@@ -722,8 +725,12 @@ public class PlayerController : MonoBehaviour
 
     private void RefreshEquippedSpellUI()
     {
+        // actualizar los iconos de la ventana del inventario
         UIDisplay display = Inventory != null ? Inventory.GetComponent<UIDisplay>() : null;
         if (display != null) display.UIEquippedSpellsDisplay();
+
+        // actualizar los del HUD
+        if (hotbarDisplay != null) hotbarDisplay.UpdateHotbar();
     }
 
      private void OnTriggerEnter(Collider other)
