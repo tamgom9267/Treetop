@@ -9,6 +9,9 @@ public class Chest : MonoBehaviour
 
     private Animator animator;
 
+
+    [SerializeField] AudioClip OpenChest;
+
     [SerializeField] GameObject Weapon;
     [SerializeField] GameObject Text;
     [SerializeField] private bool randomLoot = true;
@@ -78,6 +81,8 @@ public class Chest : MonoBehaviour
 
     private void PresentOpen()
     {
+        GetComponent<AudioSource>().PlayOneShot(OpenChest);
+        
         if (animator == null) animator = GetComponent<Animator>();
         if (animator != null) animator.SetBool("isOpen", true);
         if (Text != null) Text.SetActive(false);

@@ -7,6 +7,7 @@ public class Area1 : MonoBehaviour
 
     // Puertas de la area
     [SerializeField] private GameObject exitDoor;
+    [SerializeField] AudioClip DoorUnlockSound;
 
     [Header("Estados del cuarto")]
 
@@ -104,6 +105,7 @@ public class Area1 : MonoBehaviour
         // desactivamos la puerta
         if (door != null)
             door.SetActive(false);
+            GetComponent<AudioSource>().PlayOneShot(DoorUnlockSound,0.5f);
     }
 
     private void CloseDoor(GameObject door)

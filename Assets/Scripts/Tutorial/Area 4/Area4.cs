@@ -5,6 +5,7 @@ public class Area4 : MonoBehaviour
     [Header("Puertas de esta area")]
     [SerializeField] private GameObject entranceDoor;
     [SerializeField] private GameObject exitDoor;
+    [SerializeField] AudioClip DoorUnlockSound;
 
     [Header("Jugador")]
     [SerializeField] private PlayerClass playerClass;
@@ -105,6 +106,7 @@ public class Area4 : MonoBehaviour
         // desactivamos la puerta
         if (door != null)
             door.SetActive(false);
+            GetComponent<AudioSource>().PlayOneShot(DoorUnlockSound,0.5f);
     }
 
     private void CloseDoor(GameObject door)

@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerInventory : MonoBehaviour
 {
-    
+
     //El espacio del inventario con los espacios integrados
     public List<List<int>> grid = new List<List<int>>();
     public List<GameObject> Inventory = new List<GameObject>();

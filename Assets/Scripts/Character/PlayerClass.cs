@@ -7,6 +7,7 @@ using System.Xml;
 
 public class PlayerClass : MonoBehaviour
 {
+    [SerializeField] AudioClip TakeDamageSound;
 
     public  ClassStats classStats;
 
@@ -163,6 +164,10 @@ public class PlayerClass : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        Debug.Log("Si llega");
+        GetComponent<AudioSource>().volume = 1;
+        GetComponent<AudioSource>().PlayOneShot(TakeDamageSound, 0.5f);
+        
         // Evita recibir dano si el dano es menor o igual a 0
         if (damage <= 0 || health <= 0) { return; }
         
@@ -182,6 +187,7 @@ public class PlayerClass : MonoBehaviour
         // feedback visual
         // TriggerHitFeedback();
         TriggerEmissionFeedback(damageEmissionColor, damageFlashDuration, 3);
+        
 
         //Screen Shake
         if (cameraFollow != null) cameraFollow.Shake();

@@ -9,6 +9,8 @@ public class HintController : MonoBehaviour
     [SerializeField] private GameObject HintCanvas;
 
     [SerializeField] private GameObject HealthCanvas;
+    
+    [SerializeField] AudioClip HintActivationSound;
 
     [Header("Texto")]
 
@@ -58,6 +60,9 @@ public class HintController : MonoBehaviour
 
     public void ActivateHint(string newtext)
     {
+        
+        
+        
         value = 5;
         // Cambiamos el texto de el hint
         hintText.text = newtext;
@@ -67,6 +72,7 @@ public class HintController : MonoBehaviour
 
         // Mostramos el hint
         HintCanvas.SetActive(true);
+        HintCanvas.GetComponent<AudioSource>().PlayOneShot(HintActivationSound);
     }
 
     private void DeactivateHint()

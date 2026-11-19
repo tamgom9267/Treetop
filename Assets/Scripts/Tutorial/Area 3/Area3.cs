@@ -6,6 +6,7 @@ public class Area3 : MonoBehaviour
 
     [SerializeField] private GameObject entranceDoor;
     [SerializeField] private GameObject exitDoor;
+    [SerializeField] AudioClip DoorUnlockSound;
 
     [Header("Enemigos de esta area")]
 
@@ -114,6 +115,7 @@ public class Area3 : MonoBehaviour
         // desactivamos la puerta
         if (door != null)
             door.SetActive(false);
+            GetComponent<AudioSource>().PlayOneShot(DoorUnlockSound,0.5f);
     }
 
     private void CloseDoor(GameObject door)

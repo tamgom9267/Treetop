@@ -8,6 +8,14 @@ using System.Runtime.CompilerServices;
 
 public class PlayerController : MonoBehaviour
 {
+
+    //SFX
+    [SerializeField] AudioClip WalkSound;
+
+    [SerializeField] AudioClip GrabObjectSound;
+    [SerializeField] AudioClip DropObjectSound;
+    [SerializeField] AudioClip EquipObjectSound;
+
     // Observadores opcionales; el control local no depende de Photon.
     public event System.Action AttackStarted;
     public WeaponObject EquippedWeaponInstance => equippedWeapon;
@@ -138,6 +146,7 @@ public class PlayerController : MonoBehaviour
         if(InventoryUI.activeSelf == true)
         {
             rb.linearVelocity = new Vector3(0,0,0);
+            
             playerAnimation.SetFloat("Speed", 0);
             if (move.action.WasPressedThisFrame())
             {
@@ -170,6 +179,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             playerAnimation.SetFloat("Speed", _moveDirection.magnitude);
+            
 
             if (!inAir)
                 {
@@ -238,6 +248,7 @@ public class PlayerController : MonoBehaviour
             }       
             else if(interact.action.WasPressedThisFrame() && InventoryUI.activeSelf == false && nearestWeaponObj != null)
             {
+                GetComponent<AudioSource>().PlayOneShot(GrabObjectSound);
                 InventoryUI.GetComponent<PlayerInventory>().InspectLoot(nearestWeapon);    
                 InventoryUI.SetActive(true);
 
@@ -289,6 +300,7 @@ public class PlayerController : MonoBehaviour
                 {
                     if(Inventory.Loot.Count > 0)
                     {
+                        GetComponent<AudioSource>().PlayOneShot(DropObjectSound);
                         InventoryUI.GetComponent<PlayerInventory>().RemoveWeaponFromChestLootGrid(this.transform.position);
                         
                     }
@@ -588,6 +600,7 @@ public class PlayerController : MonoBehaviour
 
     private void RefreshEquippedWeaponUI()
     {
+        GetComponent<AudioSource>().PlayOneShot(EquipObjectSound, 0.5f);
         UIDisplay display = Inventory != null ? Inventory.GetComponent<UIDisplay>() : null;
         if (display != null) display.UIEquippedWeaponDisplay();
     }
@@ -734,6 +747,18 @@ public class PlayerController : MonoBehaviour
         {
             nearWeapons.Remove(other.gameObject);
         }
+    }
+
+    private void WalkingSound(AnimationEvent evt)
+    {
+        float lastStepTime = -1f;
+        float minStepInterval = 0.2f;
+        if (evt.animatorClipInfo.weight < 0.5f) return;
+        if (_moveDirection.magnitude == 0) return;
+        if (Time.time - lastStepTime < minStepInterval) return;
+
+        lastStepTime = Time.time;
+        GetComponent<AudioSource>().PlayOneShot(WalkSound, 0.3f);
     }
 
 }
