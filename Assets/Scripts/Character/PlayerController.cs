@@ -316,7 +316,11 @@ public class PlayerController : MonoBehaviour
 
     private void StartAttack()
     {
-        GetComponent<AudioSource>().PlayOneShot(equippedWeapon.GetComponent<WeaponObject>().AttackSound);
+        if (equippedWeapon != null)
+        {
+            GetComponent<AudioSource>().PlayOneShot(equippedWeapon.GetComponent<WeaponObject>().AttackSound);   
+        }
+        
         waitingForAttackRotation = false;
         if (!TryGetAttackTrigger(out string attackTrigger))
             return;
