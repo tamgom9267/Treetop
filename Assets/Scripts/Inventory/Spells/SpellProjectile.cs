@@ -4,6 +4,7 @@ public class SpellProjectile : MonoBehaviour
 {
     // efecto de colisión
     [SerializeField] private GameObject impactEffect;
+    [SerializeField] public AudioClip FireBallImpactSound;
 
     private int damage;
     private bool isInitialized;
@@ -17,6 +18,7 @@ public class SpellProjectile : MonoBehaviour
 
     public bool TryConsume(out int impactDamage)
     {
+        AudioSource.PlayClipAtPoint(FireBallImpactSound, transform.position, 1);
         impactDamage = damage;
         if (isConsumed) return false;
 
@@ -29,6 +31,7 @@ public class SpellProjectile : MonoBehaviour
             );
         }
 
+        
         Destroy(gameObject);
         return isInitialized;
     }

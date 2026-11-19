@@ -67,4 +67,5 @@ public abstract class SpellObject : InventoryObject
             transform.GetChild(0).gameObject.SetActive(isSelected);
         }
     }
+
 }

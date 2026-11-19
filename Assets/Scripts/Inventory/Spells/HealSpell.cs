@@ -16,8 +16,7 @@ public class HealSpell : SpellObject
                 return;
             }
 
-            
-
+            playerClass.GetComponent<AudioSource>().PlayOneShot(Sound, 0.2f);
             playerClass.SpendMP(10);
             playerClass.Heal(20);
             onCooldown = true;

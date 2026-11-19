@@ -9,22 +9,26 @@ public class FireBallSpell : SpellObject
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void SpellEffect()
     {
-        PlayerClass playerClass = player.playerClass;
-        if(playerClass.MP - 10 < 0)
-        {
-            return;
+        if (onCooldown == false){
+             PlayerClass playerClass = player.playerClass;
+            if(playerClass.MP - 10 < 0)
+            {
+                return;
+            }
+            
+            playerClass.GetComponent<AudioSource>().PlayOneShot(Sound, 0.2f);
+            onCooldown = true;
+
+            playerClass.SpendMP(10);
+            GameObject fireball = SpawnProjectile(FireBallParticle, player.transform.position + Vector3.up);
+            Rigidbody rigidbody = fireball.GetComponent<Rigidbody>();
+            rigidbody.AddForce(player.transform.forward*15,ForceMode.VelocityChange);
+
+        
+            
+            player.StartCoroutine(EndEffect(5));
         }
-        
-        onCooldown = true;
-
-        playerClass.SpendMP(10);
-        GameObject fireball = SpawnProjectile(FireBallParticle, player.transform.position + Vector3.up);
-        Rigidbody rigidbody = fireball.GetComponent<Rigidbody>();
-        rigidbody.AddForce(player.transform.forward*15,ForceMode.VelocityChange);
-
-    
-        
-        player.StartCoroutine(EndEffect(5));
+       
 
     }
 

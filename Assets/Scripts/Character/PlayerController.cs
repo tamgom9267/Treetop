@@ -234,14 +234,17 @@ public class PlayerController : MonoBehaviour
             if (Spell1.action.WasPressedThisFrame() && Slot1 != null)
             {
                 Slot1.GetComponent<SpellObject>().SpellEffect();
+                
             }
             else if (Spell2.action.WasPressedThisFrame() && Slot2 != null)
             {
                 Slot2.GetComponent<SpellObject>().SpellEffect();
+                
             }
             else if (Spell3.action.WasPressedThisFrame() && Slot3 != null)
             {
                 Slot3.GetComponent<SpellObject>().SpellEffect();
+                
             }
 
 

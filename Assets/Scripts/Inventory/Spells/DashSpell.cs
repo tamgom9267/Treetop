@@ -11,13 +11,15 @@ public class DashSpell : SpellObject
         if (onCooldown == false)
         {
             PlayerClass playerClass = player.GetComponent<PlayerController>().playerClass;
-            playerClass.speed += 10;
-            onCooldown = true;
 
             if(playerClass.MP - 5 < 0)
             {
                 return;
             }
+
+            playerClass.GetComponent<AudioSource>().PlayOneShot(Sound, 0.2f);
+            playerClass.speed += 10;
+            onCooldown = true;
 
             playerClass.SpendMP(5);
             player.StartCoroutine(EndEffect(3));   
