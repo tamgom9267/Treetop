@@ -316,6 +316,7 @@ public class PlayerController : MonoBehaviour
 
     private void StartAttack()
     {
+        GetComponent<AudioSource>().PlayOneShot(equippedWeapon.GetComponent<WeaponObject>().AttackSound);
         waitingForAttackRotation = false;
         if (!TryGetAttackTrigger(out string attackTrigger))
             return;
@@ -674,6 +675,7 @@ public class PlayerController : MonoBehaviour
 
     public void equipSpell(int slot)
     {
+        
         CursorObject cursorObj = Inventory.GetComponent<PlayerInventory>().cursor.GetComponent<CursorObject>();
 
         if (cursorObj.InventoryItemObj == null) return;
@@ -685,6 +687,8 @@ public class PlayerController : MonoBehaviour
         InventoryObject spell = spellObj.GetComponent<InventoryObject>();
 
         if (spell == null) return;
+
+        GetComponent<AudioSource>().PlayOneShot(EquipObjectSound);
 
         if (Slot1 == spell) Slot1 = null;
         if (Slot2 == spell) Slot2 = null;

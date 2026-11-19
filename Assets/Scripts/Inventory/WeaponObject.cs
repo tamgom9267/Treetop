@@ -32,6 +32,8 @@ public class WeaponObject : InventoryObject
     public int HB;
     public int speed;
 
+    public AudioClip AttackSound;
+
     public string GetInteractText() => $"Player picked up {gameObject.name}";
 
     public Transform GetTransform() => transform; 
@@ -60,6 +62,7 @@ public class WeaponObject : InventoryObject
         PD = weaponData.PD;
         HB = weaponData.HB;
         speed = weaponData.speed;
+        AttackSound = weaponData.AttackSound;
         getRealList(weaponData.requiredCells);        
 
     }

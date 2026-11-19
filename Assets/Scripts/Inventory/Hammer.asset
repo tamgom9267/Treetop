@@ -17,6 +17,7 @@ MonoBehaviour:
   prefab: {fileID: 2750878817769188343, guid: 16ef6a3cc4bfa534fb63975b39979cf4, type: 3}
   UIsprite: {fileID: 21300000, guid: c85282c0e7eacb04ca1d535e25191028, type: 3}
   weight: 0
+  AttackSound: {fileID: 8300000, guid: dc897ac87d28f2642a66598caf7fa5a4, type: 3}
   requiredCells: 0100000001000000010000000100000001000000010000000100000001000000
   health: 0
   MP: 0

@@ -12,6 +12,8 @@ public class ObjectData : ScriptableObject
 
     public int weight;
 
+    public AudioClip AttackSound;
+
    public List<int> requiredCells = new List<int>();
 
     //Stats que va a modificar
