@@ -20,6 +20,8 @@ public abstract class SpellObject : InventoryObject
     public int HB;
     public int speed;
 
+    public AudioClip Sound;
+
     public abstract void SpellEffect();
 
     protected GameObject SpawnProjectile(GameObject prefab, Vector3 position)
@@ -54,6 +56,7 @@ public abstract class SpellObject : InventoryObject
         PD = spellData.PD;
         HB = spellData.HB;
         speed = spellData.speed;
+        Sound = spellData.AttackSound;
         getRealList(spellData.requiredCells);
     }
 

@@ -16,6 +16,8 @@ public class HealSpell : SpellObject
                 return;
             }
 
+            
+
             playerClass.SpendMP(10);
             playerClass.Heal(20);
             onCooldown = true;

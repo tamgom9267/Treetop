@@ -8,11 +8,7 @@ public class DashSpell : SpellObject
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void SpellEffect()
     {
-<<<<<<< Updated upstream
-        if (onCooldown)
-=======
         if (onCooldown == false)
->>>>>>> Stashed changes
         {
             PlayerClass playerClass = player.GetComponent<PlayerController>().playerClass;
             playerClass.speed += 10;
@@ -26,22 +22,7 @@ public class DashSpell : SpellObject
             playerClass.SpendMP(5);
             player.StartCoroutine(EndEffect(3));   
         }
-<<<<<<< Updated upstream
-
-        PlayerClass playerClass = player.GetComponent<PlayerController>().playerClass;
-
-        if (playerClass.MP - 5 < 0)
-        {
-            return;
-        }
-
-        onCooldown = true;
-        playerClass.SpendMP(5);
-        playerClass.speed += 10;
-        player.StartCoroutine(EndEffect(3));
-=======
         
->>>>>>> Stashed changes
     }
 
     //No tiene cooldown por lo que se puede hacer el hechizo multiples veces
@@ -51,9 +32,6 @@ public class DashSpell : SpellObject
         PlayerClass playerClass = player.GetComponent<PlayerController>().playerClass;
         playerClass.speed -= 10;
         onCooldown = false;
-<<<<<<< Updated upstream
-=======
         
->>>>>>> Stashed changes
     }
 }
