@@ -11118,7 +11118,6 @@ GameObject:
   m_Component:
   - component: {fileID: 330585546}
   - component: {fileID: 330585545}
-  - component: {fileID: 330585544}
   - component: {fileID: 330585547}
   m_Layer: 0
   m_Name: Main Camera
@@ -11127,14 +11126,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &330585544
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 330585543}
-  m_Enabled: 1
 --- !u!20 &330585545
 Camera:
   m_ObjectHideFlags: 0
@@ -18672,6 +18663,7 @@ GameObject:
   - component: {fileID: 707366302}
   - component: {fileID: 707366308}
   - component: {fileID: 707366309}
+  - component: {fileID: 707366310}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -18992,6 +18984,14 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!81 &707366310
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 707366300}
+  m_Enabled: 1
 --- !u!1 &713041714
 GameObject:
   m_ObjectHideFlags: 0
@@ -57596,7 +57596,6 @@ GameObject:
   - component: {fileID: 692149277}
   - component: {fileID: 692149276}
   - component: {fileID: 3469287836831921240}
-  - component: {fileID: 3469287836831921241}
   m_Layer: 0
   m_Name: fogata
   m_TagString: Untagged
@@ -63229,14 +63228,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!81 &3469287836831921241
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132148773708104}
-  m_Enabled: 1
 --- !u!33 &3469287836935430619
 MeshFilter:
   m_ObjectHideFlags: 0
