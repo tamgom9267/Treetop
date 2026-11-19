@@ -18620,6 +18620,7 @@ MonoBehaviour:
   SelectedItem: {fileID: 0}
   isSelected: 0
   nearChest: {fileID: 0}
+  hotbarDisplay: {fileID: 1565571208}
   InventoryUI: {fileID: 377199324}
   handObj: {fileID: 6417828611012514567}
   nearWeapons: []
@@ -37965,6 +37966,17 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1559992368}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1565571208 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1455885289304584805, guid: b90d22db1d25b2092bf6253974dc310c, type: 3}
+  m_PrefabInstance: {fileID: 1799729174}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe4e9c991e80c62aa8d2d4a0b58598d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HotbarDisplay
 --- !u!65 &1581386729
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -43415,6 +43427,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: HUD
       objectReference: {fileID: 0}
+    - target: {fileID: 1455885289304584805, guid: b90d22db1d25b2092bf6253974dc310c, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 707366305}
     - target: {fileID: 6705876818345292063, guid: b90d22db1d25b2092bf6253974dc310c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
