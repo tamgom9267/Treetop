@@ -40,6 +40,12 @@ public class PlayerController : MonoBehaviour
     private HashSet<GameObject> enemiesHitThisAttack = new HashSet<GameObject>();
     public bool isAttacking = false;
     private bool inAir = false;
+    private CapsuleCollider bodyCapsule;
+    private readonly Collider[] knockbackOverlaps = new Collider[32];
+    private float knockbackStartedAt;
+    private const float KnockbackControlLimit = 0.75f;
+    private const float PenetrationCheckDelay = 0.12f;
+    private const float MaxSeparationStep = 0.1f;
 
     [Header("Rotacion")]
     [SerializeField] private float turnSpeed = 720f;
@@ -114,6 +120,8 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
        rb = GetComponent<Rigidbody>();
+       bodyCapsule = GetComponent<CapsuleCollider>();
+       rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
        playerClass = GetComponent<PlayerClass>();
 
        playerAnimation = GetComponent<Animator>();
@@ -434,6 +442,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnDisable()
     {
+        inAir = false;
         if (receivedHitCoroutine != null)
         {
             StopCoroutine(receivedHitCoroutine);
@@ -538,6 +547,7 @@ public class PlayerController : MonoBehaviour
 
         // No se puede controlar el movimiento del jugador mientras esta en el aire
         inAir = true;
+        knockbackStartedAt = Time.time;
 
         // Direccion desde el enemigo hacia el jugador.
         Vector3 knockbackDirection = transform.position - enemy.transform.position;
@@ -616,17 +626,63 @@ public class PlayerController : MonoBehaviour
         if (display != null) display.UIEquippedWeaponDisplay();
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {    
-        // solo se aplica si el jugador no esta en el aire
-        if (!inAir)
-            return;
+    private void FixedUpdate()
+    {
+        if (!inAir || rb == null) return;
+        float elapsed = Time.time - knockbackStartedAt;
+        if (elapsed >= KnockbackControlLimit) { inAir = false; return; }
+        if (elapsed < PenetrationCheckDelay || bodyCapsule == null) return;
 
-        // Si colisiona con el suelo, se termina el knockback
-        if (collision.gameObject.CompareTag("Obstacle"))
+        Vector3 velocity = rb.linearVelocity;
+        if (new Vector2(velocity.x, velocity.z).sqrMagnitude > 0.04f) return;
+        Vector3 position = rb.position;
+        float before = WallPenetration(position, out Vector3 direction);
+        if (before < 0.025f || direction.sqrMagnitude < 0.01f) return;
+
+        // Corregir solo una pequena distancia y solo si reduce la penetracion total.
+        Vector3 candidate = position + direction.normalized * Mathf.Min(before + 0.01f, MaxSeparationStep);
+        if (WallPenetration(candidate, out _) + 0.001f < before)
+            rb.position = candidate;
+    }
+
+    private float WallPenetration(Vector3 position, out Vector3 separation)
+    {
+        separation = Vector3.zero;
+        Vector3 scale = bodyCapsule.transform.lossyScale;
+        float radius = bodyCapsule.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z));
+        float halfSegment = Mathf.Max(0f, bodyCapsule.height * Mathf.Abs(scale.y) * 0.5f - radius);
+        Vector3 center = position + rb.rotation * Vector3.Scale(bodyCapsule.center, scale);
+        Vector3 vertical = rb.rotation * Vector3.up * halfSegment;
+        int count = Physics.OverlapCapsuleNonAlloc(center - vertical, center + vertical, radius,
+            knockbackOverlaps, ~0, QueryTriggerInteraction.Ignore);
+        float total = 0f;
+        float deepest = 0f;
+        for (int i = 0; i < count; i++)
         {
-            inAir = false;
+            Collider obstacle = knockbackOverlaps[i];
+            if (obstacle == null || obstacle == bodyCapsule || obstacle.transform.IsChildOf(transform) ||
+                obstacle.attachedRigidbody != null || !Physics.ComputePenetration(
+                    bodyCapsule, position, rb.rotation, obstacle, obstacle.transform.position,
+                    obstacle.transform.rotation, out Vector3 normal, out float depth) ||
+                Mathf.Abs(normal.y) >= 0.45f || depth < 0.01f) continue;
+            total += depth;
+            if (depth <= deepest) continue;
+            deepest = depth;
+            separation = Vector3.ProjectOnPlane(normal, Vector3.up);
         }
+        return total;
+    }
+
+    private void OnCollisionEnter(Collision collision) { CheckKnockbackLanding(collision); }
+    private void OnCollisionStay(Collision collision) { CheckKnockbackLanding(collision); }
+
+    private void CheckKnockbackLanding(Collision collision)
+    {
+        if (!inAir || rb == null || rb.linearVelocity.y > 0.05f ||
+            !collision.gameObject.CompareTag("Obstacle")) return;
+        for (int i = 0; i < collision.contactCount; i++)
+            if (Vector3.Dot(collision.GetContact(i).normal, Vector3.up) >= 0.6f)
+            { inAir = false; return; }
     }
 
     public void SetNearestWeaponFalse()
