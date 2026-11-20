@@ -307,7 +307,7 @@ public class fnatasmaenemigo : MonoBehaviour
         SetGhostGameplayActive(false);
 
         yield return StartCoroutine(
-            FadeAlpha(1f,0f, fadeInDuration)
+            FadeAlpha(1f,0f, fadeOutDuration)
         );
 
         SetGhostRenderers(false);
