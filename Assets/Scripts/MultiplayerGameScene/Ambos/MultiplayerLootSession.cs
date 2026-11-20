@@ -97,7 +97,7 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
         string id = "chest:" + floor + ":" + chestId;
         // Tambien protege contra dos solicitudes de apertura en el mismo frame.
         if (ledger.Records.ContainsKey(id)) return true;
-        GameObject selected = chest.ChooseWeaponPrefab();
+        GameObject selected = chest.ChooseLootPrefab();
         InventoryObject selectedItem = selected != null ? selected.GetComponent<InventoryObject>() : null;
         var definition = selectedItem != null ? Definition(selectedItem) : null;
         if (definition == null)
@@ -125,6 +125,17 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
         if (definition == null || definition.weapon == null) return false;
         weaponData = definition.weapon;
         return true;
+    }
+    public bool TryGetOwnedSpellName(string id, int actor, out string spellName)
+    {
+        spellName = null;
+        if (!OwnedBy(id, actor)) return false;
+        var source = MultiplayerGameplayProtocol.Host ? ledger.Records : records;
+        if (!source.TryGetValue(id, out var record)) return false;
+        MultiplayerLootDefinition definition = Definition(record.type);
+        if (definition == null || definition.prefab == null || definition.prefab.GetComponent<SpellObject>() == null) return false;
+        spellName = definition.objectName;
+        return !string.IsNullOrEmpty(spellName);
     }
     private bool LocalHeld(InventoryObject item) => player.Inventory.Inventory.Contains(item.gameObject) || player.Inventory.Loot.Contains(item.gameObject) || player.weapon == item.gameObject;
     // Algunos modelos contienen un WeaponObject deshabilitado, ademas del objeto raiz.

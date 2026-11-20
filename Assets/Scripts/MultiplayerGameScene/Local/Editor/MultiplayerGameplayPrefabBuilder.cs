@@ -216,7 +216,7 @@ public static class MultiplayerGameplayPrefabBuilder
         Folder(Root + "/Local/Loot");
         var result = new List<MultiplayerLootDefinition>(); var weapons = new HashSet<ObjectData>(); var generic = new HashSet<string>();
         var candidates = new List<string>();
-        foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { Source + "/Armas", "Assets/Prefab" })) candidates.Add(AssetDatabase.GUIDToAssetPath(guid));
+        foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { Source + "/Armas", Source + "/Hechizos", "Assets/Prefab" })) candidates.Add(AssetDatabase.GUIDToAssetPath(guid));
         candidates.Sort((a,b) => { int order = b.StartsWith(Source, StringComparison.Ordinal).CompareTo(a.StartsWith(Source, StringComparison.Ordinal)); return order != 0 ? order : string.CompareOrdinal(a,b); });
         foreach (string path in candidates)
         {
@@ -226,7 +226,7 @@ public static class MultiplayerGameplayPrefabBuilder
             if (weapon != null ? weapon.weaponData == null || !weapons.Add(weapon.weaponData) : !generic.Add(item.Objectname ?? item.Name)) continue;
             string type = (weapon != null ? MultiplayerPlayerPrefabBuilder.WeaponType(weapon.weaponData) : null) ?? AssetDatabase.AssetPathToGUID(path);
             string destination = Root + "/Local/Loot/" + type + ".prefab";
-            if (!File.Exists(destination))
+            if (!File.Exists(destination) || path.StartsWith(Source + "/Hechizos/", StringComparison.Ordinal))
             {
                 GameObject root = PrefabUtility.LoadPrefabContents(path);
                 try
@@ -239,7 +239,7 @@ public static class MultiplayerGameplayPrefabBuilder
             }
             result.Add(new MultiplayerLootDefinition { type = type, prefab = AssetDatabase.LoadAssetAtPath<GameObject>(destination),
                 weapon = weapon != null ? weapon.weaponData : null, objectName = item.Objectname,
-                icon = weapon != null ? weapon.weaponData.UIsprite : null });
+                icon = weapon != null ? weapon.weaponData.UIsprite : (item as SpellObject)?.spellData.UIsprite });
         }
         if (result.Count == 0) throw new InvalidOperationException("No se encontraron prefabs de objetos de inventario.");
         return result;
@@ -266,7 +266,9 @@ public static class MultiplayerGameplayPrefabBuilder
             {
                 var candidate = entries.GetArrayElementAtIndex(i);
                 if (candidate.FindPropertyRelative("type").stringValue == definition.type ||
-                    definition.weapon != null && candidate.FindPropertyRelative("weapon").objectReferenceValue == definition.weapon)
+                    definition.weapon != null && candidate.FindPropertyRelative("weapon").objectReferenceValue == definition.weapon ||
+                    definition.weapon == null && candidate.FindPropertyRelative("weapon").objectReferenceValue == null &&
+                    candidate.FindPropertyRelative("objectName").stringValue == definition.objectName)
                 { entry = candidate; break; }
             }
             if (entry == null) { entries.arraySize++; entry = entries.GetArrayElementAtIndex(entries.arraySize - 1); }

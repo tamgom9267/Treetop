@@ -19,13 +19,25 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     private readonly Dictionary<int, Vector3> positions = new Dictionary<int, Vector3>();
     private readonly Dictionary<int, double> poseTimes = new Dictionary<int, double>();
     private readonly Dictionary<int, MultiplayerAttackWindow> attacks = new Dictionary<int, MultiplayerAttackWindow>();
+    private sealed class SpellCastWindow
+    {
+        public int number, damage;
+        public string spell;
+        public Vector3 origin;
+        public double started;
+        public bool hit;
+    }
+    private readonly Dictionary<string, SpellCastWindow> spellCasts = new Dictionary<string, SpellCastWindow>();
+    private readonly Dictionary<int, int> lastSpellNumbers = new Dictionary<int, int>();
+    private readonly Dictionary<string, double> spellCooldowns = new Dictionary<string, double>();
+    private readonly HashSet<string> shownSpells = new HashSet<string>();
     private readonly List<MultiplayerWorldMessage> enemyFrames = new List<MultiplayerWorldMessage>();
     private readonly List<MultiplayerSlimeMotion> ownedFrames = new List<MultiplayerSlimeMotion>();
     private MultiplayerRunSession session;
     private MultiplayerPlayers players;
     private PlayerController player;
     private string floorKey;
-    private int revision, localAttack;
+    private int revision, localAttack, localSpellCast;
     private double lastPresence = double.NegativeInfinity, lastSnapshot = double.NegativeInfinity;
     private MultiplayerPlayers.TrafficClock frameClock;
     private MultiplayerPlayers.TrafficClock ownedMotionClock;
@@ -52,6 +64,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         string key = MultiplayerMapMath.Key(run, floor);
         if (floorKey == key) return;
         floorKey = key; rooms.Clear(); presence.Clear(); roomStates.Clear(); removed.Clear(); attacks.Clear();
+        spellCasts.Clear(); lastSpellNumbers.Clear(); spellCooldowns.Clear(); shownSpells.Clear(); localSpellCast = 0;
         chests.Clear(); chestStates.Clear();
         enemies.Clear(); positions.Clear(); poseTimes.Clear(); lastPresence = lastSnapshot = double.NegativeInfinity;
         frameClock = ownedMotionClock = default;
@@ -70,7 +83,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     }
     public void Suspend()
     {
-        suspended = true; attacks.Clear();
+        suspended = true; attacks.Clear(); spellCasts.Clear();
         foreach (MultiplayerEnemy enemy in enemies.Values) if (enemy != null) enemy.SuspendMotion();
     }
     public void Resume()
@@ -302,12 +315,72 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         else if (MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldRequest, message, true, MultiplayerGameplayProtocol.HostActor, flush: true) && !enemy.Anchored)
             enemy.BeginLocalKnockback(MultiplayerGameplayProtocol.LocalActor, localAttack, player.transform.position);
     }
+    public int RequestSpellCast(SpellObject spell, int damage, Vector3 origin, Quaternion rotation)
+    {
+        if (!Playing || spell == null || spell.player != player || !Loot.CanUse(spell.gameObject) ||
+            !MultiplayerGameplayProtocol.Finite(origin) || !MultiplayerGameplayProtocol.Rotation(rotation)) return 0;
+        MultiplayerItemIdentity identity = spell.GetComponent<MultiplayerItemIdentity>();
+        if (identity == null || string.IsNullOrEmpty(identity.Id)) return 0;
+        int number = ++localSpellCast;
+        var request = new MultiplayerWorldMessage { op = "spellCast", item = identity.Id, id = spell.Objectname,
+            actor = MultiplayerGameplayProtocol.LocalActor, attack = number, damage = Mathf.Clamp(damage, 0, 10000),
+            position = origin, rotation = rotation };
+        if (MultiplayerGameplayProtocol.Host) ReceiveRequest(MultiplayerGameplayProtocol.LocalActor, request);
+        else if (!MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldRequest, request, true,
+            MultiplayerGameplayProtocol.HostActor, flush: true)) return 0;
+        return number;
+    }
+    public void RequestSpellHit(int cast, MultiplayerEnemy enemy, Vector3 impact)
+    {
+        if (!Playing || cast <= 0 || enemy == null || !enemy.CombatActive || !MultiplayerGameplayProtocol.Finite(impact)) return;
+        var request = new MultiplayerWorldMessage { op = "spellHit", id = enemy.Id, attack = cast, position = impact };
+        if (MultiplayerGameplayProtocol.Host) ReceiveRequest(MultiplayerGameplayProtocol.LocalActor, request);
+        else MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldRequest, request, true,
+            MultiplayerGameplayProtocol.HostActor, flush: true);
+    }
+    private static double SpellCooldown(string spell) => spell == "Dash" ? 3d : 5d;
+    private void AcceptSpellCast(int actor, MultiplayerWorldMessage message, double now)
+    {
+        if (message.attack <= 0 || message.damage < 0 || message.damage > 10000 ||
+            !MultiplayerGameplayProtocol.Finite(message.position) || !MultiplayerGameplayProtocol.Rotation(message.rotation) ||
+            !Loot.TryGetOwnedSpellName(message.item, actor, out string spell) || spell != message.id ||
+            spell != "FireBall" && spell != "Dash" && spell != "Heal" ||
+            spell != "FireBall" && message.damage != 0 || spell == "FireBall" && message.damage == 0 ||
+            lastSpellNumbers.TryGetValue(actor, out int previous) && message.attack <= previous ||
+            !TryPosition(actor, out Vector3 position) || Vector3.Distance(position, message.position) > 3f) return;
+        string cooldownKey = actor + ":" + spell;
+        if (spellCooldowns.TryGetValue(cooldownKey, out double last) && now - last < SpellCooldown(spell) - 0.15d) return;
+        spellCooldowns[cooldownKey] = now;
+        lastSpellNumbers[actor] = message.attack;
+        spellCasts[actor + ":" + message.attack] = new SpellCastWindow { number = message.attack, spell = spell,
+            damage = message.damage, origin = message.position, started = now };
+        var state = new MultiplayerWorldMessage { op = "spellCast", actor = actor, attack = message.attack,
+            id = spell, position = message.position, rotation = message.rotation };
+        Apply(state);
+        MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldState, state, true, flush: true);
+    }
+    private void AcceptSpellHit(int actor, MultiplayerWorldMessage message, double now)
+    {
+        if (!spellCasts.TryGetValue(actor + ":" + message.attack, out var cast) || cast.spell != "FireBall" ||
+            cast.number != message.attack || now - cast.started > 3d ||
+            !MultiplayerGameplayProtocol.Finite(message.position) ||
+            Vector3.Distance(cast.origin, message.position) > 4f + 22f * (float)(now - cast.started) ||
+            !enemies.TryGetValue(message.id ?? "", out var enemy) || enemy == null || !enemy.CombatActive ||
+            Vector3.Distance(message.position, enemy.MotionPosition) > enemy.AttackReach || cast.hit ||
+            !TryPosition(actor, out _)) return;
+        cast.hit = true;
+        enemy.TakeAuthoritativeHit(cast.damage, message.position, actor, message.attack);
+        PublishEnemyState(enemy);
+        enemy.ApplyBufferedMotion();
+    }
     private void ReceiveRequest(int actor, MultiplayerWorldMessage message)
     {
         if (message.op == "snapshot") { SendSnapshot(actor); return; }
         if (!Playing) { RejectHit(actor, message); return; }
         double now = Time.realtimeSinceStartupAsDouble;
         if (message.op == "openChest") OpenChest(actor, message.id);
+        else if (message.op == "spellCast") AcceptSpellCast(actor, message, now);
+        else if (message.op == "spellHit") AcceptSpellHit(actor, message, now);
         else if (message.op == "presence" && rooms.TryGetValue(message.room ?? "", out var room) && MultiplayerGameplayProtocol.Finite(message.position))
         {
             ObservePose(actor, message.position);
@@ -389,7 +462,14 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     }
     private void Apply(MultiplayerWorldMessage message)
     {
-        if (message.op == "chest")
+        if (message.op == "spellCast")
+        {
+            if (message.actor <= 0 || message.attack <= 0 ||
+                !MultiplayerGameplayProtocol.Finite(message.position) || !MultiplayerGameplayProtocol.Rotation(message.rotation) ||
+                !shownSpells.Add(message.actor + ":" + message.attack) || message.actor == MultiplayerGameplayProtocol.LocalActor) return;
+            ShowRemoteSpell(message);
+        }
+        else if (message.op == "chest")
         {
             if (string.IsNullOrEmpty(message.id) || message.revision <= 0 ||
                 chestStates.TryGetValue(message.id, out var priorChest) && priorChest.revision >= message.revision) return;
@@ -422,6 +502,31 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
             if (!enemies.TryGetValue(message.id, out var enemy) || enemy == null) enemy = CreateEnemy(message);
             if (enemy != null && !MultiplayerGameplayProtocol.Host) enemy.Receive(message);
         }
+    }
+    private static void ShowRemoteSpell(MultiplayerWorldMessage message)
+    {
+        if (message.id == "FireBall")
+        {
+            GameObject prefab = Resources.Load<GameObject>("GeneracionDeCuartos/Hechizos/Bola de Fuego Activa");
+            if (prefab == null) return;
+            GameObject projectile = Instantiate(prefab, message.position, message.rotation);
+            SpellProjectile component = projectile.GetComponent<SpellProjectile>();
+            if (component != null) component.InitializeRemoteVisual();
+            Rigidbody body = projectile.GetComponent<Rigidbody>();
+            if (body != null) body.AddForce(message.rotation * Vector3.forward * 15f, ForceMode.VelocityChange);
+            Destroy(projectile, 4f);
+            return;
+        }
+        if (message.id != "Dash" && message.id != "Heal") return;
+        GameObject effect = new GameObject(message.id + " efecto remoto");
+        effect.transform.position = message.position + Vector3.up;
+        ParticleSystem particles = effect.AddComponent<ParticleSystem>();
+        var main = particles.main;
+        main.duration = 0.6f; main.startLifetime = 0.5f; main.startSpeed = 2f; main.startSize = 0.18f;
+        main.startColor = message.id == "Heal" ? Color.green : Color.cyan;
+        var emission = particles.emission; emission.rateOverTime = 0f;
+        particles.Emit(24);
+        Destroy(effect, 2f);
     }
     public void OnEvent(EventData ev)
     {

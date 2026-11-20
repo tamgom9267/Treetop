@@ -24,6 +24,19 @@ public abstract class SpellObject : InventoryObject
 
     public abstract void SpellEffect();
 
+    protected bool CanCast()
+    {
+        if (player == null) return false;
+        MultiplayerWorldSession world = MultiplayerWorldSession.Instance;
+        return world == null || world.Playing && world.Loot.CanUse(gameObject);
+    }
+
+    protected void PublishCast()
+    {
+        MultiplayerWorldSession world = MultiplayerWorldSession.Instance;
+        if (world != null) world.RequestSpellCast(this, 0, player.transform.position, player.transform.rotation);
+    }
+
     protected GameObject SpawnProjectile(GameObject prefab, Vector3 position)
     {
         WeaponObject equippedWeapon = player.EquippedWeaponInstance;
@@ -31,7 +44,10 @@ public abstract class SpellObject : InventoryObject
         int damage = player.playerClass.PD + PD + weaponPD;
 
         GameObject projectile = Instantiate(prefab, position, player.transform.rotation);
-        projectile.GetComponent<SpellProjectile>().Initialize(damage);
+        SpellProjectile spellProjectile = projectile.GetComponent<SpellProjectile>();
+        spellProjectile.Initialize(damage);
+        MultiplayerWorldSession world = MultiplayerWorldSession.Instance;
+        if (world != null) spellProjectile.InitializeMultiplayerCast(world.RequestSpellCast(this, damage, position, player.transform.rotation));
         return projectile;
     }
 

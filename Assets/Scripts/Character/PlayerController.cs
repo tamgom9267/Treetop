@@ -694,6 +694,7 @@ public class PlayerController : MonoBehaviour
         InventoryObject spell = spellObj.GetComponent<InventoryObject>();
 
         if (spell == null) return;
+        if (spell is SpellObject spellItem) spellItem.player = this;
 
         GetComponent<AudioSource>().PlayOneShot(EquipObjectSound);
 

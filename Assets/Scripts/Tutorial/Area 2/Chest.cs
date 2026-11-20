@@ -35,42 +35,56 @@ public class Chest : MonoBehaviour
             return null;
         }
         if (chestInteracted) return null;
-        GameObject weaponPrefab = ChooseWeaponPrefab();
-        if (weaponPrefab == null) return null;
+        GameObject lootPrefab = ChooseLootPrefab();
+        if (lootPrefab == null) return null;
         ApplySharedOpen();
 
-        GameObject weaponObj = Instantiate(weaponPrefab, transform.position, Quaternion.identity);
-        weaponObj.GetComponent<WeaponObject>().isSelected = true;
-        StartCoroutine(AnimacionArma(weaponObj, LootPosition));
-        return weaponObj;
+        GameObject lootObj = Instantiate(lootPrefab, transform.position, Quaternion.identity);
+        lootObj.GetComponent<InventoryObject>().isSelected = true;
+        StartCoroutine(AnimacionArma(lootObj, LootPosition));
+        return lootObj;
     }
 
     public Vector3 LootPosition => transform.position + Vector3.back * 3f;
 
     // En multijugador solo el host hace esta seleccion.
-    public GameObject ChooseWeaponPrefab()
+    public GameObject ChooseLootPrefab()
     {
         GameObject weaponPrefab = Weapon;
         if (randomLoot)
         {
-            GameObject[] lootPrefabs = Resources.LoadAll<GameObject>("GeneracionDeCuartos/Armas");
-            if (lootPrefabs.Length == 0)
+            GameObject[] weapons = Resources.LoadAll<GameObject>("GeneracionDeCuartos/Armas");
+            string[] spells = { "Bola de Fuego", "Dash", "Heal" };
+            if (weapons.Length == 0)
             {
-                Debug.LogError("No se encontraron prefabs de loot en Resources/GeneracionDeCuartos/Armas.", this);
+                Debug.LogError("No se encontraron armas para los cofres.", this);
                 return null;
             }
-
-            weaponPrefab = lootPrefabs[Random.Range(0, lootPrefabs.Length)];
+            GameObject[] candidates = new GameObject[weapons.Length + spells.Length];
+            for (int i = 0; i < weapons.Length; i++) candidates[i] = weapons[i];
+            for (int i = 0; i < spells.Length; i++)
+            {
+                candidates[weapons.Length + i] = Resources.Load<GameObject>("GeneracionDeCuartos/Hechizos/" + spells[i]);
+                if (candidates[weapons.Length + i] == null)
+                {
+                    Debug.LogError("Falta el hechizo de cofre: " + spells[i], this);
+                    return null;
+                }
+            }
+            weaponPrefab = candidates[Random.Range(0, candidates.Length)];
         }
 
         if (weaponPrefab == null)
         {
-            Debug.LogError("El cofre no tiene un prefab de arma asignado.", this);
+            Debug.LogError("El cofre no tiene una recompensa asignada.", this);
             return null;
         }
 
         return weaponPrefab;
     }
+
+    // Compatibilidad con referencias existentes.
+    public GameObject ChooseWeaponPrefab() => ChooseLootPrefab();
 
     public void ApplySharedOpen()
     {

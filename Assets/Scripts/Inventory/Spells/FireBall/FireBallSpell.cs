@@ -9,6 +9,7 @@ public class FireBallSpell : SpellObject
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void SpellEffect()
     {
+        if (!CanCast()) return;
         if (onCooldown == false){
              PlayerClass playerClass = player.playerClass;
             if(playerClass.MP - 10 < 0)

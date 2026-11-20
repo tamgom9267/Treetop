@@ -8,11 +8,12 @@ public class DashSpell : SpellObject
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void SpellEffect()
     {
+        if (!CanCast()) return;
         if (onCooldown == false)
         {
             PlayerClass playerClass = player.GetComponent<PlayerController>().playerClass;
 
-            if(playerClass.MP <= 0)
+            if(playerClass.MP < 5)
             {
                 return;
             }
@@ -22,6 +23,7 @@ public class DashSpell : SpellObject
             onCooldown = true;
 
             playerClass.SpendMP(5);
+            PublishCast();
             player.StartCoroutine(EndEffect(3));   
         }
         

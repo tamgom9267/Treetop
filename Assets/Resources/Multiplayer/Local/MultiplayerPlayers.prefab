@@ -110,11 +110,11 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: 2c146f585ec298e4fab40c094d85b062, type: 2}
     objectName: 
     icon: {fileID: 21300000, guid: c85282c0e7eacb04ca1d535e25191028, type: 3}
-  - type: e797e4bb67949514e994b86dfeac5cba
-    prefab: {fileID: 1995249544943147221, guid: eee8e3db73107cd45ac1566b34caf490, type: 3}
+  - type: fb0bfd242a3b3f3cfafa1955d4dadb5d
+    prefab: {fileID: 5222395603149050662, guid: de9db107f35edb0439ede5e0d2143c24, type: 3}
     weapon: {fileID: 0}
     objectName: Heal
-    icon: {fileID: 0}
+    icon: {fileID: 21300000, guid: 77a8e4716347127708655c15a8dc83d3, type: 3}
   - type: 5ed751d2c05f647468915e065607f6c1
     prefab: {fileID: 7841330066653735437, guid: 878cdef31265e74408e43947269dcad4, type: 3}
     weapon: {fileID: 11400000, guid: 56ad6963cecf69b439e2a635d6820820, type: 2}
@@ -130,16 +130,16 @@ MonoBehaviour:
     weapon: {fileID: 11400000, guid: bc9b305859a08c649b089d5837752d96, type: 2}
     objectName: 
     icon: {fileID: 21300000, guid: c3671279ef40f52479aa83f61a6e8d74, type: 3}
-  - type: 9954f0147af6c024c9b903c88e7271ef
-    prefab: {fileID: 1903786396606084534, guid: f114e95060b74bb4f86b1795cb907b70, type: 3}
+  - type: fe72a49d0eba5fe74b73c8fb62297585
+    prefab: {fileID: 5567741273084338162, guid: 4a7ae80b1ddad787c9250bfa5e769f10, type: 3}
     weapon: {fileID: 0}
     objectName: FireBall
-    icon: {fileID: 0}
-  - type: b7578f6edf9a35b42a11cda900d1bc54
-    prefab: {fileID: 680510687064729594, guid: 7009f61e1893b794682ae48b443074d5, type: 3}
+    icon: {fileID: 21300000, guid: cf39f1bc7f8500c31b49321c8b33b39b, type: 3}
+  - type: d164a2bb679316bdc8c779b921a3865a
+    prefab: {fileID: 2367134279140647186, guid: 87c5074ca24b785eaa1187d00624e346, type: 3}
     weapon: {fileID: 0}
     objectName: Dash
-    icon: {fileID: 0}
+    icon: {fileID: 21300000, guid: 865e64e525aaab2239d84b9527f4b12a, type: 3}
 --- !u!114 &7218469150914871389
 MonoBehaviour:
   m_ObjectHideFlags: 0

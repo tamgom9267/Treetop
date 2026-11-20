@@ -100,6 +100,7 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
     public bool Inspect(InventoryObject item, Sprite icon)
     {
         if (!bound || item == null || inventory.AvailableIDs.Count == 0 || inventory.Loot.Count != 0) return false;
+        if (item is SpellObject spell) spell.player = player;
         MultiplayerItemData original = MultiplayerItemData.Capture(item);
         var fit = inventory.CheckFit(item.gameObject, inventory.lootgrid, 0, 0);
         for (int turn = 0; turn < 3 && !fit.canFit; turn++)
