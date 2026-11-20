@@ -23,6 +23,8 @@ public sealed class HostSlimeMovement : MonoBehaviour
         // incluso durante la espera y la animacion de salto.
         UpdateJumpDirection(world);
         if (jumping || Time.time < nextJump || direction == Vector3.zero) return;
+        // Un golpe terminado en idle puede dejar Land pendiente para el siguiente salto.
+        animator.ResetTrigger("Land");
         jumping = true; animator.SetTrigger("StartJump");
     }
     private void UpdateJumpDirection(MultiplayerWorldSession world)

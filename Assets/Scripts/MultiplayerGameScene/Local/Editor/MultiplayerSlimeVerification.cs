@@ -242,8 +242,32 @@ public static class MultiplayerSlimeVerification
             var alive = host.Capture(1);
             var resolved = typeof(MultiplayerWorldSession).GetMethod("CreateEnemy", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(world, new object[] { alive });
             Check(ReferenceEquals(resolved, host), "Snapshots reutilizan al jefe colocado sin crear duplicados");
+            Vector3 hitOrigin = host.transform.position - Vector3.right * 2f;
+            host.TakeAuthoritativeHit(1, hitOrigin, 1, 1002);
+            host.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+            Call(host, "GroundContact");
+            Check(host.KnockbackActive && !host.CanRunHostAI, "Contacto inicial no cancela el empuje reducido del jefe");
+            Set(host, "impulseFixedAt", Time.fixedTimeAsDouble - 0.2d);
+            Set(host, "leftGround", false);
+            Call(host, "GroundContact");
+            Check(!host.KnockbackActive && host.CanRunHostAI, "Golpe del host termina sobre el suelo aunque el jefe no llegue a despegar");
+
+            Check(client.BeginLocalKnockback(2, 1003, client.transform.position - Vector3.right * 2f), "Cliente inicia el empuje reducido del jefe");
+            host.TakeAuthoritativeHit(1, hitOrigin, 2, 1003);
+            client.Receive(host.Capture(2));
+            client.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+            Set(client, "impulseFixedAt", Time.fixedTimeAsDouble - 0.2d);
+            Set(client, "leftGround", false);
+            Call(client, "GroundContact");
+            var groundedFinal = (MultiplayerSlimeMotion)Get(client, "localFinal");
+            Check(groundedFinal != null && groundedFinal.landed && !client.SimulatesMotion, "Cliente confirma el fin del empuje sin esperar el timeout");
+            // Las replicas de prueba tienen cuartos distintos dentro de una sola sesion.
+            groundedFinal.id = host.Id;
+            Check(host.ReceiveMotion(2, groundedFinal) && host.CanRunHostAI && !host.KnockbackActive,
+                "Final del empuje remoto devuelve inmediatamente la IA del jefe al host");
+            client.Receive(host.Capture(3));
             host.TakeAuthoritativeHit(health, Vector3.zero, 1, 1001);
-            var death = host.Capture(2); client.Receive(death);
+            var death = host.Capture(4); client.Receive(death);
             host.GetComponent<Animator>().Update(0f); client.GetComponent<Animator>().Update(0f);
             int deathHash = Animator.StringToHash("Base Layer.SlimeBossDeath");
             Check(host.Health == 0 && client.Health == 0 && !host.CanRunHostAI && !client.SimulatesMotion &&

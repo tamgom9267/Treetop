@@ -179,8 +179,12 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     private void GroundContact()
     {
         lastGroundAt = Time.fixedTimeAsDouble;
-        if (SimulatesMotion && KnockbackActive && leftGround &&
-            Time.fixedTimeAsDouble - impulseFixedAt >= 0.05d && body.linearVelocity.y <= 0.1f)
+        if (!SimulatesMotion || !KnockbackActive || body.linearVelocity.y > 0.1f) return;
+
+        double elapsed = Time.fixedTimeAsDouble - impulseFixedAt;
+        // Un empuje reducido puede mantener contacto con el suelo durante todo el golpe.
+        // Darle tiempo al impulso inicial antes de terminarlo sin exigir un despegue.
+        if (elapsed >= 0.05d && (leftGround || elapsed >= 0.15d))
             FinishKnockback();
     }
     private void FixedUpdate()
