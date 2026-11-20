@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
+using NUnit.Framework.Constraints;
+using UnityEngine.Rendering;
+using Unity.VisualScripting;
 
 public class fnatasmaenemigo : MonoBehaviour
 {
@@ -34,6 +38,24 @@ public class fnatasmaenemigo : MonoBehaviour
     private Quaternion currentLookRotation;
     private float currentRollAngle;
 
+    // para la desaparición y aparición
+    [Header("Visibilidad")]
+    [SerializeField] private float fadeInDuration = 0.45f;
+    [SerializeField] private float fadeOutDuration = 0.3f;
+    private bool isTransitioning;
+    private MaterialPropertyBlock ghostPropertyBlock;
+    private static readonly int GhostAlphaID =
+    Shader.PropertyToID("_GhostAlpha");
+    private static readonly int EmissionIntensityID =
+    Shader.PropertyToID("_intensidad");
+
+    [Header("Valores visuales del fantasma")]
+    [SerializeField, Range(0f, 1f)]
+    private float normalAlpha = 0.75f;
+
+    [SerializeField, Min(0f)]
+    private float normalEmissionIntensity = 1.5f;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -42,6 +64,8 @@ public class fnatasmaenemigo : MonoBehaviour
 
         meshRenderers = GetComponentsInChildren<Renderer>();
         enemyColliders = GetComponentsInChildren<Collider>();
+
+        ghostPropertyBlock = new MaterialPropertyBlock();
 
         initialYPosition = transform.position.y;
         currentLookRotation = transform.rotation;
@@ -55,13 +79,16 @@ public class fnatasmaenemigo : MonoBehaviour
             player = playerObject.transform;
         }
 
-        SetGhostState(false);
+        // SetGhostState(false);
+        SetGhostRenderers(false);
+        SetGhostGameplayActive(false);
+        SetGhostVisibility(0f);
         nextAppearTime = Time.time + Random.Range(minHiddenTime, maxHiddenTime);
     }
 
     private void Update()
     {
-        if (player == null)
+        if (player == null || isTransitioning)
             return;
 
         if (isVisible)
@@ -163,11 +190,14 @@ public class fnatasmaenemigo : MonoBehaviour
                     transform.rotation = currentLookRotation;
                 }
 
-                SetGhostState(true);
-                vanishTime = Time.time + visibleDuration;
+                // SetGhostState(true);
+                // vanishTime = Time.time + visibleDuration;
 
-                if (animator != null)
-                    animator.SetTrigger("Appear");
+                // if (animator != null)
+                //     animator.SetTrigger("Appear");
+
+                if(animator != null) animator.SetTrigger("Appear");
+                StartCoroutine(AppearRoutine());
 
                 return;
             }
@@ -176,32 +206,140 @@ public class fnatasmaenemigo : MonoBehaviour
         nextAppearTime = Time.time + 0.3f;
     }
 
+    // public void Vanish()
+    // {
+    //     SetGhostState(false);
+    //     nextAppearTime = Time.time + Random.Range(minHiddenTime, maxHiddenTime);
+    // }
+
+    // private void SetGhostState(bool active)
+    // {
+    //     isVisible = active;
+
+    //     if (rb != null)
+    //         rb.linearVelocity = Vector3.zero;
+
+    //     foreach (Renderer r in meshRenderers)
+    //     {
+    //         r.enabled = active;
+    //     }
+
+    //     foreach (Collider c in enemyColliders)
+    //     {
+    //         c.enabled = active;
+    //     }
+
+    //     if (enemyCombat != null)
+    //     {
+    //         enemyCombat.SetCombatActive(active);
+    //     }
+    // }
+
     public void Vanish()
     {
-        SetGhostState(false);
-        nextAppearTime = Time.time + Random.Range(minHiddenTime, maxHiddenTime);
+        if (isTransitioning || !isVisible) return;
+
+        StartCoroutine(VanishRoutine());
     }
 
-    private void SetGhostState(bool active)
+    private void SetGhostRenderers(bool active)
     {
-        isVisible = active;
+        foreach (Renderer r in meshRenderers) r.enabled = active;
+    }
 
-        if (rb != null)
-            rb.linearVelocity = Vector3.zero;
+    private void SetGhostGameplayActive(bool active)
+    {
+        if (rb != null) rb.linearVelocity = Vector3.zero;
 
-        foreach (Renderer r in meshRenderers)
+        foreach (Collider c in enemyColliders) c.enabled = active; 
+
+        if (enemyCombat != null) enemyCombat.SetCombatActive(active);
+    }
+
+    private void SetGhostVisibility(float visibility)
+    {
+        foreach(Renderer r in meshRenderers)
         {
-            r.enabled = active;
+            if (r == null) continue;
+
+            r.GetPropertyBlock(ghostPropertyBlock);
+
+            ghostPropertyBlock.SetFloat(
+                GhostAlphaID, normalAlpha * visibility
+            );
+
+            ghostPropertyBlock.SetFloat(
+                EmissionIntensityID, normalEmissionIntensity * visibility
+            );
+
+            r.SetPropertyBlock(ghostPropertyBlock);
+        }
+    }
+
+    private IEnumerator AppearRoutine()
+    {
+        isTransitioning = true;
+        isVisible = false;
+
+        SetGhostRenderers(true);
+        SetGhostGameplayActive(false);
+
+        SetGhostVisibility(0f);
+
+        yield return StartCoroutine(
+            FadeAlpha(0f,1f, fadeInDuration)
+        );
+
+        SetGhostGameplayActive(true);
+
+        isVisible = true;
+        vanishTime = Time.time + visibleDuration;
+
+        isTransitioning = false;
+    }
+
+    private IEnumerator VanishRoutine()
+    {
+        isTransitioning = true;
+        isVisible = false;
+
+        // Desactiva colisiones y combate
+        SetGhostGameplayActive(false);
+
+        yield return StartCoroutine(
+            FadeAlpha(1f,0f, fadeInDuration)
+        );
+
+        SetGhostRenderers(false);
+
+        nextAppearTime = Time.time + Random.Range(minHiddenTime, maxHiddenTime);
+
+        isTransitioning = false;
+    }
+
+    private IEnumerator FadeAlpha(float startAlpha, float targetAlpha, float duration)
+    {
+        if (duration <= 0f)
+        {
+            SetGhostVisibility(targetAlpha);
+            yield break;
         }
 
-        foreach (Collider c in enemyColliders)
+        float elapsed = 0f;
+
+        while (elapsed < duration)
         {
-            c.enabled = active;
+            elapsed += Time.deltaTime;
+
+            float t = Mathf.Clamp01(elapsed / duration);
+
+            float alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
+
+            SetGhostVisibility(alpha);
+
+            yield return null;
         }
 
-        if (enemyCombat != null)
-        {
-            enemyCombat.SetCombatActive(active);
-        }
+        SetGhostVisibility(targetAlpha);
     }
 }
