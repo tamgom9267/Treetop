@@ -177,7 +177,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Exit
+  m_text: Salir
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
   m_sharedMaterial: {fileID: 1042559896868849173, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
@@ -1518,7 +1518,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Options
+  m_text: Creditos
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
   m_sharedMaterial: {fileID: 1042559896868849173, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
@@ -1705,7 +1705,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1769813041
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1866,7 +1866,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Start
+  m_text: Iniciar
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
   m_sharedMaterial: {fileID: 1042559896868849173, guid: 11f8860baf05fcb9ba0b33198ef0feac, type: 2}
