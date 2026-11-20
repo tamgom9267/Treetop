@@ -31,12 +31,6 @@ public abstract class SpellObject : InventoryObject
         return world == null || world.Playing && world.Loot.CanUse(gameObject);
     }
 
-    protected void PublishCast()
-    {
-        MultiplayerWorldSession world = MultiplayerWorldSession.Instance;
-        if (world != null) world.RequestSpellCast(this, 0, player.transform.position, player.transform.rotation);
-    }
-
     protected GameObject SpawnProjectile(GameObject prefab, Vector3 position)
     {
         WeaponObject equippedWeapon = player.EquippedWeaponInstance;

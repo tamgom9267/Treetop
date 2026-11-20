@@ -338,18 +338,15 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         else MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldRequest, request, true,
             MultiplayerGameplayProtocol.HostActor, flush: true);
     }
-    private static double SpellCooldown(string spell) => spell == "Dash" ? 3d : 5d;
     private void AcceptSpellCast(int actor, MultiplayerWorldMessage message, double now)
     {
-        if (message.attack <= 0 || message.damage < 0 || message.damage > 10000 ||
+        if (message.attack <= 0 || message.damage <= 0 || message.damage > 10000 ||
             !MultiplayerGameplayProtocol.Finite(message.position) || !MultiplayerGameplayProtocol.Rotation(message.rotation) ||
-            !Loot.TryGetOwnedSpellName(message.item, actor, out string spell) || spell != message.id ||
-            spell != "FireBall" && spell != "Dash" && spell != "Heal" ||
-            spell != "FireBall" && message.damage != 0 || spell == "FireBall" && message.damage == 0 ||
+            !Loot.TryGetOwnedSpellName(message.item, actor, out string spell) || spell != "FireBall" || message.id != spell ||
             lastSpellNumbers.TryGetValue(actor, out int previous) && message.attack <= previous ||
             !TryPosition(actor, out Vector3 position) || Vector3.Distance(position, message.position) > 3f) return;
         string cooldownKey = actor + ":" + spell;
-        if (spellCooldowns.TryGetValue(cooldownKey, out double last) && now - last < SpellCooldown(spell) - 0.15d) return;
+        if (spellCooldowns.TryGetValue(cooldownKey, out double last) && now - last < 4.85d) return;
         spellCooldowns[cooldownKey] = now;
         lastSpellNumbers[actor] = message.attack;
         spellCasts[actor + ":" + message.attack] = new SpellCastWindow { number = message.attack, spell = spell,
@@ -464,7 +461,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     {
         if (message.op == "spellCast")
         {
-            if (message.actor <= 0 || message.attack <= 0 ||
+            if (message.id != "FireBall" || message.actor <= 0 || message.attack <= 0 ||
                 !MultiplayerGameplayProtocol.Finite(message.position) || !MultiplayerGameplayProtocol.Rotation(message.rotation) ||
                 !shownSpells.Add(message.actor + ":" + message.attack) || message.actor == MultiplayerGameplayProtocol.LocalActor) return;
             ShowRemoteSpell(message);
@@ -505,28 +502,14 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
     }
     private static void ShowRemoteSpell(MultiplayerWorldMessage message)
     {
-        if (message.id == "FireBall")
-        {
-            GameObject prefab = Resources.Load<GameObject>("GeneracionDeCuartos/Hechizos/Bola de Fuego Activa");
-            if (prefab == null) return;
-            GameObject projectile = Instantiate(prefab, message.position, message.rotation);
-            SpellProjectile component = projectile.GetComponent<SpellProjectile>();
-            if (component != null) component.InitializeRemoteVisual();
-            Rigidbody body = projectile.GetComponent<Rigidbody>();
-            if (body != null) body.AddForce(message.rotation * Vector3.forward * 15f, ForceMode.VelocityChange);
-            Destroy(projectile, 4f);
-            return;
-        }
-        if (message.id != "Dash" && message.id != "Heal") return;
-        GameObject effect = new GameObject(message.id + " efecto remoto");
-        effect.transform.position = message.position + Vector3.up;
-        ParticleSystem particles = effect.AddComponent<ParticleSystem>();
-        var main = particles.main;
-        main.duration = 0.6f; main.startLifetime = 0.5f; main.startSpeed = 2f; main.startSize = 0.18f;
-        main.startColor = message.id == "Heal" ? Color.green : Color.cyan;
-        var emission = particles.emission; emission.rateOverTime = 0f;
-        particles.Emit(24);
-        Destroy(effect, 2f);
+        GameObject prefab = Resources.Load<GameObject>("GeneracionDeCuartos/Hechizos/Bola de Fuego Activa");
+        if (prefab == null) return;
+        GameObject projectile = Instantiate(prefab, message.position, message.rotation);
+        SpellProjectile component = projectile.GetComponent<SpellProjectile>();
+        if (component != null) component.InitializeRemoteVisual();
+        Rigidbody body = projectile.GetComponent<Rigidbody>();
+        if (body != null) body.AddForce(message.rotation * Vector3.forward * 15f, ForceMode.VelocityChange);
+        Destroy(projectile, 4f);
     }
     public void OnEvent(EventData ev)
     {

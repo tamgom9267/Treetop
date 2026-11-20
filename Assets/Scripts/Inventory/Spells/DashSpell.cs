@@ -23,7 +23,6 @@ public class DashSpell : SpellObject
             onCooldown = true;
 
             playerClass.SpendMP(5);
-            PublishCast();
             player.StartCoroutine(EndEffect(3));   
         }
         

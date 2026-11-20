@@ -166,6 +166,8 @@ public sealed class MultiplayerRemotePlayer : MonoBehaviour
 
     // Nombres conservados para los Animation Events de los clips originales.
     public void EnableWeaponCollider() { equipment.SetActionTrail(true); }
+    // El mismo clip de caminar se usa en solitario; el sonido se reproduce solo en el jugador local.
+    public void WalkingSound(AnimationEvent _) { }
     public void EndAttack()
     {
         actionPlaying = false;

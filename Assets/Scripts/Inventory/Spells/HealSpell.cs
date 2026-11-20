@@ -20,7 +20,6 @@ public class HealSpell : SpellObject
             playerClass.GetComponent<AudioSource>().PlayOneShot(Sound, 0.2f);
             playerClass.SpendMP(10);
             playerClass.Heal(20);
-            PublishCast();
             onCooldown = true;
             player.StartCoroutine(EndEffect());
         }
