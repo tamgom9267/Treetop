@@ -117,7 +117,7 @@ public static class PersistentSessionNetworkVerification
             string path = Path.GetFullPath(Path.Combine(Application.dataPath, "../Temp/lifecycle-verification/network.json"));
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             File.WriteAllText(path, JsonUtility.ToJson(new Report { success = success, checks = passed.ToArray() }, true));
-            Debug.Log("Verificacion de red: " + passed.Count + " comprobaciones; correcta=" + success);
+            /*Debug.Log("Verificacion de red: " + passed.Count + " comprobaciones; correcta=" + success)*/;
         }
     }
 

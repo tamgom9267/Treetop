@@ -15,7 +15,7 @@ public partial class WorldGenerator : MonoBehaviour
             // Verifica que existe el prefab
             if (roomPrefab == null)
             {
-                Debug.LogError("No se encontro el prefab de el cuarto: " + room.roomID);
+                /*Debug.LogError("No se encontro el prefab de el cuarto: " + room.roomID)*/;
                 return;
             }
 
@@ -25,7 +25,7 @@ public partial class WorldGenerator : MonoBehaviour
             GeneratedRoomController roomController = newRoom.GetComponent<GeneratedRoomController>();
             if (roomController == null)
             {
-                Debug.LogError("El prefab del cuarto '" + room.roomID +"' no tiene GeneratedRoomController.");
+                /*Debug.LogError("El prefab del cuarto '" + room.roomID +"' no tiene GeneratedRoomController.")*/;
                 return;
             }
 

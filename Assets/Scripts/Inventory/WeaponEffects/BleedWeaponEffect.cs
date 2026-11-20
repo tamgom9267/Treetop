@@ -17,7 +17,7 @@ public sealed class BleedWeaponEffect : WeaponEffect
                 return ApplyBleed(target, damagePerTick, (int)ticks, tickInterval);
         }
 
-        Debug.LogWarning("Se ignoro una configuracion invalida de sangrado.", this);
+        /*Debug.LogWarning("Se ignoro una configuracion invalida de sangrado.", this)*/;
         return null;
     }
 

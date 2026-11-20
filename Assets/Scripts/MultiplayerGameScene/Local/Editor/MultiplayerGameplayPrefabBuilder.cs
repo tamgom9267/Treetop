@@ -25,7 +25,7 @@ public static class MultiplayerGameplayPrefabBuilder
         if (EditorApplication.isPlayingOrWillChangePlaymode) return;
         if (EditorApplication.isUpdating || EditorApplication.isCompiling) { EditorApplication.delayCall += BuildWhenIdle; return; }
         try { CreatePrefabs(); MultiplayerGameplayVerification.RunChecks(); }
-        catch (Exception error) { Debug.LogException(error); }
+        catch (Exception error) { /*Debug.LogException(error)*/; }
     }
     [MenuItem("Tools/Multiplayer/Crear prefabs de fase 4")]
     public static void CreatePrefabs()
@@ -50,7 +50,7 @@ public static class MultiplayerGameplayPrefabBuilder
         var definitions = BuildLoot();
         ConfigureCoordinator(definitions);
         ValidatePrefabs();
-        Debug.Log("FASE 4: 22 cuartos, 4 prefabs de enemigos, catalogo de loot y coordinador preparados. No se guardaron escenas.");
+        /*Debug.Log("FASE 4: 22 cuartos, 4 prefabs de enemigos, catalogo de loot y coordinador preparados. No se guardaron escenas.")*/;
     }
     [MenuItem("Tools/Multiplayer/Actualizar cuartos 7 y boss2")]
     public static void RebuildTreeRooms()

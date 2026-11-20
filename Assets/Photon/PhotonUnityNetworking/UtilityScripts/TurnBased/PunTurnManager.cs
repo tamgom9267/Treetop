@@ -168,7 +168,7 @@ namespace Photon.Pun.UtilityScripts
         {
             if (IsFinishedByMe)
             {
-                UnityEngine.Debug.LogWarning("Can't SendMove. Turn is finished by this player.");
+                /*UnityEngine.Debug.LogWarning("Can't SendMove. Turn is finished by this player.")*/;
                 return;
             }
 

@@ -261,7 +261,7 @@ namespace Photon.Pun
                             if (_newType == typeof(PhotonView))
                             {
                                 listProperty.GetArrayElementAtIndex(i).objectReferenceValue = null;
-                                Debug.LogError("PhotonView Detected you dropped a PhotonView, this is not allowed. \n It's been removed from observed field.");
+                                /*Debug.LogError("PhotonView Detected you dropped a PhotonView, this is not allowed. \n It's been removed from observed field.")*/;
 
                             }
                             else if (_newType == typeof(Transform))
@@ -276,7 +276,7 @@ namespace Photon.Pun
                                 }
                                 // switch observe from transform to _ptv
                                 listProperty.GetArrayElementAtIndex(i).objectReferenceValue = _ptv;
-                                Debug.Log("PhotonView has detected you dropped a Transform. Instead it's better to observe a PhotonTransformView for better control and performances");
+                                /*Debug.Log("PhotonView has detected you dropped a Transform. Instead it's better to observe a PhotonTransformView for better control and performances")*/;
                             }
                             else if (_newType == typeof(Rigidbody))
                             {
@@ -292,7 +292,7 @@ namespace Photon.Pun
                                 }
                                 // switch observe from transform to _prbv
                                 listProperty.GetArrayElementAtIndex(i).objectReferenceValue = _prbv;
-                                Debug.Log("PhotonView has detected you dropped a RigidBody. Instead it's better to observe a PhotonRigidbodyView for better control and performances");
+                                /*Debug.Log("PhotonView has detected you dropped a RigidBody. Instead it's better to observe a PhotonRigidbodyView for better control and performances")*/;
                             }
                             else if (_newType == typeof(Rigidbody2D))
                             {
@@ -306,7 +306,7 @@ namespace Photon.Pun
                                 }
                                 // switch observe from transform to _prb2dv
                                 listProperty.GetArrayElementAtIndex(i).objectReferenceValue = _prb2dv;
-                                Debug.Log("PhotonView has detected you dropped a Rigidbody2D. Instead it's better to observe a PhotonRigidbody2DView for better control and performances");
+                                /*Debug.Log("PhotonView has detected you dropped a Rigidbody2D. Instead it's better to observe a PhotonRigidbody2DView for better control and performances")*/;
                             }
                             else if (_newType == typeof(Animator))
                             {
@@ -320,7 +320,7 @@ namespace Photon.Pun
                                 }
                                 // switch observe from transform to _prb2dv
                                 listProperty.GetArrayElementAtIndex(i).objectReferenceValue = _pav;
-                                Debug.Log("PhotonView has detected you dropped a Animator, so we switched to PhotonAnimatorView so that you can serialized the Animator variables");
+                                /*Debug.Log("PhotonView has detected you dropped a Animator, so we switched to PhotonAnimatorView so that you can serialized the Animator variables")*/;
                             }
                             else if (!typeof(IPunObservable).IsAssignableFrom(_newType))
                             {
@@ -337,7 +337,7 @@ namespace Photon.Pun
                                 if (!_ignore)
                                 {
                                     listProperty.GetArrayElementAtIndex(i).objectReferenceValue = null;
-                                    Debug.LogError("PhotonView Detected you dropped a Component missing IPunObservable Interface,\n You dropped a <" + _newType + "> instead. It's been removed from observed field.");
+                                    /*Debug.LogError("PhotonView Detected you dropped a Component missing IPunObservable Interface,\n You dropped a <" + _newType + "> instead. It's been removed from observed field.")*/;
                                 }
                             }
                         }

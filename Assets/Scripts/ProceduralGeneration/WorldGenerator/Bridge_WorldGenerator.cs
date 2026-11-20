@@ -12,7 +12,7 @@ public partial class WorldGenerator : MonoBehaviour
         // Verifica que existe el prefab
         if (puenteHorizontal == null || puenteVertical == null)
         {
-            Debug.LogError("No se encontro el prefab de el puente");
+            /*Debug.LogError("No se encontro el prefab de el puente")*/;
         }
         
         foreach (RoomData room in floorData.rooms)

@@ -70,7 +70,7 @@ public static class MultiplayerCombatVerification
             var setup = JsonUtility.FromJson<Setup>(SessionState.GetString(SceneSetupKey, "{}"));
             if (setup.scenes != null && Array.Exists(setup.scenes, s => !string.IsNullOrEmpty(s.path)))
                 EditorSceneManager.RestoreSceneManagerSetup(setup.scenes);
-            Debug.Log("Combate multijugador: " + checks.Count + " comprobaciones; " + (failure ?? "OK"));
+            /*Debug.Log("Combate multijugador: " + checks.Count + " comprobaciones; " + (failure ?? "OK"))*/;
             if (Application.isBatchMode) EditorApplication.Exit(failure == null ? 0 : 1);
         }
     }
@@ -82,7 +82,7 @@ public static class MultiplayerCombatVerification
         if (lastFrame == Time.frameCount) { EditorApplication.Step(); return; }
         lastFrame = Time.frameCount;
         try { if (!routine.MoveNext()) Finish(); }
-        catch (Exception error) { failure = error.ToString(); Debug.LogException(error); Finish(); }
+        catch (Exception error) { failure = error.ToString(); /*Debug.LogException(error)*/; Finish(); }
     }
 
     private static void Finish()

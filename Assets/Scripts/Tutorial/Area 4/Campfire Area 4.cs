@@ -19,7 +19,7 @@ public class Campfire : MonoBehaviour
         playerClass = other.GetComponentInParent<PlayerClass>();
         if (playerClass == null)
         {
-            Debug.LogWarning("El jugador que entro en la fogata no tiene PlayerClass.", other);
+            /*Debug.LogWarning("El jugador que entro en la fogata no tiene PlayerClass.", other)*/;
             return;
         }
 

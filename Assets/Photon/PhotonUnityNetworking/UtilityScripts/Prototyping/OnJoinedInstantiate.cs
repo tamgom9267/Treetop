@@ -148,7 +148,7 @@ namespace Photon.Pun.UtilityScripts
 					return null;
 
 				if (!PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(validated).Contains("/Resources"))
-					Debug.LogWarning("Player Prefab needs to be a Prefab in a Resource folder.");
+					/*Debug.LogWarning("Player Prefab needs to be a Prefab in a Resource folder.")*/;
 			}
 #else
             GameObject validated = unvalidated;
@@ -191,7 +191,7 @@ namespace Photon.Pun.UtilityScripts
                     if (o == null)
                         continue;
 #if UNITY_EDITOR
-                    Debug.Log("Auto-Instantiating: " + o.name);
+                    /*Debug.Log("Auto-Instantiating: " + o.name)*/;
 #endif
                     Vector3 spawnPos; Quaternion spawnRot;
                     GetSpawnPoint(out spawnPos, out spawnRot);

@@ -2773,23 +2773,23 @@ namespace Photon.Realtime
                 return;
             }
             #if !SUPPORTED_UNITY
-            Debug.WriteLine(message);
+            /*Debug.WriteLine(message)*/;
             #else
             if (level == DebugLevel.ERROR)
             {
-                Debug.LogError(message);
+                /*Debug.LogError(message)*/;
             }
             else if (level == DebugLevel.WARNING)
             {
-                Debug.LogWarning(message);
+                /*Debug.LogWarning(message)*/;
             }
             else if (level == DebugLevel.INFO)
             {
-                Debug.Log(message);
+                /*Debug.Log(message)*/;
             }
             else if (level == DebugLevel.ALL)
             {
-                Debug.Log(message);
+                /*Debug.Log(message)*/;
             }
             #endif
         }

@@ -57,7 +57,7 @@ public class Chest : MonoBehaviour
             string[] spells = { "Bola de Fuego", "Dash", "Heal" };
             if (weapons.Length == 0)
             {
-                Debug.LogError("No se encontraron armas para los cofres.", this);
+                /*Debug.LogError("No se encontraron armas para los cofres.", this)*/;
                 return null;
             }
             GameObject[] candidates = new GameObject[weapons.Length + spells.Length];
@@ -67,7 +67,7 @@ public class Chest : MonoBehaviour
                 candidates[weapons.Length + i] = Resources.Load<GameObject>("GeneracionDeCuartos/Hechizos/" + spells[i]);
                 if (candidates[weapons.Length + i] == null)
                 {
-                    Debug.LogError("Falta el hechizo de cofre: " + spells[i], this);
+                    /*Debug.LogError("Falta el hechizo de cofre: " + spells[i], this)*/;
                     return null;
                 }
             }
@@ -76,7 +76,7 @@ public class Chest : MonoBehaviour
 
         if (weaponPrefab == null)
         {
-            Debug.LogError("El cofre no tiene una recompensa asignada.", this);
+            /*Debug.LogError("El cofre no tiene una recompensa asignada.", this)*/;
             return null;
         }
 

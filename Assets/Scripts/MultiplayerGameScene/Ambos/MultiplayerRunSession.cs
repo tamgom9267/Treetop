@@ -286,7 +286,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         {
             if (!Application.CanStreamedLevelBeLoaded(villageSceneName))
             {
-                Debug.LogError("Falta VillageMenuScene en el perfil de compilacion.", this);
+                /*Debug.LogError("Falta VillageMenuScene en el perfil de compilacion.", this)*/;
                 return false;
             }
             settlementRequested = true;
@@ -295,7 +295,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         }
         if (!hostGenerator.TryCreateFloor(BaseSeed, FloorNumber + 1, RunId, out MultiplayerFloorData data, out string error))
         {
-            Debug.LogError("No se pudo preparar el siguiente piso: " + error, this);
+            /*Debug.LogError("No se pudo preparar el siguiente piso: " + error, this)*/;
             return false;
         }
         settlementRequested = true;
@@ -439,7 +439,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
         localBuiltKey = CurrentKey;
         if (!PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable { { ReadyKey, CurrentKey }, { FailureKey, string.Empty } }))
         { ReportBuildFailed("No se pudo confirmar la construccion del piso."); yield break; }
-        Debug.Log("Mapa listo: " + CurrentKey + " | seed " + BaseSeed + " | final " + floorData.finalSeed, this);
+        /*Debug.Log("Mapa listo: " + CurrentKey + " | seed " + BaseSeed + " | final " + floorData.finalSeed, this)*/;
         if (Phase == MultiplayerRunPhase.Playing) FinishTransition();
         CheckParticipants();
     }
@@ -473,7 +473,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
     public void ReportBuildFailed(string message)
     {
         if (sceneExitPrepared) return;
-        Debug.LogError(message, this);
+        /*Debug.LogError(message, this)*/;
         if (party != null && party.IsHost) { FailRun(message); return; }
         if (reportedFailureKey == CurrentKey) return;
         reportedFailureKey = CurrentKey;
@@ -800,7 +800,7 @@ public class MultiplayerRunSession : MonoBehaviourPunCallbacks
 
     private void FailReturn(string message)
     {
-        Debug.LogError(message, this);
+        /*Debug.LogError(message, this)*/;
         if (completedRun) FailRun(message);
         ReleasePlayer();
         ShowLoading(false, string.Empty);

@@ -375,7 +375,7 @@ public class PlayerController : MonoBehaviour
                 attackTrigger = "isAttackingHammer";
                 return true;
             default:
-                Debug.LogWarning("No hay un trigger de ataque configurado para el arma: " + weaponName, this);
+                /*Debug.LogWarning("No hay un trigger de ataque configurado para el arma: " + weaponName, this)*/;
                 attackTrigger = null;
                 return false;
         }
@@ -542,7 +542,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             knockbackMultiplier = 10f;
-            Debug.LogWarning("Tag no asignado");
+            /*Debug.LogWarning("Tag no asignado")*/;
         }
 
         // No se puede controlar el movimiento del jugador mientras esta en el aire

@@ -160,11 +160,11 @@ public class DungeonInstructionsGenerator : MonoBehaviour
                 Direction result = GetFreeDirection(new Vector3Int(57, 0, 0), preferred);
                 if (result != Direction.North)
                 {
-                    Debug.LogError("PRUEBA FALLIDA: la salida debia ser Norte y fue " + result + ".", this);
+                    /*Debug.LogError("PRUEBA FALLIDA: la salida debia ser Norte y fue " + result + ".", this)*/;
                     return;
                 }
             }
-            Debug.Log("PRUEBA CORRECTA: izquierda, derecha y abajo ocupados; salida hacia arriba (Norte) en ambos intentos.", this);
+            /*Debug.Log("PRUEBA CORRECTA: izquierda, derecha y abajo ocupados; salida hacia arriba (Norte) en ambos intentos.", this)*/;
         }
         finally
         {
@@ -239,6 +239,6 @@ public class DungeonInstructionsGenerator : MonoBehaviour
 
         File.WriteAllText(path, json);
 
-        Debug.Log($"Piso {floorNumber} generado | Seed base: {baseSeed} | Seed final: {finalSeed}", this);
+        /*Debug.Log($"Piso {floorNumber} generado | Seed base: {baseSeed} | Seed final: {finalSeed}", this)*/;
     }
 }

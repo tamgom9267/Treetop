@@ -203,7 +203,7 @@ namespace Photon.Pun.UtilityScripts
         {
             if (PhotonNetwork.NetworkingClient == null)
             {
-                Debug.LogError("nwp is null");
+                /*Debug.LogError("nwp is null")*/;
                 return "";
             }
             return string.Format("#{0:00} '{1}'{5} {4}{2} {3} {6}", player.ActorNumber + "/userId:<" + player.UserId + ">", player.NickName, player.IsMasterClient ? "(master)" : "", this.PlayerProps ? player.CustomProperties.ToStringFull() : "", (PhotonNetwork.LocalPlayer.ActorNumber == player.ActorNumber) ? "(you)" : "", player.UserId, player.IsInactive ? " / Is Inactive" : "");

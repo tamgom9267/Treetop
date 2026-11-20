@@ -252,7 +252,7 @@ namespace Photon.Pun
                 // log warning, unless there was one recently
                 if (EditorApplication.timeSinceStartup - lastWarning > 3)
                 {
-                    Debug.LogWarning(CurrentLang.WarningPhotonDisconnect);
+                    /*Debug.LogWarning(CurrentLang.WarningPhotonDisconnect)*/;
                     lastWarning = EditorApplication.timeSinceStartup;
                 }
 
@@ -632,7 +632,7 @@ namespace Photon.Pun
                 // while RegisterByEmail will check RequestPendingResult below, it would also display an error message. no needed in this case
                 if (this.serviceClient.RequestPendingResult)
                 {
-                    Debug.LogWarning("Registration request is pending a response. Please wait.");
+                    /*Debug.LogWarning("Registration request is pending a response. Please wait.")*/;
                     return;
                 }
             }
@@ -671,7 +671,7 @@ namespace Photon.Pun
                     }
                     else if (PhotonEditorUtils.HasChat)
                     {
-                        Debug.LogWarning("Registration successful but no Chat AppId returned");
+                        /*Debug.LogWarning("Registration successful but no Chat AppId returned")*/;
                     }
                     key = ((int) ServiceTypes.Voice).ToString();
                     if (res.ApplicationIds.TryGetValue(key, out appId))
@@ -680,7 +680,7 @@ namespace Photon.Pun
                     }
                     else if (PhotonEditorUtils.HasVoice)
                     {
-                        Debug.LogWarning("Registration successful but no Voice AppId returned");
+                        /*Debug.LogWarning("Registration successful but no Voice AppId returned")*/;
                     }
                     PhotonEditor.SaveSettings();
                     this.photonSetupState = PhotonSetupStates.GoEditPhotonServerSettings;
@@ -741,7 +741,7 @@ namespace Photon.Pun
 
             if (PhotonNetwork.PhotonServerSettings == null)
             {
-                Debug.LogWarning("UpdateRpcList() wasn not able to access the PhotonServerSettings. Not updating the RPCs.");
+                /*Debug.LogWarning("UpdateRpcList() wasn not able to access the PhotonServerSettings. Not updating the RPCs.")*/;
                 return;
             }
 
@@ -837,7 +837,7 @@ namespace Photon.Pun
                 serverSettings.RpcList.Clear();
                 EditorUtility.SetDirty(serverSettings);
 
-                Debug.LogWarning(CurrentLang.ServerSettingsCleanedWarning);
+                /*Debug.LogWarning(CurrentLang.ServerSettingsCleanedWarning)*/;
             }
         }
 

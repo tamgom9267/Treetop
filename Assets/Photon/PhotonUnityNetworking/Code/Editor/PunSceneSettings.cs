@@ -96,7 +96,7 @@ namespace Photon.Pun
                     catch (Exception e)
                     {
                         #if PHOTON_UNITY_NETWORKING
-                        Debug.LogError("-- WARNING: PROJECT CLEANUP NECESSARY -- If you delete pun from your project, make sure you also clean up the Scripting define symbols from any reference to PUN like 'PHOTON_UNITY_NETWORKING ");
+                        /*Debug.LogError("-- WARNING: PROJECT CLEANUP NECESSARY -- If you delete pun from your project, make sure you also clean up the Scripting define symbols from any reference to PUN like 'PHOTON_UNITY_NETWORKING ")*/;
                         #endif
                     }
                     #pragma warning restore 0168
@@ -117,7 +117,7 @@ namespace Photon.Pun
             PunSceneSettings pss = Instance;
             if (pss == null)
             {
-                Debug.LogError("pss cant be null");
+                /*Debug.LogError("pss cant be null")*/;
                 return 1;
             }
 

@@ -62,7 +62,7 @@ namespace Photon.Pun.UtilityScripts
             this.originalMaterial = GetComponent<Renderer>().material;
             if (!this.originalMaterial.HasProperty("_EmissionColor"))
             {
-                Debug.LogWarning("Doesn't have emission, can't flash " + gameObject);
+                /*Debug.LogWarning("Doesn't have emission, can't flash " + gameObject)*/;
                 yield break;
             }
 

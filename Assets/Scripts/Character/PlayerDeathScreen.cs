@@ -43,7 +43,7 @@ public class PlayerDeathScreen : MonoBehaviour
         DeathPanelView prefab = Resources.Load<DeathPanelView>(DeathPanelResource);
         if (prefab == null || !prefab.IsConfigured)
         {
-            Debug.LogError("Configura los textos y el boton en el prefab Canvas Muerte.", this);
+            /*Debug.LogError("Configura los textos y el boton en el prefab Canvas Muerte.", this)*/;
             return;
         }
 

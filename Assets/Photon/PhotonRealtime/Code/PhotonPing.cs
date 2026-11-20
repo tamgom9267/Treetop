@@ -132,7 +132,7 @@ namespace Photon.Realtime
             catch (Exception e)
             {
                 this.sock = null;
-                System.Diagnostics.Debug.WriteLine(e.ToString());
+                /*System.Diagnostics.Debug.WriteLine(e.ToString())*/;
 
                 // bubble up
                 throw;

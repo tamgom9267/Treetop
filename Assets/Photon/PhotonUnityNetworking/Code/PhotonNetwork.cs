@@ -449,7 +449,7 @@ namespace Photon.Pun
 
                 if (value && IsConnected)
                 {
-                    Debug.LogError("Can't start OFFLINE mode while connected!");
+                    /*Debug.LogError("Can't start OFFLINE mode while connected!")*/;
                     return;
                 }
 
@@ -958,7 +958,7 @@ namespace Photon.Pun
                 }
                 else
                 {
-                    Debug.Log("Can't change CrcCheckEnabled while being connected. CrcCheckEnabled stays " + NetworkingClient.LoadBalancingPeer.CrcEnabled);
+                    /*Debug.Log("Can't change CrcCheckEnabled while being connected. CrcCheckEnabled stays " + NetworkingClient.LoadBalancingPeer.CrcEnabled)*/;
                 }
             }
         }
@@ -1119,7 +1119,7 @@ namespace Photon.Pun
         {
             if (PhotonServerSettings == null)
             {
-                Debug.LogError("Can't connect: Loading settings failed. ServerSettings asset must be in any 'Resources' folder as: " + ServerSettingsFileName);
+                /*Debug.LogError("Can't connect: Loading settings failed. ServerSettings asset must be in any 'Resources' folder as: " + ServerSettingsFileName)*/;
                 return false;
             }
 
@@ -1130,17 +1130,17 @@ namespace Photon.Pun
         {
             if (NetworkingClient.LoadBalancingPeer.PeerState != PeerStateValue.Disconnected)
             {
-                Debug.LogWarning("ConnectUsingSettings() failed. Can only connect while in state 'Disconnected'. Current state: " + NetworkingClient.LoadBalancingPeer.PeerState);
+                /*Debug.LogWarning("ConnectUsingSettings() failed. Can only connect while in state 'Disconnected'. Current state: " + NetworkingClient.LoadBalancingPeer.PeerState)*/;
                 return false;
             }
             if (PhotonHandler.AppQuits)
             {
-                Debug.LogWarning("Can't connect: Application is closing. Unity called OnApplicationQuit().");
+                /*Debug.LogWarning("Can't connect: Application is closing. Unity called OnApplicationQuit().")*/;
                 return false;
             }
             if (PhotonServerSettings == null)
             {
-                Debug.LogError("Can't connect: Loading settings failed. ServerSettings asset must be in any 'Resources' folder as: " + ServerSettingsFileName);
+                /*Debug.LogError("Can't connect: Loading settings failed. ServerSettings asset must be in any 'Resources' folder as: " + ServerSettingsFileName)*/;
                 return false;
             }
 
@@ -1160,7 +1160,7 @@ namespace Photon.Pun
             {
                 OfflineMode = false; // Cleanup offline mode
                 // someone can set OfflineMode in code and then call ConnectUsingSettings() with non-offline settings. Warning for that case:
-                Debug.LogWarning("ConnectUsingSettings() disabled the offline mode. No longer offline.");
+                /*Debug.LogWarning("ConnectUsingSettings() disabled the offline mode. No longer offline.")*/;
             }
 
 
@@ -1191,25 +1191,25 @@ namespace Photon.Pun
             // TODO: refactor NetworkingClient.LoadBalancingPeer.PeerState to not use the peer but LBC.connected or so
             if (NetworkingClient.LoadBalancingPeer.PeerState != PeerStateValue.Disconnected)
             {
-                Debug.LogWarning("ConnectToMaster() failed. Can only connect while in state 'Disconnected'. Current state: " + NetworkingClient.LoadBalancingPeer.PeerState);
+                /*Debug.LogWarning("ConnectToMaster() failed. Can only connect while in state 'Disconnected'. Current state: " + NetworkingClient.LoadBalancingPeer.PeerState)*/;
                 return false;
             }
             if (PhotonHandler.AppQuits)
             {
-                Debug.LogWarning("Can't connect: Application is closing. Unity called OnApplicationQuit().");
+                /*Debug.LogWarning("Can't connect: Application is closing. Unity called OnApplicationQuit().")*/;
                 return false;
             }
 
             if (OfflineMode)
             {
                 OfflineMode = false; // Cleanup offline mode
-                Debug.LogWarning("ConnectToMaster() disabled the offline mode. No longer offline.");
+                /*Debug.LogWarning("ConnectToMaster() disabled the offline mode. No longer offline.")*/;
             }
 
             if (!IsMessageQueueRunning)
             {
                 IsMessageQueueRunning = true;
-                Debug.LogWarning("ConnectToMaster() enabled IsMessageQueueRunning. Needs to be able to dispatch incoming messages.");
+                /*Debug.LogWarning("ConnectToMaster() enabled IsMessageQueueRunning. Needs to be able to dispatch incoming messages.")*/;
             }
 
             SetupLogging();
@@ -1250,12 +1250,12 @@ namespace Photon.Pun
         {
             if (NetworkingClient.LoadBalancingPeer.PeerState != PeerStateValue.Disconnected)
             {
-                Debug.LogWarning("ConnectToBestCloudServer() failed. Can only connect while in state 'Disconnected'. Current state: " + NetworkingClient.LoadBalancingPeer.PeerState);
+                /*Debug.LogWarning("ConnectToBestCloudServer() failed. Can only connect while in state 'Disconnected'. Current state: " + NetworkingClient.LoadBalancingPeer.PeerState)*/;
                 return false;
             }
             if (PhotonHandler.AppQuits)
             {
-                Debug.LogWarning("Can't connect: Application is closing. Unity called OnApplicationQuit().");
+                /*Debug.LogWarning("Can't connect: Application is closing. Unity called OnApplicationQuit().")*/;
                 return false;
             }
 
@@ -1288,12 +1288,12 @@ namespace Photon.Pun
         {
             if (NetworkingClient.LoadBalancingPeer.PeerState != PeerStateValue.Disconnected && NetworkingClient.Server != ServerConnection.NameServer)
             {
-                Debug.LogWarning("ConnectToRegion() failed. Can only connect while in state 'Disconnected'. Current state: " + NetworkingClient.LoadBalancingPeer.PeerState);
+                /*Debug.LogWarning("ConnectToRegion() failed. Can only connect while in state 'Disconnected'. Current state: " + NetworkingClient.LoadBalancingPeer.PeerState)*/;
                 return false;
             }
             if (PhotonHandler.AppQuits)
             {
-                Debug.LogWarning("Can't connect: Application is closing. Unity called OnApplicationQuit().");
+                /*Debug.LogWarning("Can't connect: Application is closing. Unity called OnApplicationQuit().")*/;
                 return false;
             }
 
@@ -1348,26 +1348,26 @@ namespace Photon.Pun
         {
             if (string.IsNullOrEmpty(NetworkingClient.MasterServerAddress))
             {
-                Debug.LogWarning("Reconnect() failed. It seems the client wasn't connected before?! Current state: " + NetworkingClient.LoadBalancingPeer.PeerState);
+                /*Debug.LogWarning("Reconnect() failed. It seems the client wasn't connected before?! Current state: " + NetworkingClient.LoadBalancingPeer.PeerState)*/;
                 return false;
             }
 
             if (NetworkingClient.LoadBalancingPeer.PeerState != PeerStateValue.Disconnected)
             {
-                Debug.LogWarning("Reconnect() failed. Can only connect while in state 'Disconnected'. Current state: " + NetworkingClient.LoadBalancingPeer.PeerState);
+                /*Debug.LogWarning("Reconnect() failed. Can only connect while in state 'Disconnected'. Current state: " + NetworkingClient.LoadBalancingPeer.PeerState)*/;
                 return false;
             }
 
             if (OfflineMode)
             {
                 OfflineMode = false; // Cleanup offline mode
-                Debug.LogWarning("Reconnect() disabled the offline mode. No longer offline.");
+                /*Debug.LogWarning("Reconnect() disabled the offline mode. No longer offline.")*/;
             }
 
             if (!IsMessageQueueRunning)
             {
                 IsMessageQueueRunning = true;
-                Debug.LogWarning("Reconnect() enabled IsMessageQueueRunning. Needs to be able to dispatch incoming messages.");
+                /*Debug.LogWarning("Reconnect() enabled IsMessageQueueRunning. Needs to be able to dispatch incoming messages.")*/;
             }
 
             NetworkingClient.IsUsingNameServer = false;
@@ -1410,7 +1410,7 @@ namespace Photon.Pun
                 return true;
             }
 
-            Debug.LogError("Cannot send messages when not connected. Either connect to Photon OR use offline mode!");
+            /*Debug.LogError("Cannot send messages when not connected. Either connect to Photon OR use offline mode!")*/;
             return false;
         }
 
@@ -1467,19 +1467,19 @@ namespace Photon.Pun
 
             if (!PhotonNetwork.EnableCloseConnection)
             {
-                Debug.LogError("CloseConnection is disabled. No need to call it.");
+                /*Debug.LogError("CloseConnection is disabled. No need to call it.")*/;
                 return false;
             }
 
             if (!LocalPlayer.IsMasterClient)
             {
-                Debug.LogError("CloseConnection: Only the masterclient can kick another player.");
+                /*Debug.LogError("CloseConnection: Only the masterclient can kick another player.")*/;
                 return false;
             }
 
             if (kickPlayer == null)
             {
-                Debug.LogError("CloseConnection: No such player connected!");
+                /*Debug.LogError("CloseConnection: No such player connected!")*/;
                 return false;
             }
 
@@ -1527,7 +1527,7 @@ namespace Photon.Pun
         {
             if (!InRoom || !VerifyCanUseNetwork() || OfflineMode)
             {
-                if (LogLevel == PunLogLevel.Informational) Debug.Log("Can not SetMasterClient(). Not in room or in OfflineMode.");
+                if (LogLevel == PunLogLevel.Informational) /*Debug.Log("Can not SetMasterClient(). Not in room or in OfflineMode.")*/;
                 return false;
             }
 
@@ -1612,7 +1612,7 @@ namespace Photon.Pun
             {
                 if (offlineModeRoom != null)
                 {
-                    Debug.LogError("JoinRandomRoom failed. In offline mode you still have to leave a room to enter another.");
+                    /*Debug.LogError("JoinRandomRoom failed. In offline mode you still have to leave a room to enter another.")*/;
                     return false;
                 }
                 EnterOfflineRoom("offline room", null, true);
@@ -1620,7 +1620,7 @@ namespace Photon.Pun
             }
             if (NetworkingClient.Server != ServerConnection.MasterServer || !IsConnectedAndReady)
             {
-                Debug.LogError("JoinRandomRoom failed. Client is on "+ NetworkingClient.Server+ " (must be Master Server for matchmaking)" + (IsConnectedAndReady ? " and ready" : " but not ready for operations (State: "+ NetworkingClient.State + ")") + ". Wait for callback: OnJoinedLobby or OnConnectedToMaster.");
+                /*Debug.LogError("JoinRandomRoom failed. Client is on "+ NetworkingClient.Server+ " (must be Master Server for matchmaking)" + (IsConnectedAndReady ? " and ready" : " but not ready for operations (State: "+ NetworkingClient.State + ")") + ". Wait for callback: OnJoinedLobby or OnConnectedToMaster.")*/;
                 return false;
             }
 
@@ -1668,7 +1668,7 @@ namespace Photon.Pun
             {
                 if (offlineModeRoom != null)
                 {
-                    Debug.LogError("JoinRandomOrCreateRoom failed. In offline mode you still have to leave a room to enter another.");
+                    /*Debug.LogError("JoinRandomOrCreateRoom failed. In offline mode you still have to leave a room to enter another.")*/;
                     return false;
                 }
                 EnterOfflineRoom("offline room", null, true);
@@ -1676,7 +1676,7 @@ namespace Photon.Pun
             }
             if (NetworkingClient.Server != ServerConnection.MasterServer || !IsConnectedAndReady)
             {
-                Debug.LogError("JoinRandomOrCreateRoom failed. Client is on "+ NetworkingClient.Server+ " (must be Master Server for matchmaking)" + (IsConnectedAndReady ? " and ready" : " but not ready for operations (State: "+ NetworkingClient.State + ")") + ". Wait for callback: OnJoinedLobby or OnConnectedToMaster.");
+                /*Debug.LogError("JoinRandomOrCreateRoom failed. Client is on "+ NetworkingClient.Server+ " (must be Master Server for matchmaking)" + (IsConnectedAndReady ? " and ready" : " but not ready for operations (State: "+ NetworkingClient.State + ")") + ". Wait for callback: OnJoinedLobby or OnConnectedToMaster.")*/;
                 return false;
             }
 
@@ -1731,7 +1731,7 @@ namespace Photon.Pun
             {
                 if (offlineModeRoom != null)
                 {
-                    Debug.LogError("CreateRoom failed. In offline mode you still have to leave a room to enter another.");
+                    /*Debug.LogError("CreateRoom failed. In offline mode you still have to leave a room to enter another.")*/;
                     return false;
                 }
                 EnterOfflineRoom(roomName, roomOptions, true);
@@ -1739,7 +1739,7 @@ namespace Photon.Pun
             }
             if (NetworkingClient.Server != ServerConnection.MasterServer || !IsConnectedAndReady)
             {
-                Debug.LogError("CreateRoom failed. Client is on " + NetworkingClient.Server + " (must be Master Server for matchmaking)" + (IsConnectedAndReady ? " and ready" : "but not ready for operations (State: " + NetworkingClient.State + ")") + ". Wait for callback: OnJoinedLobby or OnConnectedToMaster.");
+                /*Debug.LogError("CreateRoom failed. Client is on " + NetworkingClient.Server + " (must be Master Server for matchmaking)" + (IsConnectedAndReady ? " and ready" : "but not ready for operations (State: " + NetworkingClient.State + ")") + ". Wait for callback: OnJoinedLobby or OnConnectedToMaster.")*/;
                 return false;
             }
 
@@ -1799,7 +1799,7 @@ namespace Photon.Pun
             {
                 if (offlineModeRoom != null)
                 {
-                    Debug.LogError("JoinOrCreateRoom failed. In offline mode you still have to leave a room to enter another.");
+                    /*Debug.LogError("JoinOrCreateRoom failed. In offline mode you still have to leave a room to enter another.")*/;
                     return false;
                 }
                 EnterOfflineRoom(roomName, roomOptions, true);  // in offline mode, JoinOrCreateRoom assumes you create the room
@@ -1807,12 +1807,12 @@ namespace Photon.Pun
             }
             if (NetworkingClient.Server != ServerConnection.MasterServer || !IsConnectedAndReady)
             {
-                Debug.LogError("JoinOrCreateRoom failed. Client is on " + NetworkingClient.Server + " (must be Master Server for matchmaking)" + (IsConnectedAndReady ? " and ready" : "but not ready for operations (State: " + NetworkingClient.State + ")") + ". Wait for callback: OnJoinedLobby or OnConnectedToMaster.");
+                /*Debug.LogError("JoinOrCreateRoom failed. Client is on " + NetworkingClient.Server + " (must be Master Server for matchmaking)" + (IsConnectedAndReady ? " and ready" : "but not ready for operations (State: " + NetworkingClient.State + ")") + ". Wait for callback: OnJoinedLobby or OnConnectedToMaster.")*/;
                 return false;
             }
             if (string.IsNullOrEmpty(roomName))
             {
-                Debug.LogError("JoinOrCreateRoom failed. A roomname is required. If you don't know one, how will you join?");
+                /*Debug.LogError("JoinOrCreateRoom failed. A roomname is required. If you don't know one, how will you join?")*/;
                 return false;
             }
 
@@ -1864,7 +1864,7 @@ namespace Photon.Pun
             {
                 if (offlineModeRoom != null)
                 {
-                    Debug.LogError("JoinRoom failed. In offline mode you still have to leave a room to enter another.");
+                    /*Debug.LogError("JoinRoom failed. In offline mode you still have to leave a room to enter another.")*/;
                     return false;
                 }
                 EnterOfflineRoom(roomName, null, true);
@@ -1872,12 +1872,12 @@ namespace Photon.Pun
             }
             if (NetworkingClient.Server != ServerConnection.MasterServer || !IsConnectedAndReady)
             {
-                Debug.LogError("JoinRoom failed. Client is on " + NetworkingClient.Server + " (must be Master Server for matchmaking)" + (IsConnectedAndReady ? " and ready" : "but not ready for operations (State: " + NetworkingClient.State + ")") + ". Wait for callback: OnJoinedLobby or OnConnectedToMaster.");
+                /*Debug.LogError("JoinRoom failed. Client is on " + NetworkingClient.Server + " (must be Master Server for matchmaking)" + (IsConnectedAndReady ? " and ready" : "but not ready for operations (State: " + NetworkingClient.State + ")") + ". Wait for callback: OnJoinedLobby or OnConnectedToMaster.")*/;
                 return false;
             }
             if (string.IsNullOrEmpty(roomName))
             {
-                Debug.LogError("JoinRoom failed. A roomname is required. If you don't know one, how will you join?");
+                /*Debug.LogError("JoinRoom failed. A roomname is required. If you don't know one, how will you join?")*/;
                 return false;
             }
 
@@ -1914,17 +1914,17 @@ namespace Photon.Pun
         {
             if (OfflineMode)
             {
-                Debug.LogError("RejoinRoom failed due to offline mode.");
+                /*Debug.LogError("RejoinRoom failed due to offline mode.")*/;
                 return false;
             }
             if (NetworkingClient.Server != ServerConnection.MasterServer || !IsConnectedAndReady)
             {
-                Debug.LogError("RejoinRoom failed. Client is on " + NetworkingClient.Server + " (must be Master Server for matchmaking)" + (IsConnectedAndReady ? " and ready" : "but not ready for operations (State: " + NetworkingClient.State + ")") + ". Wait for callback: OnJoinedLobby or OnConnectedToMaster.");
+                /*Debug.LogError("RejoinRoom failed. Client is on " + NetworkingClient.Server + " (must be Master Server for matchmaking)" + (IsConnectedAndReady ? " and ready" : "but not ready for operations (State: " + NetworkingClient.State + ")") + ". Wait for callback: OnJoinedLobby or OnConnectedToMaster.")*/;
                 return false;
             }
             if (string.IsNullOrEmpty(roomName))
             {
-                Debug.LogError("RejoinRoom failed. A roomname is required. If you don't know one, how will you join?");
+                /*Debug.LogError("RejoinRoom failed. A roomname is required. If you don't know one, how will you join?")*/;
                 return false;
             }
 
@@ -1950,19 +1950,19 @@ namespace Photon.Pun
         {
             if (NetworkingClient.LoadBalancingPeer.PeerState != PeerStateValue.Disconnected)
             {
-                Debug.LogWarning("ReconnectAndRejoin() failed. Can only connect while in state 'Disconnected'. Current state: " + NetworkingClient.LoadBalancingPeer.PeerState);
+                /*Debug.LogWarning("ReconnectAndRejoin() failed. Can only connect while in state 'Disconnected'. Current state: " + NetworkingClient.LoadBalancingPeer.PeerState)*/;
                 return false;
             }
             if (OfflineMode)
             {
                 OfflineMode = false; // Cleanup offline mode
-                Debug.LogWarning("ReconnectAndRejoin() disabled the offline mode. No longer offline.");
+                /*Debug.LogWarning("ReconnectAndRejoin() disabled the offline mode. No longer offline.")*/;
             }
 
             if (!IsMessageQueueRunning)
             {
                 IsMessageQueueRunning = true;
-                Debug.LogWarning("ReconnectAndRejoin() enabled IsMessageQueueRunning. Needs to be able to dispatch incoming messages.");
+                /*Debug.LogWarning("ReconnectAndRejoin() enabled IsMessageQueueRunning. Needs to be able to dispatch incoming messages.")*/;
             }
 
             return NetworkingClient.ReconnectAndRejoin();
@@ -1995,7 +1995,7 @@ namespace Photon.Pun
             {
                 if (CurrentRoom == null)
                 {
-                    Debug.LogWarning("PhotonNetwork.CurrentRoom is null. You don't have to call LeaveRoom() when you're not in one. State: " + PhotonNetwork.NetworkClientState);
+                    /*Debug.LogWarning("PhotonNetwork.CurrentRoom is null. You don't have to call LeaveRoom() when you're not in one. State: " + PhotonNetwork.NetworkClientState)*/;
                 }
                 else
                 {
@@ -2282,7 +2282,7 @@ namespace Photon.Pun
 
             if (!InRoom || eventCode >= 200)
             {
-                Debug.LogWarning("RaiseEvent(" + eventCode + ") failed. Your event is not being sent! Check if your are in a Room and the eventCode must be less than 200 (0..199).");
+                /*Debug.LogWarning("RaiseEvent(" + eventCode + ") failed. Your event is not being sent! Check if your are in a Room and the eventCode must be less than 200 (0..199).")*/;
                 return false;
             }
 
@@ -2304,7 +2304,7 @@ namespace Photon.Pun
 
             if (!InRoom)
             {
-                Debug.LogWarning("RaiseEvent(" + eventCode + ") failed. Your event is not being sent! Check if your are in a Room");
+                /*Debug.LogWarning("RaiseEvent(" + eventCode + ") failed. Your event is not being sent! Check if your are in a Room")*/;
                 return false;
             }
 
@@ -2320,7 +2320,7 @@ namespace Photon.Pun
         {
             if (view.ViewID != 0)
             {
-                Debug.LogError("AllocateViewID() can't be used for PhotonViews that already have a viewID. This view is: " + view.ToString());
+                /*Debug.LogError("AllocateViewID() can't be used for PhotonViews that already have a viewID. This view is: " + view.ToString())*/;
                 return false;
             }
 
@@ -2343,13 +2343,13 @@ namespace Photon.Pun
         {
             if (!PhotonNetwork.IsMasterClient)
             {
-                Debug.LogError("Only the Master Client can AllocateRoomViewID(). Check PhotonNetwork.IsMasterClient!");
+                /*Debug.LogError("Only the Master Client can AllocateRoomViewID(). Check PhotonNetwork.IsMasterClient!")*/;
                 return false;
             }
 
             if (view.ViewID != 0)
             {
-                Debug.LogError("AllocateRoomViewID() can't be used for PhotonViews that already have a viewID. This view is: " + view.ToString());
+                /*Debug.LogError("AllocateRoomViewID() can't be used for PhotonViews that already have a viewID. This view is: " + view.ToString())*/;
                 return false;
             }
 
@@ -2365,7 +2365,7 @@ namespace Photon.Pun
         {
             if (roomObject && !LocalPlayer.IsMasterClient)
             {
-                Debug.LogError("Only a Master Client can AllocateViewID() for room objects. This client/player is not a Master Client. Returning an invalid viewID: -1.");
+                /*Debug.LogError("Only a Master Client can AllocateViewID() for room objects. This client/player is not a Master Client. Returning an invalid viewID: -1.")*/;
                 return 0;
             }
 
@@ -2434,7 +2434,7 @@ namespace Photon.Pun
         {
             if (CurrentRoom == null)
             {
-                Debug.LogError("Can not Instantiate before the client joined/created a room. State: "+PhotonNetwork.NetworkClientState);
+                /*Debug.LogError("Can not Instantiate before the client joined/created a room. State: "+PhotonNetwork.NetworkClientState)*/;
                 return null;
             }
 
@@ -2452,7 +2452,7 @@ namespace Photon.Pun
         {
             if (CurrentRoom == null)
             {
-                Debug.LogError("Can not Instantiate before the client joined/created a room.");
+                /*Debug.LogError("Can not Instantiate before the client joined/created a room.")*/;
                 return null;
             }
 
@@ -2551,13 +2551,13 @@ namespace Photon.Pun
 
             if (go == null)
             {
-                Debug.LogError("Failed to network-Instantiate: " + parameters.prefabName);
+                /*Debug.LogError("Failed to network-Instantiate: " + parameters.prefabName)*/;
                 return null;
             }
 
             if (go.activeSelf)
             {
-                Debug.LogWarning("PrefabPool.Instantiate() should return an inactive GameObject. " + prefabPool.GetType().Name + " returned an active object. PrefabId: " + parameters.prefabName);
+                /*Debug.LogWarning("PrefabPool.Instantiate() should return an inactive GameObject. " + prefabPool.GetType().Name + " returned an active object. PrefabId: " + parameters.prefabName)*/;
             }
 
 
@@ -2566,7 +2566,7 @@ namespace Photon.Pun
 
             if (photonViews.Length == 0)
             {
-                Debug.LogError("PhotonNetwork.Instantiate() can only instantiate objects with a PhotonView component. This prefab does not have one: " + parameters.prefabName);
+                /*Debug.LogError("PhotonNetwork.Instantiate() can only instantiate objects with a PhotonView component. This prefab does not have one: " + parameters.prefabName)*/;
                 return null;
             }
 
@@ -2714,7 +2714,7 @@ namespace Photon.Pun
             }
             else
             {
-                Debug.LogError("Destroy(targetPhotonView) failed, cause targetPhotonView is null.");
+                /*Debug.LogError("Destroy(targetPhotonView) failed, cause targetPhotonView is null.")*/;
             }
         }
 
@@ -2762,7 +2762,7 @@ namespace Photon.Pun
         {
             if (targetPlayer == null)
             {
-                Debug.LogError("DestroyPlayerObjects() failed, cause parameter 'targetPlayer' was null.");
+                /*Debug.LogError("DestroyPlayerObjects() failed, cause parameter 'targetPlayer' was null.")*/;
             }
 
             DestroyPlayerObjects(targetPlayer.ActorNumber);
@@ -2793,7 +2793,7 @@ namespace Photon.Pun
             }
             else
             {
-                Debug.LogError("DestroyPlayerObjects() failed, cause players can only destroy their own GameObjects. A Master Client can destroy anyone's. This is master: " + PhotonNetwork.IsMasterClient);
+                /*Debug.LogError("DestroyPlayerObjects() failed, cause players can only destroy their own GameObjects. A Master Client can destroy anyone's. This is master: " + PhotonNetwork.IsMasterClient)*/;
             }
         }
 
@@ -2821,7 +2821,7 @@ namespace Photon.Pun
             }
             else
             {
-                Debug.LogError("Couldn't call DestroyAll() as only the master client is allowed to call this.");
+                /*Debug.LogError("Couldn't call DestroyAll() as only the master client is allowed to call this.")*/;
             }
         }
 
@@ -2846,7 +2846,7 @@ namespace Photon.Pun
 
             if (!targetPlayer.IsLocal && !IsMasterClient)
             {
-                Debug.LogError("Error; Only the MasterClient can call RemoveRPCs for other players.");
+                /*Debug.LogError("Error; Only the MasterClient can call RemoveRPCs for other players.")*/;
                 return;
             }
 
@@ -2880,7 +2880,7 @@ namespace Photon.Pun
         {
             if (string.IsNullOrEmpty(methodName))
             {
-                Debug.LogError("RPC method name cannot be null or empty.");
+                /*Debug.LogError("RPC method name cannot be null or empty.")*/;
                 return;
             }
 
@@ -2891,7 +2891,7 @@ namespace Photon.Pun
 
             if (CurrentRoom == null)
             {
-                Debug.LogWarning("RPCs can only be sent in rooms. Call of \"" + methodName + "\" gets executed locally only, if at all.");
+                /*Debug.LogWarning("RPCs can only be sent in rooms. Call of \"" + methodName + "\" gets executed locally only, if at all.")*/;
                 return;
             }
 
@@ -2901,7 +2901,7 @@ namespace Photon.Pun
             }
             else
             {
-                Debug.LogWarning("Could not execute RPC " + methodName + ". Possible scene loading in progress?");
+                /*Debug.LogWarning("Could not execute RPC " + methodName + ". Possible scene loading in progress?")*/;
             }
         }
 
@@ -2917,13 +2917,13 @@ namespace Photon.Pun
 
             if (CurrentRoom == null)
             {
-                Debug.LogWarning("RPCs can only be sent in rooms. Call of \"" + methodName + "\" gets executed locally only, if at all.");
+                /*Debug.LogWarning("RPCs can only be sent in rooms. Call of \"" + methodName + "\" gets executed locally only, if at all.")*/;
                 return;
             }
 
             if (LocalPlayer == null)
             {
-                Debug.LogError("RPC can't be sent to target Player being null! Did not send \"" + methodName + "\" call.");
+                /*Debug.LogError("RPC can't be sent to target Player being null! Did not send \"" + methodName + "\" call.")*/;
             }
 
             if (NetworkingClient != null)
@@ -2932,7 +2932,7 @@ namespace Photon.Pun
             }
             else
             {
-                Debug.LogWarning("Could not execute RPC " + methodName + ". Possible scene loading in progress?");
+                /*Debug.LogWarning("Could not execute RPC " + methodName + ". Possible scene loading in progress?")*/;
             }
         }
 
@@ -3135,7 +3135,7 @@ namespace Photon.Pun
             }
             else if (photonServerSettings != null)
             {
-                Debug.LogWarning("photonServerSettings is not null. Will not LoadOrCreateSettings().");
+                /*Debug.LogWarning("photonServerSettings is not null. Will not LoadOrCreateSettings().")*/;
                 return;
             }
 
@@ -3154,7 +3154,7 @@ namespace Photon.Pun
                 photonServerSettings = (ServerSettings)ScriptableObject.CreateInstance("ServerSettings");
                 if (photonServerSettings == null)
                 {
-                    Debug.LogError("Failed to create ServerSettings. PUN is unable to run this way. If you deleted it from the project, reload the Editor.");
+                    /*Debug.LogError("Failed to create ServerSettings. PUN is unable to run this way. If you deleted it from the project, reload the Editor.")*/;
                     return;
                 }
             }

@@ -40,7 +40,7 @@ public static class MultiplayerWeaponVerification
             CheckInventoryShapes();
             MultiplayerGameplayVerification.RunChecks();
             Write("editor", true, null);
-            Debug.Log("Armas multijugador: " + checks.Count + " comprobaciones correctas.");
+            /*Debug.Log("Armas multijugador: " + checks.Count + " comprobaciones correctas.")*/;
         }
         catch (Exception error) { Write("editor", false, error.ToString()); throw; }
     }

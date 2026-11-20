@@ -290,7 +290,7 @@ public class PlayerInventory : MonoBehaviour
 
         if (!canFit || ObjImagePosition.Count == 0)
         {
-            Debug.LogWarning("Createloot: el objeto no cabe en el lootgrid (¿slot ocupado?)");
+            /*Debug.LogWarning("Createloot: el objeto no cabe en el lootgrid (¿slot ocupado?)")*/;
             return;
         }
         

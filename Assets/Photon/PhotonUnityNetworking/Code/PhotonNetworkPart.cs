@@ -179,7 +179,7 @@ namespace Photon.Pun
             {
                 if (value == null)
                 {
-                    Debug.LogWarning("PhotonNetwork.PrefabPool cannot be set to null. It will default back to using the 'DefaultPool' Pool");
+                    /*Debug.LogWarning("PhotonNetwork.PrefabPool cannot be set to null. It will default back to using the 'DefaultPool' Pool")*/;
                     prefabPool = new DefaultPool();
                 }
                 else
@@ -358,7 +358,7 @@ namespace Photon.Pun
         {
             if (rpcData == null || !rpcData.ContainsKey(keyByteZero))
             {
-                Debug.LogError("Malformed RPC; this should never occur. Content: " + SupportClassPun.DictionaryToString(rpcData));
+                /*Debug.LogError("Malformed RPC; this should never occur. Content: " + SupportClassPun.DictionaryToString(rpcData))*/;
                 return;
             }
 
@@ -377,7 +377,7 @@ namespace Photon.Pun
                 int rpcIndex = (byte)rpcData[keyByteFive];  // LIMITS RPC COUNT
                 if (rpcIndex > PhotonNetwork.PhotonServerSettings.RpcList.Count - 1)
                 {
-                    Debug.LogError("Could not find RPC with index: " + rpcIndex + ". Going to ignore! Check PhotonServerSettings.RpcList");
+                    /*Debug.LogError("Could not find RPC with index: " + rpcIndex + ". Going to ignore! Check PhotonServerSettings.RpcList")*/;
                     return;
                 }
                 else
@@ -405,31 +405,31 @@ namespace Photon.Pun
 
                 if (owningPv)
                 {
-                    Debug.LogWarning("Received RPC \"" + inMethodName + "\" for viewID " + netViewID + " but this PhotonView does not exist! View was/is ours." + (ownerSent ? " Owner called." : " Remote called.") + " By: " + sender);
+                    /*Debug.LogWarning("Received RPC \"" + inMethodName + "\" for viewID " + netViewID + " but this PhotonView does not exist! View was/is ours." + (ownerSent ? " Owner called." : " Remote called.") + " By: " + sender)*/;
                 }
                 else
                 {
-                    Debug.LogWarning("Received RPC \"" + inMethodName + "\" for viewID " + netViewID + " but this PhotonView does not exist! Was remote PV." + (ownerSent ? " Owner called." : " Remote called.") + " By: " + sender + " Maybe GO was destroyed but RPC not cleaned up.");
+                    /*Debug.LogWarning("Received RPC \"" + inMethodName + "\" for viewID " + netViewID + " but this PhotonView does not exist! Was remote PV." + (ownerSent ? " Owner called." : " Remote called.") + " By: " + sender + " Maybe GO was destroyed but RPC not cleaned up.")*/;
                 }
                 return;
             }
 
             if (photonNetview.Prefix != otherSidePrefix)
             {
-                Debug.LogError("Received RPC \"" + inMethodName + "\" on viewID " + netViewID + " with a prefix of " + otherSidePrefix + ", our prefix is " + photonNetview.Prefix + ". The RPC has been ignored.");
+                /*Debug.LogError("Received RPC \"" + inMethodName + "\" on viewID " + netViewID + " with a prefix of " + otherSidePrefix + ", our prefix is " + photonNetview.Prefix + ". The RPC has been ignored.")*/;
                 return;
             }
 
             // Get method name
             if (string.IsNullOrEmpty(inMethodName))
             {
-                Debug.LogError("Malformed RPC; this should never occur. Content: " + SupportClassPun.DictionaryToString(rpcData));
+                /*Debug.LogError("Malformed RPC; this should never occur. Content: " + SupportClassPun.DictionaryToString(rpcData))*/;
                 return;
             }
 
             if (PhotonNetwork.LogLevel >= PunLogLevel.Full)
             {
-                Debug.Log("Received RPC: " + inMethodName);
+                /*Debug.Log("Received RPC: " + inMethodName)*/;
             }
 
 
@@ -473,7 +473,7 @@ namespace Photon.Pun
                 MonoBehaviour monob = photonNetview.RpcMonoBehaviours[componentsIndex];
                 if (monob == null)
                 {
-                    Debug.LogError("ERROR You have missing MonoBehaviours on your gameobjects!");
+                    /*Debug.LogError("ERROR You have missing MonoBehaviours on your gameobjects!")*/;
                     continue;
                 }
 
@@ -638,21 +638,21 @@ namespace Photon.Pun
                     if (foundMethods == 0)
                     {
                         // found no method that matches
-                        Debug.LogErrorFormat(context, "RPC method '{0}({2})' not found on object with PhotonView {1}. Implement as non-static. Apply [PunRPC]. Components on children are not found. " +
-                            "Return type must be void or IEnumerator (if you enable RunRpcCoroutines). RPCs are a one-way message.", inMethodName, netViewID, argsString);
+                        /*Debug.LogErrorFormat(context, "RPC method '{0}({2})' not found on object with PhotonView {1}. Implement as non-static. Apply [PunRPC]. Components on children are not found. " +
+                            "Return type must be void or IEnumerator (if you enable RunRpcCoroutines). RPCs are a one-way message.", inMethodName, netViewID, argsString)*/;
                     }
                     else
                     {
                         // found a method but not the right arguments
-                        Debug.LogErrorFormat(context, "RPC method '{0}' found on object with PhotonView {1} but has wrong parameters. Implement as '{0}({2})'. PhotonMessageInfo is optional as final parameter." +
-                            "Return type must be void or IEnumerator (if you enable RunRpcCoroutines).", inMethodName, netViewID, argsString);
+                        /*Debug.LogErrorFormat(context, "RPC method '{0}' found on object with PhotonView {1} but has wrong parameters. Implement as '{0}({2})'. PhotonMessageInfo is optional as final parameter." +
+                            "Return type must be void or IEnumerator (if you enable RunRpcCoroutines).", inMethodName, netViewID, argsString)*/;
                     }
                 }
                 else
                 {
                     // multiple components have the same method
-                    Debug.LogErrorFormat(context, "RPC method '{0}({2})' found {3}x on object with PhotonView {1}. Only one component should implement it." +
-                            "Return type must be void or IEnumerator (if you enable RunRpcCoroutines).", inMethodName, netViewID, argsString, foundMethods);
+                    /*Debug.LogErrorFormat(context, "RPC method '{0}({2})' found {3}x on object with PhotonView {1}. Only one component should implement it." +
+                            "Return type must be void or IEnumerator (if you enable RunRpcCoroutines).", inMethodName, netViewID, argsString, foundMethods)*/;
                 }
             }
         }
@@ -700,7 +700,7 @@ namespace Photon.Pun
         {
             if (playerId <= 0)
             {
-                Debug.LogError("Failed to Destroy objects of playerId: " + playerId);
+                /*Debug.LogError("Failed to Destroy objects of playerId: " + playerId)*/;
                 return;
             }
 
@@ -723,7 +723,7 @@ namespace Photon.Pun
             {
                 if (view == null)
                 {
-                    Debug.LogError("Null view");
+                    /*Debug.LogError("Null view")*/;
                     continue;
                 }
 
@@ -782,7 +782,7 @@ namespace Photon.Pun
 
             if (go == null)
             {
-                Debug.LogError("Failed to 'network-remove' GameObject because it's null.");
+                /*Debug.LogError("Failed to 'network-remove' GameObject because it's null.")*/;
                 return;
             }
 
@@ -790,7 +790,7 @@ namespace Photon.Pun
             go.GetComponentsInChildren<PhotonView>(true, foundPVs);
             if (foundPVs.Count <= 0)
             {
-                Debug.LogError("Failed to 'network-remove' GameObject because has no PhotonView components: " + go);
+                /*Debug.LogError("Failed to 'network-remove' GameObject because has no PhotonView components: " + go)*/;
                 return;
             }
 
@@ -802,7 +802,7 @@ namespace Photon.Pun
                 //Debug.LogWarning("Destroy " + instantiationId + " creator " + creatorId, go);
                 if (!viewZero.IsMine)
                 {
-                    Debug.LogError("Failed to 'network-remove' GameObject. Client is neither owner nor MasterClient taking over for owner who left: " + viewZero);
+                    /*Debug.LogError("Failed to 'network-remove' GameObject. Client is neither owner nor MasterClient taking over for owner who left: " + viewZero)*/;
                     foundPVs.Clear();   // as foundPVs is re-used, clean it to avoid lingering references
                     return;
                 }
@@ -853,7 +853,7 @@ namespace Photon.Pun
 
             if (PhotonNetwork.LogLevel >= PunLogLevel.Full)
             {
-                Debug.Log("Network destroy Instantiated GO: " + go.name);
+                /*Debug.Log("Network destroy Instantiated GO: " + go.name)*/;
             }
             
             foundPVs.Clear();           // as foundPVs is re-used, clean it to avoid lingering references
@@ -995,7 +995,7 @@ namespace Photon.Pun
             if (netView.ViewID == 0)
             {
                 // don't register views with ID 0 (not initialized). they register when a ID is assigned later on
-                Debug.Log("PhotonView register is ignored, because viewID is 0. No id assigned yet to: " + netView);
+                /*Debug.Log("PhotonView register is ignored, because viewID is 0. No id assigned yet to: " + netView)*/;
                 return;
             }
 
@@ -1006,7 +1006,7 @@ namespace Photon.Pun
                 // if some other view is in the list already, we got a problem. it might be indestructible. print out error
                 if (netView != listedView)
                 {
-                    Debug.LogError(string.Format("PhotonView ID duplicate found: {0}. New: {1} old: {2}. Maybe one wasn't destroyed on scene load?! Check for 'DontDestroyOnLoad'. Destroying old entry, adding new.", netView.ViewID, netView, listedView));
+                    /*Debug.LogError(string.Format("PhotonView ID duplicate found: {0}. New: {1} old: {2}. Maybe one wasn't destroyed on scene load?! Check for 'DontDestroyOnLoad'. Destroying old entry, adding new.", netView.ViewID, netView, listedView))*/;
                 }
                 else
                 {
@@ -1024,7 +1024,7 @@ namespace Photon.Pun
 
             if (PhotonNetwork.LogLevel >= PunLogLevel.Full)
             {
-                Debug.Log("Registered PhotonView: " + netView.ViewID);
+                /*Debug.Log("Registered PhotonView: " + netView.ViewID)*/;
             }
         }
 
@@ -1072,7 +1072,7 @@ namespace Photon.Pun
         {
             if (view.OwnerActorNr != NetworkingClient.LocalPlayer.ActorNumber && !NetworkingClient.LocalPlayer.IsMasterClient)
             {
-                Debug.LogError("Cannot remove cached RPCs on a PhotonView thats not ours! " + view.Owner + " scene: " + view.IsRoomView);
+                /*Debug.LogError("Cannot remove cached RPCs on a PhotonView thats not ours! " + view.Owner + " scene: " + view.IsRoomView)*/;
                 return;
             }
 
@@ -1201,12 +1201,12 @@ namespace Photon.Pun
 
             if (view.ViewID < 1)
             {
-                Debug.LogError("Illegal view ID:" + view.ViewID + " method: " + methodName + " GO:" + view.gameObject.name);
+                /*Debug.LogError("Illegal view ID:" + view.ViewID + " method: " + methodName + " GO:" + view.gameObject.name)*/;
             }
 
             if (PhotonNetwork.LogLevel >= PunLogLevel.Full)
             {
-                Debug.Log("Sending RPC \"" + methodName + "\" to target: " + target + " or player:" + player + ".");
+                /*Debug.Log("Sending RPC \"" + methodName + "\" to target: " + target + " or player:" + player + ".")*/;
             }
 
 
@@ -1324,7 +1324,7 @@ namespace Photon.Pun
                         break;
                     }
                 default:
-                    Debug.LogError("Unsupported target enum: " + target);
+                    /*Debug.LogError("Unsupported target enum: " + target)*/;
                     break;
             }
         }
@@ -1359,7 +1359,7 @@ namespace Photon.Pun
                         byte g = disableGroups[index];
                         if (g <= 0)
                         {
-                            Debug.LogError("Error: PhotonNetwork.SetInterestGroups was called with an illegal group number: " + g + ". The Group number should be at least 1.");
+                            /*Debug.LogError("Error: PhotonNetwork.SetInterestGroups was called with an illegal group number: " + g + ". The Group number should be at least 1.")*/;
                             continue;
                         }
 
@@ -1390,7 +1390,7 @@ namespace Photon.Pun
                         byte g = enableGroups[index];
                         if (g <= 0)
                         {
-                            Debug.LogError("Error: PhotonNetwork.SetInterestGroups was called with an illegal group number: " + g + ". The Group number should be at least 1.");
+                            /*Debug.LogError("Error: PhotonNetwork.SetInterestGroups was called with an illegal group number: " + g + ". The Group number should be at least 1.")*/;
                             continue;
                         }
 
@@ -1500,7 +1500,7 @@ namespace Photon.Pun
             if (removeKeys.Count > 0)
             {
                 if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
-                    Debug.Log("New level loaded. Removed " + removeKeys.Count + " scene view IDs from last level.");
+                    /*Debug.Log("New level loaded. Removed " + removeKeys.Count + " scene view IDs from last level.")*/;
             }
         }
 
@@ -1805,14 +1805,14 @@ namespace Photon.Pun
             {
                 if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
                 {
-                    Debug.LogWarning("Received OnSerialization for view ID " + viewID + ". We have no such PhotonView! Ignore this if you're joining or leaving a room. State: " + NetworkingClient.State);
+                    /*Debug.LogWarning("Received OnSerialization for view ID " + viewID + ". We have no such PhotonView! Ignore this if you're joining or leaving a room. State: " + NetworkingClient.State)*/;
                 }
                 return;
             }
 
             if (view.Prefix > 0 && correctPrefix != view.Prefix)
             {
-                Debug.LogError("Received OnSerialization for view ID " + viewID + " with prefix " + correctPrefix + ". Our prefix is " + view.Prefix);
+                /*Debug.LogError("Received OnSerialization for view ID " + viewID + " with prefix " + correctPrefix + ". Our prefix is " + view.Prefix)*/;
                 return;
             }
 
@@ -1834,8 +1834,8 @@ namespace Photon.Pun
                     // Skip this packet as we haven't got received complete-copy of this view yet.
                     if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
                     {
-                        Debug.Log("Skipping packet for " + view.name + " [" + view.ViewID +
-                                  "] as we haven't received a full packet for delta compression yet. This is OK if it happens for the first few frames after joining a game.");
+                        /*Debug.Log("Skipping packet for " + view.name + " [" + view.ViewID +
+                                  "] as we haven't received a full packet for delta compression yet. This is OK if it happens for the first few frames after joining a game.")*/;
                     }
                     return;
                 }
@@ -2130,7 +2130,7 @@ namespace Photon.Pun
             }
             if (levelId == null)
             {
-                Debug.LogError("Parameter levelId can't be null!");
+                /*Debug.LogError("Parameter levelId can't be null!")*/;
                 return;
             }
 
@@ -2167,7 +2167,7 @@ namespace Photon.Pun
             {
                 if (!_AsyncLevelLoadingOperation.isDone)
                 {
-                    Debug.LogWarning("PUN cancels an ongoing async level load, as another scene should be loaded. Next scene to load: " + levelId);
+                    /*Debug.LogWarning("PUN cancels an ongoing async level load, as another scene should be loaded. Next scene to load: " + levelId)*/;
                 }
 
                 _AsyncLevelLoadingOperation.allowSceneActivation = false;
@@ -2179,7 +2179,7 @@ namespace Photon.Pun
             Hashtable setScene = new Hashtable();
             if (levelId is int) setScene[CurrentSceneProperty] = (int)levelId;
             else if (levelId is string) setScene[CurrentSceneProperty] = (string)levelId;
-            else Debug.LogError("Parameter levelId must be int or string!");
+            else /*Debug.LogError("Parameter levelId must be int or string!")*/;
 
             PhotonNetwork.CurrentRoom.SetCustomProperties(setScene);
             SendAllOutgoingCommands(); // send immediately! because: in most cases the client will begin to load and pause sending anything for a while
@@ -2247,11 +2247,11 @@ namespace Photon.Pun
                     // MasterClient "requests" a disconnection from us
                     if (PhotonNetwork.EnableCloseConnection == false)
                     {
-                        Debug.LogWarning("CloseConnection received from " + originatingPlayer + ". PhotonNetwork.EnableCloseConnection is false. Ignoring the request (this client stays in the room).");
+                        /*Debug.LogWarning("CloseConnection received from " + originatingPlayer + ". PhotonNetwork.EnableCloseConnection is false. Ignoring the request (this client stays in the room).")*/;
                     }
                     else if (originatingPlayer == null || !originatingPlayer.IsMasterClient)
                     {
-                        Debug.LogWarning("CloseConnection received from " + originatingPlayer + ". That player is not the Master Client. " + PhotonNetwork.MasterClient + " is.");
+                        /*Debug.LogWarning("CloseConnection received from " + originatingPlayer + ". That player is not the Master Client. " + PhotonNetwork.MasterClient + " is.")*/;
                     }
                     else if (PhotonNetwork.EnableCloseConnection)
                     {
@@ -2299,7 +2299,7 @@ namespace Photon.Pun
                     }
                     else
                     {
-                        Debug.LogError("Ev Destroy Failed. Could not find PhotonView with instantiationId " + instantiationId + ". Sent by actorNr: " + actorNr);
+                        /*Debug.LogError("Ev Destroy Failed. Could not find PhotonView with instantiationId " + instantiationId + ". Sent by actorNr: " + actorNr)*/;
                     }
 
                     break;
@@ -2314,13 +2314,13 @@ namespace Photon.Pun
                         PhotonView requestedView = GetPhotonView(requestedViewId);
                         if (requestedView == null)
                         {
-                            Debug.LogWarning("Can't find PhotonView of incoming OwnershipRequest. ViewId not found: " + requestedViewId);
+                            /*Debug.LogWarning("Can't find PhotonView of incoming OwnershipRequest. ViewId not found: " + requestedViewId)*/;
                             break;
                         }
 
                         if (PhotonNetwork.LogLevel == PunLogLevel.Informational)
                         {
-                            Debug.Log(string.Format("OwnershipRequest. actorNr {0} requests view {1} from {2}. current pv owner: {3} is {4}. isMine: {6} master client: {5}", actorNr, requestedViewId, requestedFromOwnerId, requestedView.OwnerActorNr, requestedView.IsOwnerActive ? "active" : "inactive", MasterClient.ActorNumber, requestedView.IsMine));
+                            /*Debug.Log(string.Format("OwnershipRequest. actorNr {0} requests view {1} from {2}. current pv owner: {3} is {4}. isMine: {6} master client: {5}", actorNr, requestedViewId, requestedFromOwnerId, requestedView.OwnerActorNr, requestedView.IsOwnerActive ? "active" : "inactive", MasterClient.ActorNumber, requestedView.IsMine))*/;
                         }
 
                         switch (requestedView.OwnershipTransfer)
@@ -2359,7 +2359,7 @@ namespace Photon.Pun
                                 break;
 
                             default:
-                                Debug.LogWarning("Ownership mode == " + (requestedView.OwnershipTransfer) + ". Ignoring request.");
+                                /*Debug.LogWarning("Ownership mode == " + (requestedView.OwnershipTransfer) + ". Ignoring request.")*/;
                                 break;
                         }
                     }
@@ -2373,7 +2373,7 @@ namespace Photon.Pun
 
                         if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
                         {
-                            Debug.Log("Ev OwnershipTransfer. ViewID " + requestedViewId + " to: " + newOwnerId + " Time: " + Environment.TickCount % 1000);
+                            /*Debug.Log("Ev OwnershipTransfer. ViewID " + requestedViewId + " to: " + newOwnerId + " Time: " + Environment.TickCount % 1000)*/;
                         }
 
                         PhotonView requestedView = GetPhotonView(requestedViewId);
@@ -2396,17 +2396,17 @@ namespace Photon.Pun
                             else if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
                             {
                                 if (requestedView.OwnershipTransfer == OwnershipOption.Request)
-                                    Debug.Log("Failed incoming OwnershipTransfer attempt for '" + requestedView.name + "; " + requestedViewId +
-                                              " - photonView has OwnershipTransfer set to OwnershipOption.Request, but Player attempting to change owner is not the current owner/controller.");
+                                    /*Debug.Log("Failed incoming OwnershipTransfer attempt for '" + requestedView.name + "; " + requestedViewId +
+                                              " - photonView has OwnershipTransfer set to OwnershipOption.Request, but Player attempting to change owner is not the current owner/controller.")*/;
                                 else
-                                    Debug.Log("Failed incoming OwnershipTransfer attempt for '" + requestedView.name + "; " + requestedViewId +
-                                              " - photonView has OwnershipTransfer set to OwnershipOption.Fixed.");
+                                    /*Debug.Log("Failed incoming OwnershipTransfer attempt for '" + requestedView.name + "; " + requestedViewId +
+                                              " - photonView has OwnershipTransfer set to OwnershipOption.Fixed.")*/;
                             }
                         }
                         else if (PhotonNetwork.LogLevel >= PunLogLevel.ErrorsOnly)
                         {
-                            Debug.LogErrorFormat("Failed to find a PhotonView with ID={0} for incoming OwnershipTransfer event (newOwnerActorNumber={1}), sender={2}",
-                                                 requestedViewId, newOwnerId, actorNr);
+                            /*Debug.LogErrorFormat("Failed to find a PhotonView with ID={0} for incoming OwnershipTransfer event (newOwnerActorNumber={1}), sender={2}",
+                                                 requestedViewId, newOwnerId, actorNr)*/;
                         }
 
                         break;
@@ -2430,7 +2430,7 @@ namespace Photon.Pun
                             {
                                 if (PhotonNetwork.LogLevel >= PunLogLevel.ErrorsOnly)
                                 {
-                                    Debug.LogErrorFormat("Failed to find a PhotonView with ID={0} for incoming OwnershipUpdate event (newOwnerActorNumber={1}), sender={2}. If you load scenes, make sure to pause the message queue.", viewId, newOwnerId, actorNr);
+                                    /*Debug.LogErrorFormat("Failed to find a PhotonView with ID={0} for incoming OwnershipUpdate event (newOwnerActorNumber={1}), sender={2}. If you load scenes, make sure to pause the message queue.", viewId, newOwnerId, actorNr)*/;
                                 }
 
                                 continue;
@@ -2474,7 +2474,7 @@ namespace Photon.Pun
                     {
                         if (PhotonNetwork.LogLevel >= PunLogLevel.Full)
                         {
-                            Debug.Log("OpGetRegions failed. Will not ping any. ReturnCode: " + opResponse.ReturnCode);
+                            /*Debug.Log("OpGetRegions failed. Will not ping any. ReturnCode: " + opResponse.ReturnCode)*/;
                         }
                         return;
                     }
@@ -2484,7 +2484,7 @@ namespace Photon.Pun
 
                         if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
                         {
-                            Debug.Log("PUN got region list. Going to ping minimum regions, based on this previous result summary: " + previousBestRegionSummary);
+                            /*Debug.Log("PUN got region list. Going to ping minimum regions, based on this previous result summary: " + previousBestRegionSummary)*/;
                         }
                         NetworkingClient.RegionHandler.PingMinimumOfRegions(OnRegionsPinged, previousBestRegionSummary);
                     }
@@ -2522,7 +2522,7 @@ namespace Photon.Pun
         {
             if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
             {
-                Debug.Log(regionHandler.GetResults());
+                /*Debug.Log(regionHandler.GetResults())*/;
             }
 
             _cachedRegionHandler = regionHandler;
@@ -2543,20 +2543,20 @@ namespace Photon.Pun
             #if DEVELOPMENT_BUILD || UNITY_EDITOR
             if (!string.IsNullOrEmpty(PhotonServerSettings.DevRegion) && ConnectMethod == ConnectMethod.ConnectToBest)
             {
-                Debug.LogWarning("PUN is in development mode (development build). As the 'dev region' is not empty (" + PhotonServerSettings.DevRegion + ") it overrides the found best region. See PhotonServerSettings.");
+                /*Debug.LogWarning("PUN is in development mode (development build). As the 'dev region' is not empty (" + PhotonServerSettings.DevRegion + ") it overrides the found best region. See PhotonServerSettings.")*/;
 
                 string _finalDevRegion = PhotonServerSettings.DevRegion;
                 if (!_cachedRegionHandler.EnabledRegions.Any(p => p.Code == PhotonServerSettings.DevRegion))
                 {
                     _finalDevRegion = _cachedRegionHandler.EnabledRegions[0].Code;
 
-                    Debug.LogWarning("The 'dev region' (" + PhotonServerSettings.DevRegion + ") was not found in the enabled regions, the first enabled region is picked (" + _finalDevRegion + ")");
+                    /*Debug.LogWarning("The 'dev region' (" + PhotonServerSettings.DevRegion + ") was not found in the enabled regions, the first enabled region is picked (" + _finalDevRegion + ")")*/;
                 }
 
                 bool connects = PhotonNetwork.NetworkingClient.ConnectToRegionMaster(_finalDevRegion);
                 if (!connects)
                 {
-                    Debug.LogError("PUN could not ConnectToRegionMaster successfully. Please check error messages.");
+                    /*Debug.LogError("PUN could not ConnectToRegionMaster successfully. Please check error messages.")*/;
                 }
                 return;
             }
@@ -2567,7 +2567,7 @@ namespace Photon.Pun
                 bool connects = PhotonNetwork.NetworkingClient.ConnectToRegionMaster(regionHandler.BestRegion.Code);
                 if (!connects)
                 {
-                    Debug.LogError("PUN could not ConnectToRegionMaster successfully. Please check error messages.");
+                    /*Debug.LogError("PUN could not ConnectToRegionMaster successfully. Please check error messages.")*/;
                 }
             }
         }

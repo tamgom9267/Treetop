@@ -617,12 +617,12 @@ namespace Photon.Realtime
                 sw.Stop();
                 if (sw.ElapsedMilliseconds > 100)
                 {
-                    System.Diagnostics.Debug.WriteLine($"RegionPingThreaded.ResolveHost() took: {sw.ElapsedMilliseconds}ms");
+                    /*System.Diagnostics.Debug.WriteLine($"RegionPingThreaded.ResolveHost() took: {sw.ElapsedMilliseconds}ms")*/;
                 }
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine($"RegionPingThreaded ResolveHost failed for {this.region}. Caught: {e}");
+                /*System.Diagnostics.Debug.WriteLine($"RegionPingThreaded ResolveHost failed for {this.region}. Caught: {e}")*/;
                 this.Aborted = true;
             }
 
@@ -642,7 +642,7 @@ namespace Photon.Realtime
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine("RegionPinger.RegionPingThreaded() caught exception for ping.StartPing(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message);
+                    /*System.Diagnostics.Debug.WriteLine("RegionPinger.RegionPingThreaded() caught exception for ping.StartPing(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message)*/;
                     break;
                 }
 
@@ -726,12 +726,12 @@ namespace Photon.Realtime
                 sw.Stop();
                 if (sw.ElapsedMilliseconds > 100)
                 {
-                    Debug.Log($"RegionPingCoroutine.ResolveHost() took: {sw.ElapsedMilliseconds}ms");
+                    /*Debug.Log($"RegionPingCoroutine.ResolveHost() took: {sw.ElapsedMilliseconds}ms")*/;
                 }
             }
             catch (Exception e)
             {
-                Debug.Log($"RegionPingCoroutine ResolveHost failed for {this.region}. Caught: {e}");
+                /*Debug.Log($"RegionPingCoroutine ResolveHost failed for {this.region}. Caught: {e}")*/;
                 this.Aborted = true;
             }
 
@@ -751,7 +751,7 @@ namespace Photon.Realtime
                 }
                 catch (Exception e)
                 {
-                    Debug.Log("RegionPinger.RegionPingCoroutine() caught exception for ping.StartPing(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message);
+                    /*Debug.Log("RegionPinger.RegionPingCoroutine() caught exception for ping.StartPing(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message)*/;
                     break;
                 }
 
@@ -868,7 +868,7 @@ namespace Photon.Realtime
             }
             catch (System.Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("RegionPinger.ResolveHost() caught an exception for Dns.GetHostAddresses(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message);
+                /*System.Diagnostics.Debug.WriteLine("RegionPinger.ResolveHost() caught an exception for Dns.GetHostAddresses(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message)*/;
             }
 
             return ipv4Address;

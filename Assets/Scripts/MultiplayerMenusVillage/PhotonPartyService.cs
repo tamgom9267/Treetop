@@ -173,7 +173,7 @@ public class PhotonPartyService : MonoBehaviourPunCallbacks, IOnEventCallback
             if (!warned && Time.realtimeSinceStartupAsDouble >= warningAt)
             {
                 warned = true;
-                Debug.LogWarning("Photon sigue cerrando la conexion. El multijugador esperara su confirmacion.", this);
+                /*Debug.LogWarning("Photon sigue cerrando la conexion. El multijugador esperara su confirmacion.", this)*/;
             }
             yield return null;
         }

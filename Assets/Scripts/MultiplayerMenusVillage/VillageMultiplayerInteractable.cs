@@ -19,7 +19,7 @@ public class VillageMultiplayerInteractable : MonoBehaviour
         SetHint(false);
         Collider trigger = GetComponent<Collider>();
         if (trigger == null || !trigger.isTrigger)
-            Debug.LogWarning("Activa Is Trigger en el collider del objeto multijugador.", this);
+            /*Debug.LogWarning("Activa Is Trigger en el collider del objeto multijugador.", this)*/;
     }
 
     private void Update()

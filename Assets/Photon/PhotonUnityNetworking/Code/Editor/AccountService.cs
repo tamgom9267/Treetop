@@ -72,20 +72,20 @@ namespace Photon.Realtime
         {
             if (this.RequestPendingResult)
             {
-                Debug.LogError("Registration request pending result. Not sending another.");
+                /*Debug.LogError("Registration request pending result. Not sending another.")*/;
                 return false;
             }
 
             if (!IsValidEmail(email))
             {
-                Debug.LogErrorFormat("Email \"{0}\" is not valid", email);
+                /*Debug.LogErrorFormat("Email \"{0}\" is not valid", email)*/;
                 return false;
             }
 
             string serviceTypeString = GetServiceTypesFromList(serviceTypes);
             if (string.IsNullOrEmpty(serviceTypeString))
             {
-                Debug.LogError("serviceTypes string is null or empty");
+                /*Debug.LogError("serviceTypes string is null or empty")*/;
                 return false;
             }
 
@@ -176,7 +176,7 @@ namespace Photon.Realtime
                     }
                     else
                     {
-                        Debug.LogError("The server did not return any AppId, ApplicationIds was empty in the response.");
+                        /*Debug.LogError("The server did not return any AppId, ApplicationIds was empty in the response.")*/;
                         return null;
                     }
                 }
@@ -184,7 +184,7 @@ namespace Photon.Realtime
             }
             catch (Exception ex) // probably JSON parsing exception, check if returned string is valid JSON
             {
-                Debug.LogException(ex);
+                /*Debug.LogException(ex)*/;
                 return null;
             }
         }

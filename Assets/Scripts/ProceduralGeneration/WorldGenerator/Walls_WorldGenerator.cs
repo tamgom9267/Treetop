@@ -11,7 +11,7 @@ public partial class WorldGenerator : MonoBehaviour
         // Verifica que existe el prefab
         if (paredHorizontal == null || paredVertical == null)
         {
-            Debug.LogError("No se encontro el prefab de la pared");
+            /*Debug.LogError("No se encontro el prefab de la pared")*/;
             return;
         }
 
@@ -48,7 +48,7 @@ public partial class WorldGenerator : MonoBehaviour
         // Verifica que existe el prefab
         if (puertaHorizontal == null || paredDePuertaHorizontal == null || puertaVertical == null || paredDePuertaVertical == null)
         {
-            Debug.LogError("No se encontro el prefab de el puente");
+            /*Debug.LogError("No se encontro el prefab de el puente")*/;
             return;
         }
 
@@ -131,7 +131,7 @@ public partial class WorldGenerator : MonoBehaviour
     {
         if (floorData == null || floorData.rooms == null || floorData.rooms.Count == 0)
         {
-            Debug.LogWarning("No se puede generar el portal final porque el piso no tiene cuartos.");
+            /*Debug.LogWarning("No se puede generar el portal final porque el piso no tiene cuartos.")*/;
             return;
         }
 
@@ -160,13 +160,13 @@ public partial class WorldGenerator : MonoBehaviour
                 wallLocation = nextRoomPosition + new Vector3(-21.5f, 0, 0);
                 break;
             default:
-                Debug.LogError("La direccion de salida del cuarto final no es valida.");
+                /*Debug.LogError("La direccion de salida del cuarto final no es valida.")*/;
                 return;
         }
 
         if (portalPrefab == null)
         {
-            Debug.LogError("No se encontro el prefab del portal final en Resources/GeneracionDeCuartos/Portal.");
+            /*Debug.LogError("No se encontro el prefab del portal final en Resources/GeneracionDeCuartos/Portal.")*/;
             return;
         }
 

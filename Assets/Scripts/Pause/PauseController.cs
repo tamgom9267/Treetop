@@ -49,18 +49,18 @@ public class PauseController : MonoBehaviour
     {
         if (PauseAction.WasPressedThisFrame())
         {
-            Debug.Log("ESC PRESIONADO");
+            /*Debug.Log("ESC PRESIONADO")*/;
             TogglePause();
         }
     }
 
     public void OnPause(InputValue value)
     {
-        Debug.Log("OnPause fue llamado");
+        /*Debug.Log("OnPause fue llamado")*/;
         // Solo hacemos algo cuando ESC es presionado
         if (value.isPressed)
         {
-            Debug.Log("ESC PRESIONADO");
+            /*Debug.Log("ESC PRESIONADO")*/;
             TogglePause();
         }
     }

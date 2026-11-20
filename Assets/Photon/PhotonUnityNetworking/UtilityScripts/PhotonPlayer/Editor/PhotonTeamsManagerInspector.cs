@@ -180,7 +180,7 @@ namespace Photon.Pun.UtilityScripts
                         byte newCode = (byte)teamCodeSp.intValue;
                         if (codes.Contains(newCode))
                         {
-                            Debug.LogWarningFormat("Team with the same code {0} already exists", newCode);
+                            /*Debug.LogWarningFormat("Team with the same code {0} already exists", newCode)*/;
                             teamCodeSp.intValue = oldCode;
                         }
                     }
@@ -193,12 +193,12 @@ namespace Photon.Pun.UtilityScripts
                         string newName = teamNameSp.stringValue;
                         if (string.IsNullOrEmpty(newName))
                         {
-                            Debug.LogWarning("Team name cannot be null or empty");
+                            /*Debug.LogWarning("Team name cannot be null or empty")*/;
                             teamNameSp.stringValue = oldName;
                         } 
                         else if (names.Contains(newName))
                         {
-                            Debug.LogWarningFormat("Team with the same name \"{0}\" already exists", newName);
+                            /*Debug.LogWarningFormat("Team with the same name \"{0}\" already exists", newName)*/;
                             teamNameSp.stringValue = oldName;
                         }
                     }

@@ -60,12 +60,12 @@ namespace Photon.Pun.UtilityScripts
 
         public void Start()
         {
-            if (this.Text == null) Debug.LogError("Reference to 'Text' is not set. Please set a valid reference.", this);
+            if (this.Text == null) /*Debug.LogError("Reference to 'Text' is not set. Please set a valid reference.", this)*/;
         }
 
         public override void OnEnable()
         {
-            Debug.Log("OnEnable CountdownTimer");
+            /*Debug.Log("OnEnable CountdownTimer")*/;
             base.OnEnable();
 
             // the starttime may already be in the props. look it up.
@@ -75,7 +75,7 @@ namespace Photon.Pun.UtilityScripts
         public override void OnDisable()
         {
             base.OnDisable();
-            Debug.Log("OnDisable CountdownTimer");
+            /*Debug.Log("OnDisable CountdownTimer")*/;
         }
 
 
@@ -103,7 +103,7 @@ namespace Photon.Pun.UtilityScripts
             this.isTimerRunning = false;
             this.enabled = false;
 
-            Debug.Log("Emptying info text.", this.Text);
+            /*Debug.Log("Emptying info text.", this.Text)*/;
             this.Text.text = string.Empty;
 
             if (OnCountdownTimerHasExpired != null) OnCountdownTimerHasExpired();
@@ -112,7 +112,7 @@ namespace Photon.Pun.UtilityScripts
 
         public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
         {
-            Debug.Log("CountdownTimer.OnRoomPropertiesUpdate " + propertiesThatChanged.ToStringFull());
+            /*Debug.Log("CountdownTimer.OnRoomPropertiesUpdate " + propertiesThatChanged.ToStringFull())*/;
             Initialize();
         }
 
@@ -123,7 +123,7 @@ namespace Photon.Pun.UtilityScripts
             if (TryGetStartTime(out propStartTime))
             {
                 this.startTime = propStartTime;
-                Debug.Log("Initialize sets StartTime " + this.startTime + " server time now: " + PhotonNetwork.ServerTimestamp + " remain: " + TimeRemaining());
+                /*Debug.Log("Initialize sets StartTime " + this.startTime + " server time now: " + PhotonNetwork.ServerTimestamp + " remain: " + TimeRemaining())*/;
 
 
                 this.isTimerRunning = TimeRemaining() > 0;
@@ -170,7 +170,7 @@ namespace Photon.Pun.UtilityScripts
             PhotonNetwork.CurrentRoom.SetCustomProperties(props);
 
 
-            Debug.Log("Set Custom Props for Time: "+ props.ToStringFull() + " wasSet: "+wasSet);
+            /*Debug.Log("Set Custom Props for Time: "+ props.ToStringFull() + " wasSet: "+wasSet)*/;
         }
     }
 }

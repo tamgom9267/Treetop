@@ -10,21 +10,21 @@ public class StartingRoomSpawns : MonoBehaviour
     {
         if (hostSpawn == null)
         {
-            Debug.LogWarning("Asigna el Host Spawn en el cuarto inicial.", this);
+            /*Debug.LogWarning("Asigna el Host Spawn en el cuarto inicial.", this)*/;
             return;
         }
 
         NewestSingleton singleton = NewestSingleton.Instance;
         if (singleton == null)
         {
-            Debug.LogWarning("No se encontro el singleton del personaje para ubicarlo en el Host Spawn.", this);
+            /*Debug.LogWarning("No se encontro el singleton del personaje para ubicarlo en el Host Spawn.", this)*/;
             return;
         }
 
         PlayerController player = singleton.GetComponentInChildren<PlayerController>();
         if (player == null)
         {
-            Debug.LogWarning("El singleton no contiene un PlayerController.", singleton);
+            /*Debug.LogWarning("El singleton no contiene un PlayerController.", singleton)*/;
             return;
         }
 

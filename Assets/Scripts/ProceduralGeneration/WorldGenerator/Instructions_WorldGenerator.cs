@@ -14,7 +14,7 @@ public partial class WorldGenerator : MonoBehaviour
         // verifica que el Json Existe
         if (!File.Exists(path))
         {
-            Debug.LogError("No se encontro el json: " + path);
+            /*Debug.LogError("No se encontro el json: " + path)*/;
             return;
         }
 

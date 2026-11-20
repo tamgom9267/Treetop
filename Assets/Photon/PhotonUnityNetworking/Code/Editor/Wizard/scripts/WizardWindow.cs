@@ -550,7 +550,7 @@ namespace Photon.Realtime.Editor
 
         private void ErrorCallback(string err)
         {
-            UnityEngine.Debug.LogError(err);
+            /*UnityEngine.Debug.LogError(err)*/;
 
             requestingAppId = false;
             this.setupState = SetupState.RegistrationError;
@@ -571,8 +571,8 @@ namespace Photon.Realtime.Editor
             else
             {
                 this.setupState = SetupState.AlreadyRegistered;
-                UnityEngine.Debug.LogWarning("It was not possible to process your request, please go to the Photon Cloud Dashboard.");
-                UnityEngine.Debug.LogWarningFormat("Return Code: {0}", response.ReturnCode);
+                /*UnityEngine.Debug.LogWarning("It was not possible to process your request, please go to the Photon Cloud Dashboard.")*/;
+                /*UnityEngine.Debug.LogWarningFormat("Return Code: {0}", response.ReturnCode)*/;
             }
 
             requestingAppId = false;

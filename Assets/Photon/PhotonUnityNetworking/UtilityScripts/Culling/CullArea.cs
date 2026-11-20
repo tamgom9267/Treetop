@@ -119,8 +119,8 @@ namespace Photon.Pun.UtilityScripts
             {
                 if (Debug.isDebugBuild)
                 {
-                    Debug.LogError("There are too many cells created by your subdivision options. Maximum allowed number of cells is " + (MAX_NUMBER_OF_ALLOWED_CELLS - this.FIRST_GROUP_ID) +
-                                   ". Current number of cells is " + this.CellCount + ".");
+                    /*Debug.LogError("There are too many cells created by your subdivision options. Maximum allowed number of cells is " + (MAX_NUMBER_OF_ALLOWED_CELLS - this.FIRST_GROUP_ID) +
+                                   ". Current number of cells is " + this.CellCount + ".")*/;
                     return;
                 }
                 else

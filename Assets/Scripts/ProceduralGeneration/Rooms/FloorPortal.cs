@@ -15,7 +15,7 @@ public class FloorPortal : MonoBehaviour
         WorldGenerator generator = FindFirstObjectByType<WorldGenerator>();
         if (generator == null)
         {
-            Debug.LogWarning("No se encontro el generador para crear el siguiente piso.", this);
+            /*Debug.LogWarning("No se encontro el generador para crear el siguiente piso.", this)*/;
             return;
         }
 
@@ -23,7 +23,7 @@ public class FloorPortal : MonoBehaviour
         {
             if (!Application.CanStreamedLevelBeLoaded(VillageSceneName))
             {
-                Debug.LogError("Falta VillageMenuScene en el perfil de compilacion.", this);
+                /*Debug.LogError("Falta VillageMenuScene en el perfil de compilacion.", this)*/;
                 return;
             }
 
@@ -32,7 +32,7 @@ public class FloorPortal : MonoBehaviour
             catch (Exception exception)
             {
                 activated = false;
-                Debug.LogError("No se pudo regresar a la aldea: " + exception.Message, this);
+                /*Debug.LogError("No se pudo regresar a la aldea: " + exception.Message, this)*/;
             }
             return;
         }

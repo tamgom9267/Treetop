@@ -180,7 +180,7 @@ public sealed class MultiplayerDeathSession : MonoBehaviourPunCallbacks, IOnEven
         DeathPanelView prefab = Resources.Load<DeathPanelView>(DeathPrefabPath);
         if (prefab == null || !prefab.IsConfigured)
         {
-            Debug.LogError("Falta Canvas Muerte configurado.", this);
+            /*Debug.LogError("Falta Canvas Muerte configurado.", this)*/;
             if (!hasWipe) EnterSpectator();
             return;
         }

@@ -27,7 +27,7 @@ public static class MultiplayerSlimeVerification
         bool success = report.summary.result == BuildResult.Succeeded;
         File.WriteAllText("Logs/combat-verification/build.json", JsonUtility.ToJson(new Report { success = success,
             error = report.summary.result.ToString(), checks = new[] { output, "Errores: " + report.summary.totalErrors } }, true));
-        Debug.Log("Build de verificacion de slimes: " + report.summary.result);
+        /*Debug.Log("Build de verificacion de slimes: " + report.summary.result)*/;
         if (Application.isBatchMode) EditorApplication.Exit(success ? 0 : 1);
     }
     public static IEnumerator CheckSlimes(MultiplayerWorldSession world)
@@ -183,7 +183,7 @@ public static class MultiplayerSlimeVerification
             Time.captureDeltaTime = previousCaptureDelta;
             Directory.CreateDirectory("Logs/combat-verification");
             File.WriteAllText("Logs/combat-verification/slimes.json", JsonUtility.ToJson(new Report { success = success, checks = checks.ToArray() }, true));
-            Debug.Log("Slimes multijugador: " + checks.Count + " comprobaciones; correcta=" + success);
+            /*Debug.Log("Slimes multijugador: " + checks.Count + " comprobaciones; correcta=" + success)*/;
         }
     }
     private static void CheckOwnershipRaces(MultiplayerWorldSession world)
@@ -471,7 +471,7 @@ public static class MultiplayerSlimeVerification
             run.enabled = runEnabled; observer.Disconnect(); observer.Service();
             Directory.CreateDirectory("Logs/combat-verification");
             File.WriteAllText("Logs/combat-verification/slime-network.json", JsonUtility.ToJson(new Report { success = success, checks = networkChecks.ToArray() }, true));
-            Debug.Log("Red de slimes: " + networkChecks.Count + " comprobaciones; correcta=" + success);
+            /*Debug.Log("Red de slimes: " + networkChecks.Count + " comprobaciones; correcta=" + success)*/;
         }
         yield return NetworkWait(() => service.Members.Count == 2, attacker, observer);
     }

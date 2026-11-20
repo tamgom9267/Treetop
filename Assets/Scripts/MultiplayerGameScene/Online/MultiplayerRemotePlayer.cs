@@ -46,7 +46,7 @@ public sealed class MultiplayerRemotePlayer : MonoBehaviour
         interpolationDelay = Mathf.Clamp(delay, 0f, 0.3f);
         
         appearance = GetComponentInChildren<MultiplayerPlayerAppearance>(true);
-        if (appearance == null) Debug.LogError($"Falta MultiplayerPlayerAppearance en {gameObject.name}");
+        if (appearance == null) /*Debug.LogError($"Falta MultiplayerPlayerAppearance en {gameObject.name}")*/;
         
         equipment.Configure(equipment.Hand, catalog);
         animator.updateMode = AnimatorUpdateMode.UnscaledTime;

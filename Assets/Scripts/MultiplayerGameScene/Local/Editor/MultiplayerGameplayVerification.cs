@@ -21,7 +21,7 @@ public static class MultiplayerGameplayVerification
             MultiplayerGameplayPrefabBuilder.ValidatePrefabs(); Check(true, "22 cuartos y 4 prefabs de enemigos configurados por rol");
             CheckWorldSerialization(); CheckPresence(); CheckAttacks(); CheckLoot(); CheckRooms(); CheckInventory();
             MultiplayerPlayerVerification.RunChecks(); Check(true, "Regresion de las pruebas nativas de fase 3");
-            Write(true, null); Debug.Log("FASE 4: " + passed.Count + " comprobaciones correctas. Temp/phase4-verification/editor-tests.json");
+            Write(true, null); /*Debug.Log("FASE 4: " + passed.Count + " comprobaciones correctas. Temp/phase4-verification/editor-tests.json")*/;
         }
         catch (Exception error) { Write(false, error.ToString()); throw; }
     }
@@ -48,7 +48,7 @@ public static class MultiplayerGameplayVerification
         Check(spectator != null && spectator.GetComponent<SpectatorPanelView>() != null &&
             new SerializedObject(spectator.GetComponent<SpectatorPanelView>()).FindProperty("messageText").objectReferenceValue != null,
             "Panel editable de espectador conserva el texto configurado");
-        Debug.Log("MUERTE MULTIJUGADOR: " + passed.Count + " comprobaciones correctas.");
+        /*Debug.Log("MUERTE MULTIJUGADOR: " + passed.Count + " comprobaciones correctas.")*/;
     }
     private static void CheckWorldSerialization()
     {

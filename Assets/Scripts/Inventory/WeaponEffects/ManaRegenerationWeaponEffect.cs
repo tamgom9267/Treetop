@@ -12,7 +12,7 @@ public sealed class ManaRegenerationWeaponEffect : WeaponEffect
         if (manaPerTick > 0 && IsPositiveFinite(tickInterval))
             return Regenerate(wearer, manaPerTick, tickInterval);
 
-        Debug.LogWarning("Se ignoro una configuracion invalida de regeneracion de mana.", this);
+        /*Debug.LogWarning("Se ignoro una configuracion invalida de regeneracion de mana.", this)*/;
         return null;
     }
 

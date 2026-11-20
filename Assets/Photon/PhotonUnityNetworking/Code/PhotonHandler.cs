@@ -97,7 +97,7 @@ namespace Photon.Pun
         {
             if (Instance != this)
             {
-                Debug.LogError("PhotonHandler is a singleton but there are multiple instances. this != Instance.");
+                /*Debug.LogError("PhotonHandler is a singleton but there are multiple instances. this != Instance.")*/;
                 return;
             }
 
@@ -115,12 +115,12 @@ namespace Photon.Pun
                     #if UNITY_6000_4_OR_NEWER
                     if (supportLogger.GetEntityId() != this.supportLoggerComponent.GetEntityId())
                     {
-                        Debug.LogWarningFormat("Cached SupportLogger component is different from the one attached to PhotonMono GameObject");
+                        /*Debug.LogWarningFormat("Cached SupportLogger component is different from the one attached to PhotonMono GameObject")*/;
                     }
                     #else
                     if (supportLogger.GetInstanceID() != this.supportLoggerComponent.GetInstanceID())
                     {
-                        Debug.LogWarningFormat("Cached SupportLogger component is different from the one attached to PhotonMono GameObject");
+                        /*Debug.LogWarningFormat("Cached SupportLogger component is different from the one attached to PhotonMono GameObject")*/;
                     }
                     #endif
                 }
@@ -221,7 +221,7 @@ namespace Photon.Pun
         {
             if (PhotonNetwork.NetworkingClient == null)
             {
-                Debug.LogError("NetworkPeer broke!");
+                /*Debug.LogError("NetworkPeer broke!")*/;
                 return;
             }
 

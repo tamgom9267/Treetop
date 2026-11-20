@@ -189,7 +189,7 @@ namespace Photon.Pun.UtilityScripts
                     PhotonTeam team = teamsByCode[teamCode];
                     if (!playersPerTeam[teamCode].Add(targetPlayer))
                     {
-                        Debug.LogWarningFormat("Unexpected situation while setting team {0} for player {1}, updating teams for all", team, targetPlayer);
+                        /*Debug.LogWarningFormat("Unexpected situation while setting team {0} for player {1}, updating teams for all", team, targetPlayer)*/;
                         this.UpdateTeams();
                     }
                     if (PlayerJoinedTeam != null)
@@ -199,8 +199,8 @@ namespace Photon.Pun.UtilityScripts
                 }
                 else
                 {
-                    Debug.LogErrorFormat("Unexpected: custom property key {0} should have of type byte, instead we got {1} of type {2}. Player: {3}", 
-                        TeamPlayerProp, temp, temp.GetType(), targetPlayer);
+                    /*Debug.LogErrorFormat("Unexpected: custom property key {0} should have of type byte, instead we got {1} of type {2}. Player: {3}", 
+                        TeamPlayerProp, temp, temp.GetType(), targetPlayer)*/;
                 }
             }
         }
@@ -214,7 +214,7 @@ namespace Photon.Pun.UtilityScripts
             PhotonTeam team = otherPlayer.GetPhotonTeam();
             if (team != null && !playersPerTeam[team.Code].Remove(otherPlayer))
             {
-                Debug.LogWarningFormat("Unexpected situation while removing player {0} who left from team {1}, updating teams for all", otherPlayer, team);
+                /*Debug.LogWarningFormat("Unexpected situation while removing player {0} who left from team {1}, updating teams for all", otherPlayer, team)*/;
                 // revert to 'brute force' in case of unexpected situation
                 this.UpdateTeams();
             }
@@ -242,7 +242,7 @@ namespace Photon.Pun.UtilityScripts
             }
             if (!playersPerTeam[team.Code].Add(newPlayer))
             {
-                Debug.LogWarningFormat("Unexpected situation while adding player {0} who joined to team {1}, updating teams for all", newPlayer, team);
+                /*Debug.LogWarningFormat("Unexpected situation while adding player {0} who joined to team {1}, updating teams for all", newPlayer, team)*/;
                 // revert to 'brute force' in case of unexpected situation
                 this.UpdateTeams();
             }
@@ -393,7 +393,7 @@ namespace Photon.Pun.UtilityScripts
             {
                 if (!players.Contains(player))
                 {
-                    Debug.LogWarningFormat("Unexpected situation while getting team mates of player {0} who is joined to team {1}, updating teams for all", player, team);
+                    /*Debug.LogWarningFormat("Unexpected situation while getting team mates of player {0} who is joined to team {1}, updating teams for all", player, team)*/;
                     // revert to 'brute force' in case of unexpected situation
                     this.UpdateTeams();
                 }
@@ -519,13 +519,13 @@ namespace Photon.Pun.UtilityScripts
         {
             if (team == null)
             {
-                Debug.LogWarning("JoinTeam failed: PhotonTeam provided is null");
+                /*Debug.LogWarning("JoinTeam failed: PhotonTeam provided is null")*/;
                 return false;
             }
             PhotonTeam currentTeam = player.GetPhotonTeam();
             if (currentTeam != null)
             {
-                Debug.LogWarningFormat("JoinTeam failed: player ({0}) is already joined to a team ({1}), call SwitchTeam instead", player, team);
+                /*Debug.LogWarningFormat("JoinTeam failed: player ({0}) is already joined to a team ({1}), call SwitchTeam instead", player, team)*/;
                 return false;
             }
             return player.SetCustomProperties(new Hashtable { { PhotonTeamsManager.TeamPlayerProp, team.Code } });
@@ -563,18 +563,18 @@ namespace Photon.Pun.UtilityScripts
         {
             if (team == null)
             {
-                Debug.LogWarning("SwitchTeam failed: PhotonTeam provided is null");
+                /*Debug.LogWarning("SwitchTeam failed: PhotonTeam provided is null")*/;
                 return false;
             }
             PhotonTeam currentTeam = player.GetPhotonTeam();
             if (currentTeam == null)
             {
-                Debug.LogWarningFormat("SwitchTeam failed: player ({0}) was not joined to any team, call JoinTeam instead", player);
+                /*Debug.LogWarningFormat("SwitchTeam failed: player ({0}) was not joined to any team, call JoinTeam instead", player)*/;
                 return false;
             }
             if (currentTeam.Code == team.Code)
             {
-                Debug.LogWarningFormat("SwitchTeam failed: player ({0}) is already joined to the same team {1}", player, team);
+                /*Debug.LogWarningFormat("SwitchTeam failed: player ({0}) is already joined to the same team {1}", player, team)*/;
                 return false;
             }
             return player.SetCustomProperties(new Hashtable { { PhotonTeamsManager.TeamPlayerProp, team.Code } },
@@ -613,7 +613,7 @@ namespace Photon.Pun.UtilityScripts
             PhotonTeam currentTeam = player.GetPhotonTeam();
             if (currentTeam == null)
             {
-                Debug.LogWarningFormat("LeaveCurrentTeam failed: player ({0}) was not joined to any team", player);
+                /*Debug.LogWarningFormat("LeaveCurrentTeam failed: player ({0}) was not joined to any team", player)*/;
                 return false;
             }
             return player.SetCustomProperties(new Hashtable {{PhotonTeamsManager.TeamPlayerProp, null}}, new Hashtable {{PhotonTeamsManager.TeamPlayerProp, currentTeam.Code}});

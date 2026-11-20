@@ -154,7 +154,7 @@ public class HostWorldGenerator : MonoBehaviour
     {
         building = false;
         if (session != null) session.ReportBuildFailed(error);
-        else Debug.LogError(error, this);
+        else /*Debug.LogError(error, this)*/;
     }
 
     private static void ClearFloorLoot()

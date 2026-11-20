@@ -35,7 +35,7 @@ public static class MultiplayerPlayerPrefabBuilder
         if (EditorApplication.isCompiling || EditorApplication.isUpdating)
         { EditorApplication.delayCall += CreateWhenIdle; return; }
         try { CreateMissingPrefabs(); }
-        catch (Exception exception) { Debug.LogException(exception); }
+        catch (Exception exception) { /*Debug.LogException(exception)*/; }
     }
 
     [MenuItem("Tools/Multiplayer/Crear prefabs de jugadores")]
@@ -64,7 +64,7 @@ public static class MultiplayerPlayerPrefabBuilder
         }
         finally { EditorSceneManager.ClosePreviewScene(preview); }
         ValidatePrefabs();
-        Debug.Log("FASE 3: prefabs de jugadores creados y validados. No se guardaron escenas ni se modificaron prefabs originales.");
+        /*Debug.Log("FASE 3: prefabs de jugadores creados y validados. No se guardaron escenas ni se modificaron prefabs originales.")*/;
     }
 
     public static ObjectData WeaponData(string type)

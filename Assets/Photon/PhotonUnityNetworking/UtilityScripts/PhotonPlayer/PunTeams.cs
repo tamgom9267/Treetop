@@ -142,7 +142,7 @@ namespace Photon.Pun.UtilityScripts
         {
             if (!PhotonNetwork.IsConnectedAndReady)
             {
-                Debug.LogWarning("JoinTeam was called in state: " + PhotonNetwork.NetworkClientState + ". Not IsConnectedAndReady.");
+                /*Debug.LogWarning("JoinTeam was called in state: " + PhotonNetwork.NetworkClientState + ". Not IsConnectedAndReady.")*/;
                 return;
             }
 

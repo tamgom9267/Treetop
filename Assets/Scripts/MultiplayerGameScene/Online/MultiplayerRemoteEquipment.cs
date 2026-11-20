@@ -76,7 +76,7 @@ public sealed class MultiplayerRemoteEquipment : MonoBehaviour
         if (definition == null || definition.remotePrefab == null || hand == null)
         {
             if (warnedTypes.Add(item.type ?? string.Empty))
-                Debug.LogWarning("Multiplayer: objeto visual no registrado: " + item.type, this);
+                /*Debug.LogWarning("Multiplayer: objeto visual no registrado: " + item.type, this)*/;
             return null;
         }
         MultiplayerWeaponVisual visual = Instantiate(definition.remotePrefab, hand, false);

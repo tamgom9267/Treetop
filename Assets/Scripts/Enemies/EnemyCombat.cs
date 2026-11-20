@@ -182,7 +182,7 @@ public class EnemyCombat : MonoBehaviour
 
         currentHealth = Mathf.Max(0, currentHealth - damage);
 
-        Debug.Log(gameObject.name + " recibio " + damage + " de daño. Vida actual: " + currentHealth);
+        /*Debug.Log(gameObject.name + " recibio " + damage + " de daño. Vida actual: " + currentHealth)*/;
 
         if (flashCoroutine != null) StopCoroutine(flashCoroutine);
         if (enemyMaterials != null) flashCoroutine = StartCoroutine(DoFlash());

@@ -266,7 +266,7 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
             int colorIndex = GetColorIndexForActor(actor);
 
             if(colorIndex >= 0) remote.ApplyPlayerColor(colorIndex);
-            else Debug.LogWarning("No se pudo determinar el color del jugador " + actor);
+            else /*Debug.LogWarning("No se pudo determinar el color del jugador " + actor)*/;
 
             remotes.Add(actor, remote);
         }
@@ -348,7 +348,7 @@ public sealed class MultiplayerPlayers : MonoBehaviourPunCallbacks, IOnEventCall
 
         if (appearance == null)
         {
-            Debug.LogError("El jugador local no tiene MultiplayerPlayerAppearance.", player);
+            /*Debug.LogError("El jugador local no tiene MultiplayerPlayerAppearance.", player)*/;
             return;
         }
 

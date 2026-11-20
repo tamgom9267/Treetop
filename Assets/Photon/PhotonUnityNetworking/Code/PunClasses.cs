@@ -574,7 +574,7 @@ namespace Photon.Pun
         {
             if (this.IsWriting)
             {
-                Debug.LogError("Error: you cannot read this stream that you are writing!");
+                /*Debug.LogError("Error: you cannot read this stream that you are writing!")*/;
                 return null;
             }
 
@@ -588,7 +588,7 @@ namespace Photon.Pun
         {
             if (this.IsWriting)
             {
-                Debug.LogError("Error: you cannot read this stream that you are writing!");
+                /*Debug.LogError("Error: you cannot read this stream that you are writing!")*/;
                 return null;
             }
 
@@ -602,7 +602,7 @@ namespace Photon.Pun
         {
             if (!this.IsWriting)
             {
-                Debug.LogError("Error: you cannot write/send to this stream that you are reading!");
+                /*Debug.LogError("Error: you cannot write/send to this stream that you are reading!")*/;
                 return;
             }
 
@@ -893,7 +893,7 @@ namespace Photon.Pun
                 res = Resources.Load<GameObject>(prefabId);
                 if (res == null)
                 {
-                    Debug.LogError("DefaultPool failed to load \"" + prefabId + "\". Make sure it's in a \"Resources\" folder. Or use a custom IPunPrefabPool.");
+                    /*Debug.LogError("DefaultPool failed to load \"" + prefabId + "\". Make sure it's in a \"Resources\" folder. Or use a custom IPunPrefabPool.")*/;
                 }
                 else
                 {

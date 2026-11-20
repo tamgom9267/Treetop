@@ -93,7 +93,7 @@ public static class PersistentSessionLifecycleVerification
     private static void OnPlayModeChanged(PlayModeStateChange state)
     {
         if (!SessionState.GetBool(RunningKey, false)) return;
-        Debug.Log("Verificacion de ciclo de vida: " + state);
+        /*Debug.Log("Verificacion de ciclo de vida: " + state)*/;
         if (state == PlayModeStateChange.EnteredPlayMode)
         {
             Application.runInBackground = true;
@@ -122,7 +122,7 @@ public static class PersistentSessionLifecycleVerification
             }
             string network = Path.Combine(Path.GetDirectoryName(ReportPath), "network.json");
             if (File.Exists(network)) File.Copy(network, Path.Combine(output, "network.json"), true);
-            Debug.Log("Resultado de ciclo de vida: correcta=" + report.success + "; " + output);
+            /*Debug.Log("Resultado de ciclo de vida: correcta=" + report.success + "; " + output)*/;
             EditorApplication.Exit(report.success ? 0 : 1);
         }
     }
@@ -151,7 +151,7 @@ public static class PersistentSessionLifecycleVerification
             }
             Finish();
         }
-        catch (Exception error) { failure = error.ToString(); Debug.LogException(error); Finish(); }
+        catch (Exception error) { failure = error.ToString(); /*Debug.LogException(error)*/; Finish(); }
     }
 
     private static void Finish()
@@ -163,7 +163,7 @@ public static class PersistentSessionLifecycleVerification
         Directory.CreateDirectory(Path.GetDirectoryName(ReportPath));
         File.WriteAllText(ReportPath, JsonUtility.ToJson(new Report
             { success = failure == null, error = failure, checks = passed.ToArray() }, true));
-        Debug.Log("Ciclo de vida: " + passed.Count + " comprobaciones. Informe: " + ReportPath);
+        /*Debug.Log("Ciclo de vida: " + passed.Count + " comprobaciones. Informe: " + ReportPath)*/;
         EditorApplication.isPlaying = false;
     }
 

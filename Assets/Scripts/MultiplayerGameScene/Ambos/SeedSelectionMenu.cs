@@ -48,7 +48,7 @@ public class SeedSelectionMenu : MonoBehaviour
         }
         if (seedPanel == null || seedPanel == gameObject || transform.IsChildOf(seedPanel.transform) || villageMenu == null)
         {
-            Debug.LogError("Asigna Seed Panel y Village Menu; SeedSelectionMenu debe estar fuera de su panel.", this);
+            /*Debug.LogError("Asigna Seed Panel y Village Menu; SeedSelectionMenu debe estar fuera de su panel.", this)*/;
             return false;
         }
         if (!villageMenu.TryOpenExternalMenu()) return false;
@@ -145,7 +145,7 @@ public class SeedSelectionMenu : MonoBehaviour
     }
 
     private void OnDisable() { Close(); }
-    private void Error(string message) { if (errorText != null) errorText.text = message; else Debug.LogWarning(message, this); }
+    private void Error(string message) { if (errorText != null) errorText.text = message; else /*Debug.LogWarning(message, this)*/; }
     private void SetPanel(bool active)
     {
         if (seedPanel != null && !transform.IsChildOf(seedPanel.transform)) seedPanel.SetActive(active);

@@ -297,7 +297,7 @@ namespace Photon.Pun
                 // TODO: Check if the isPlaying check is needed when the PhotonViewHandler is updated
                 if (value != 0 && this.viewIdField != 0)
                 {
-                    Debug.LogWarning("Changing a ViewID while it's in use is not possible (except setting it to 0 (not being used). Current ViewID: " + this.viewIdField);
+                    /*Debug.LogWarning("Changing a ViewID while it's in use is not possible (except setting it to 0 (not being used). Current ViewID: " + this.viewIdField)*/;
                     return;
                 }
                 
@@ -403,7 +403,7 @@ namespace Photon.Pun
 
                 if (wasInList && this.InstantiationId > 0 && !PhotonHandler.AppQuits && PhotonNetwork.LogLevel >= PunLogLevel.Informational)
                 {
-                    Debug.Log("PUN-instantiated '" + this.gameObject.name + "' got destroyed by engine. This is OK when loading levels. Otherwise use: PhotonNetwork.Destroy().");
+                    /*Debug.Log("PUN-instantiated '" + this.gameObject.name + "' got destroyed by engine. This is OK when loading levels. Otherwise use: PhotonNetwork.Destroy().")*/;
                 }
             }
         }
@@ -428,8 +428,8 @@ namespace Photon.Pun
             {
                 if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
                 {
-                    Debug.LogWarning("Attempting to RequestOwnership of GameObject '" + name + "' viewId: " + ViewID +
-                        ", but PhotonView.OwnershipTransfer is set to Fixed.");
+                    /*Debug.LogWarning("Attempting to RequestOwnership of GameObject '" + name + "' viewId: " + ViewID +
+                        ", but PhotonView.OwnershipTransfer is set to Fixed.")*/;
                 }
             }
         }
@@ -448,8 +448,8 @@ namespace Photon.Pun
             {
                 if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
                 {
-                    Debug.LogWarning("Attempting to TransferOwnership of GameObject '" + name + "' viewId: " + ViewID +
-                   ", but provided Player newOwner is null.");
+                    /*Debug.LogWarning("Attempting to TransferOwnership of GameObject '" + name + "' viewId: " + ViewID +
+                   ", but provided Player newOwner is null.")*/;
                 }
             }
         }
@@ -471,11 +471,11 @@ namespace Photon.Pun
                 if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
                 {
                     if (OwnershipTransfer == OwnershipOption.Fixed)
-                        Debug.LogWarning("Attempting to TransferOwnership of GameObject '" + name + "' viewId: " + ViewID +
-                            " without the authority to do so. TransferOwnership is not allowed if PhotonView.OwnershipTransfer is set to Fixed.");
+                        /*Debug.LogWarning("Attempting to TransferOwnership of GameObject '" + name + "' viewId: " + ViewID +
+                            " without the authority to do so. TransferOwnership is not allowed if PhotonView.OwnershipTransfer is set to Fixed.")*/;
                     else if (OwnershipTransfer == OwnershipOption.Request)
-                        Debug.LogWarning("Attempting to TransferOwnership of GameObject '" + name + "' viewId: " + ViewID +
-                           " without the authority to do so. PhotonView.OwnershipTransfer is set to Request, so only the controller of this object can TransferOwnership.");
+                        /*Debug.LogWarning("Attempting to TransferOwnership of GameObject '" + name + "' viewId: " + ViewID +
+                           " without the authority to do so. PhotonView.OwnershipTransfer is set to Request, so only the controller of this object can TransferOwnership.")*/;
                 }
             }
         }
@@ -545,7 +545,7 @@ namespace Photon.Pun
             }
             else
             {
-                Debug.LogError("Observed scripts have to implement IPunObservable. " + component + " does not. It is Type: " + component.GetType(), component.gameObject);
+                /*Debug.LogError("Observed scripts have to implement IPunObservable. " + component + " does not. It is Type: " + component.GetType(), component.gameObject)*/;
             }
         }
 
@@ -558,7 +558,7 @@ namespace Photon.Pun
             }
             else
             {
-                Debug.LogError("Observed scripts have to implement IPunObservable. " + component + " does not. It is Type: " + component.GetType(), component.gameObject);
+                /*Debug.LogError("Observed scripts have to implement IPunObservable. " + component + " does not. It is Type: " + component.GetType(), component.gameObject)*/;
             }
         }
 

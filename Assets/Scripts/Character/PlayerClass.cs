@@ -164,7 +164,7 @@ public class PlayerClass : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        Debug.Log("Si llega");
+        /*Debug.Log("Si llega")*/;
         GetComponent<AudioSource>().volume = 1;
         GetComponent<AudioSource>().PlayOneShot(TakeDamageSound, 0.5f);
         
@@ -182,7 +182,7 @@ public class PlayerClass : MonoBehaviour
         // Cambio a Mathf para que la vida no pueda ser menor a 0 y evitar errores en el HUD
         health = Mathf.Max(0, health - damage);
 
-        Debug.Log("Player took " + damage + " damage. Current health: " + health);
+        /*Debug.Log("Player took " + damage + " damage. Current health: " + health)*/;
 
         // feedback visual
         // TriggerHitFeedback();

@@ -26,7 +26,7 @@ public class ManaFountain : MonoBehaviour
 
         if (playerStats == null)
         {
-            Debug.LogWarning("El jugador no tiene PlayerClass", playerCerca);
+            /*Debug.LogWarning("El jugador no tiene PlayerClass", playerCerca)*/;
             return;
         }
 

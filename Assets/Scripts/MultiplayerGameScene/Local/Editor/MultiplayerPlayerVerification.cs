@@ -26,12 +26,12 @@ public static class MultiplayerPlayerVerification
             CheckReplicas();
             CheckWeaponReplicas();
             WriteReport(true, string.Empty);
-            Debug.Log("FASE 3: " + passed.Count + " pruebas nativas correctas. Informe: Temp/phase3-verification/editor-tests.json");
+            /*Debug.Log("FASE 3: " + passed.Count + " pruebas nativas correctas. Informe: Temp/phase3-verification/editor-tests.json")*/;
         }
         catch (Exception error)
         {
             WriteReport(false, error.ToString());
-            Debug.LogException(error);
+            /*Debug.LogException(error)*/;
             throw;
         }
     }

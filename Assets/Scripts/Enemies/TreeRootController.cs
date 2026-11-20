@@ -45,17 +45,17 @@ public class TreeRootController : MonoBehaviour
 
         if (rootCount == 0)
         {
-            Debug.LogError("TreeRootController - asigna al menos 1 agnete, animator y modelo de rama", this);
+            /*Debug.LogError("TreeRootController - asigna al menos 1 agnete, animator y modelo de rama", this)*/;
             return;
         }
 
         if (agentCount != animatorCount || agentCount != modelCount)
         {
-            Debug.LogWarning(
+            /*Debug.LogWarning(
                 $"TreeRootController: los arrays tienen tamaños diferentes. " +
                 $"Se utilizarán {rootCount} raíces " +
                 $"Agentes: {agentCount}, Animator: {animatorCount}, Modelos: {modelCount}", this
-            );
+            )*/;
         }
 
         isAttacking = new bool[rootCount];
@@ -191,7 +191,7 @@ public class TreeRootController : MonoBehaviour
 
         animator.SetBool("isAttacking", true);
 
-        Debug.Log("La rama " + index + " Ataca");
+        /*Debug.Log("La rama " + index + " Ataca")*/;
     }
 
     // para pasar del final de la animación de ataque a la de bajar la rama
@@ -216,7 +216,7 @@ public class TreeRootController : MonoBehaviour
             agent.isStopped = false;
         }
 
-        Debug.Log("La raiz " + index + " vuelve a seguir al jugador");
+        /*Debug.Log("La raiz " + index + " vuelve a seguir al jugador")*/;
     }
 
     public void SetRootActive(bool active)

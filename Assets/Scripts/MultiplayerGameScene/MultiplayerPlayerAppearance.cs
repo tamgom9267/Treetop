@@ -57,9 +57,9 @@ public class MultiplayerPlayerAppearance : MonoBehaviour
             }
         }
 
-        Debug.LogWarning(
+        /*Debug.LogWarning(
             $"No se encontró el material {targetMaterialName} en {gameObject.name}"
-        );
+        )*/;
     }
 
     public void ApplyRed()

@@ -193,7 +193,7 @@ namespace Photon.Pun
                 EditorGUI.LabelField(copyrect, new GUIContent("", "Copy Hashcode to Clipboard"));
                 if (GUI.Button(copyrect, PhotonGUI.CopyIcon, GUIStyle.none))
                 {
-                    Debug.Log("RPC-List HashCode copied into your ClipBoard: " + this.rpcCrc + ". Make sure clients that send each other RPCs have the same RPC-List.");
+                    /*Debug.Log("RPC-List HashCode copied into your ClipBoard: " + this.rpcCrc + ". Make sure clients that send each other RPCs have the same RPC-List.")*/;
                     EditorGUIUtility.systemCopyBuffer = this.rpcCrc;
                 }
                 EditorGUI.SelectableLabel(hashrect, this.rpcCrc);

@@ -43,7 +43,7 @@ namespace Photon.Pun.UtilityScripts
 
             if (cullAreaCount > 1)
             {
-                Debug.LogWarning("Destroying newly created cull area because there is already one existing in the scene.");
+                /*Debug.LogWarning("Destroying newly created cull area because there is already one existing in the scene.")*/;
 
                 DestroyImmediate(cullArea);
 
@@ -228,7 +228,7 @@ namespace Photon.Pun.UtilityScripts
 
                     cullArea.transform.localScale = new Vector3(scaleX, scaleY, scaleZ);
 
-                    Debug.LogWarning("Scaling on a single axis can not be lower than 1. Resetting...");
+                    /*Debug.LogWarning("Scaling on a single axis can not be lower than 1. Resetting...")*/;
                 }
 
                 cullArea.RecreateCellHierarchy = true;

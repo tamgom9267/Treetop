@@ -33,7 +33,7 @@ namespace Photon.Pun.UtilityScripts
         {
             if (Instance != null)
             {
-                Debug.LogWarning("PointedAtGameObjectInfo is already featured in the scene, gameobject is destroyed");
+                /*Debug.LogWarning("PointedAtGameObjectInfo is already featured in the scene, gameobject is destroyed")*/;
                 Destroy(this.gameObject);
             }
 

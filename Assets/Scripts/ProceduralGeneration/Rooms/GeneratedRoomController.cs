@@ -50,7 +50,7 @@ public class GeneratedRoomController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("No se encontro un trigger en el Plano del cuarto.", this);
+            /*Debug.LogWarning("No se encontro un trigger en el Plano del cuarto.", this)*/;
         }
 
         enemy1 = Resources.Load<GameObject>(
@@ -63,7 +63,7 @@ public class GeneratedRoomController : MonoBehaviour
 
         if (enemy1 == null || enemy2 == null)
         {
-            Debug.LogError("No se encontro Enemigo1 o Enemigo2 en Resources.");
+            /*Debug.LogError("No se encontro Enemigo1 o Enemigo2 en Resources.")*/;
             return;
         }
     }

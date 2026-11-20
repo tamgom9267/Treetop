@@ -101,7 +101,7 @@ public sealed class MultiplayerLootSession : MonoBehaviour, IOnEventCallback
         InventoryObject selectedItem = selected != null ? selected.GetComponent<InventoryObject>() : null;
         var definition = selectedItem != null ? Definition(selectedItem) : null;
         if (definition == null)
-        { Debug.LogError("El premio del cofre no esta en el catalogo de loot multijugador.", chest); return false; }
+        { /*Debug.LogError("El premio del cofre no esta en el catalogo de loot multijugador.", chest)*/; return false; }
         var item = Instantiate(definition.prefab, chest.LootPosition, Quaternion.identity).GetComponent<InventoryObject>();
         var identity = item.GetComponent<MultiplayerItemIdentity>();
         if (identity == null) identity = item.gameObject.AddComponent<MultiplayerItemIdentity>();

@@ -29,7 +29,7 @@ public class HealthBar : MonoBehaviour
 
         if (playerClass == null)
         {
-            Debug.LogWarning("Asigna PlayerClass en el UI");
+            /*Debug.LogWarning("Asigna PlayerClass en el UI")*/;
             return;
         }
 
@@ -49,13 +49,13 @@ public class HealthBar : MonoBehaviour
     {
         if (hpPotion == null || mpPotion == null)
         {
-            Debug.LogWarning("Asigna las RawImage del UI");
+            /*Debug.LogWarning("Asigna las RawImage del UI")*/;
             return false;
         }
 
         if (hpPotion.material == null || mpPotion.material == null)
         {
-            Debug.LogWarning("Asiugna los materiales de las RawImage del UI");
+            /*Debug.LogWarning("Asiugna los materiales de las RawImage del UI")*/;
             return false;
         }
 

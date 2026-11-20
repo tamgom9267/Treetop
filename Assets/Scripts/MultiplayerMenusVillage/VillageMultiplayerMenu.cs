@@ -292,7 +292,7 @@ public class VillageMultiplayerMenu : MonoBehaviour
             noticeVisible = true;
         else
         {
-            Debug.LogWarning(message, this);
+            /*Debug.LogWarning(message, this)*/;
             if (statusText != null) statusText.text = message;
         }
         RenderPanels();
@@ -323,7 +323,7 @@ public class VillageMultiplayerMenu : MonoBehaviour
         if (panel == null || panel.activeSelf == active) return;
         if (transform.IsChildOf(panel.transform))
         {
-            Debug.LogError("VillageMultiplayerMenu debe estar fuera de los paneles que controla.", this);
+            /*Debug.LogError("VillageMultiplayerMenu debe estar fuera de los paneles que controla.", this)*/;
             return;
         }
         panel.SetActive(active);
