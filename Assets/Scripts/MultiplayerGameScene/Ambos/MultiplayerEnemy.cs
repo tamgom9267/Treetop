@@ -22,6 +22,8 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     [SerializeField] private Vector3 deathEffectOffset = Vector3.zero;
     [SerializeField] private bool authority;
     [SerializeField] private bool isGhost;
+    [SerializeField] private bool anchored;
+    [SerializeField] private GameObject destroyTarget;
 
     private Rigidbody body;
     private Animator animator;
@@ -66,7 +68,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     public bool KnockbackActive => knockbackActive || pendingAttack > 0;
     public bool GhostHidden { get; private set; }
     public bool CombatActive => combatActive && !GhostHidden && world != null && Health > 0 && !deathStarted;
-    public bool SimulatesMotion => CombatActive && !suspended && !deathStarted && !localLanded && !motionBlocked &&
+    public bool SimulatesMotion => !anchored && CombatActive && !suspended && !deathStarted && !localLanded && !motionBlocked &&
         (pendingAttack > 0 || motionActor == localActor);
     public bool CanRunHostAI => authority && SimulatesMotion && !KnockbackActive;
     internal bool CanRunGhostAI => isGhost && authority && combatActive && !suspended &&
@@ -74,6 +76,8 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     public bool PublishesMotion => !authority && SimulatesMotion && KnockbackActive;
     public Vector3 MotionPosition => SimulatesMotion ? body.position : latestMotion != null ? latestMotion.position : transform.position;
     public float AttackReach => 6f + GetComponent<Collider>().bounds.extents.magnitude;
+    public GameObject DespawnTarget => destroyTarget != null ? destroyTarget : gameObject;
+    public bool Anchored => anchored;
     public bool CanReceiveWeaponEffects => authority && CombatActive && !suspended &&
         world != null && world.Playing;
 
@@ -122,7 +126,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (deathStarted || combatActive == active) return;
         combatActive = active;
         SetPhysics(SimulatesMotion);
-        if (active && !startsActive && animator != null) animator.SetTrigger("Activate");
+        if (active && !startsActive && !anchored && animator != null) animator.SetTrigger("Activate");
     }
     internal void SetGhostHidden(bool hidden)
     {
@@ -225,7 +229,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     }
     public bool BeginLocalKnockback(int actor, int attack, Vector3 origin)
     {
-        if (authority || isGhost || !CombatActive || suspended || actor != localActor || actor <= 0 || attack <= 0 ||
+        if (anchored || authority || isGhost || !CombatActive || suspended || actor != localActor || actor <= 0 || attack <= 0 ||
             !MultiplayerGameplayProtocol.Finite(origin) || !anticipatedHits.Add(Key(actor, attack))) return false;
         pendingAttack = attack; pendingBaseVersion = motionVersion; pendingAt = Time.realtimeSinceStartupAsDouble;
         localSequence = 0; localLanded = false; localFinal = null; motionBlocked = false; frames.Clear(); correctionAt = double.NegativeInfinity;
@@ -242,6 +246,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         Health = Mathf.Max(0, Health - damage); HitRevision++;
         lastHitActor = actor; lastHitAttack = attack; lastHitOrigin = origin; ShowHit(origin);
         if (Health == 0) { BeginConfirmedDeath(); return; }
+        if (anchored) return;
         if (isGhost)
         {
             // El fantasma permanece en el host durante el empuje y conserva su altura.
@@ -507,6 +512,12 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     {
         if (deathStarted) return;
         deathStarted = true; pendingAttack = 0; knockbackActive = false;
+        MultiplayerTreeRootSync tree = GetComponentInParent<MultiplayerTreeRootSync>();
+        if (tree != null)
+        {
+            tree.GetComponent<TreeRootController>().SetRootActive(false);
+            tree.CloseWindows();
+        }
         candidates.Clear(); frames.Clear(); localLanded = false; PauseAI();
         if (!body.isKinematic) { body.linearVelocity = Vector3.zero; body.angularVelocity = Vector3.zero; }
         SetPhysics(false);

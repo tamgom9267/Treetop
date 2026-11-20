@@ -36,6 +36,11 @@ public class TreeRootAttack : MonoBehaviour
 
         PlayerController playerController = other.GetComponent<PlayerController>();
 
+        if (MultiplayerWorldSession.Instance != null &&
+            (playerController != MultiplayerStartingRoomSpawns.LocalPlayer ||
+             MultiplayerDeathSession.Instance != null &&
+             !MultiplayerDeathSession.Instance.IsAlive(MultiplayerGameplayProtocol.LocalActor))) return;
+
         PlayerClass playerClass = other.GetComponent<PlayerClass>();
 
         if (playerController == null || playerClass == null) return;

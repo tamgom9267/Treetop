@@ -9,7 +9,7 @@ using UnityEngine;
 // Canal independiente de los eventos visuales 20-23 de la fase 3.
 public static class MultiplayerGameplayProtocol
 {
-    public const byte WorldRequest = 30, WorldState = 31, EnemyFrames = 32, WorldSnapshot = 33, SlimeMotion = 34;
+    public const byte WorldRequest = 30, WorldState = 31, EnemyFrames = 32, WorldSnapshot = 33, SlimeMotion = 34, TreeRoots = 35;
     public const byte LootRequest = 40, LootState = 41, LootSnapshot = 42, Settlement = 43;
     public const byte FloorRequest = 44, DefeatReturnRequest = 45;
     public const int Version = 1;
@@ -135,6 +135,15 @@ public sealed class MultiplayerSlimeMotion
 public sealed class MultiplayerSlimeMotionBatch
 {
     public MultiplayerSlimeMotion[] entries;
+}
+
+[Serializable]
+public sealed class MultiplayerTreeRootState
+{
+    public string id;
+    public int sequence, attackMask, windowMask;
+    public Vector3[] positions;
+    public float[] heights;
 }
 
 // Los grupos contienen mensajes individuales que no pueden contener otros grupos.

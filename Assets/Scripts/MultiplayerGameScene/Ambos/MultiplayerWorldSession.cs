@@ -299,7 +299,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         if (!Playing || enemy == null || !enemy.CombatActive || weapon.player != player || localAttack <= 0 || !Loot.CanUse(player.weapon) || !player.RegisterEnemyHit(enemy.gameObject)) return;
         var message = new MultiplayerWorldMessage { op = "hit", id = enemy.Id, attack = localAttack };
         if (MultiplayerGameplayProtocol.Host) ReceiveRequest(MultiplayerGameplayProtocol.LocalActor, message);
-        else if (MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldRequest, message, true, MultiplayerGameplayProtocol.HostActor, flush: true))
+        else if (MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldRequest, message, true, MultiplayerGameplayProtocol.HostActor, flush: true) && !enemy.Anchored)
             enemy.BeginLocalKnockback(MultiplayerGameplayProtocol.LocalActor, localAttack, player.transform.position);
     }
     private void ReceiveRequest(int actor, MultiplayerWorldMessage message)
@@ -380,6 +380,12 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         foreach (string id in removed) entries.Add(new MultiplayerWorldMessage { op = "remove", id = id, revision = ++revision });
         MultiplayerGameplayProtocol.Send(MultiplayerGameplayProtocol.WorldSnapshot,
             new MultiplayerWorldBatch { op = "snapshot", entries = entries.ToArray() }, true, actor);
+        foreach (MultiplayerEnemy enemy in enemies.Values)
+            if (enemy != null && enemy.Anchored)
+            {
+                MultiplayerTreeRootSync tree = enemy.GetComponentInParent<MultiplayerTreeRootSync>();
+                if (tree != null) tree.Publish(true, actor);
+            }
     }
     private void Apply(MultiplayerWorldMessage message)
     {
@@ -407,7 +413,7 @@ public sealed class MultiplayerWorldSession : MonoBehaviour, IOnEventCallback
         {
             removed.Add(message.id);
             if (enemies.TryGetValue(message.id, out var enemy) && enemy != null)
-            { enemy.SpawnDeathEffect(); enemy.SuspendMotion(); enemy.gameObject.SetActive(false); Destroy(enemy.gameObject); }
+            { enemy.SpawnDeathEffect(); enemy.SuspendMotion(); GameObject target = enemy.DespawnTarget; target.SetActive(false); Destroy(target); }
             enemies.Remove(message.id);
         }
         else if (message.op == "enemy" && !string.IsNullOrEmpty(message.id) && !removed.Contains(message.id) &&

@@ -6,6 +6,7 @@ public class TreeRootAnimationEvents : MonoBehaviour
 {
     [SerializeField] private TreeRootController controller;
     [SerializeField] private int ramaIndex;
+    public int RootIndex => ramaIndex;
 
     [Header("Ataque")]
     [SerializeField] private BoxCollider attackCollider;
@@ -21,19 +22,33 @@ public class TreeRootAnimationEvents : MonoBehaviour
 
     public void EnableRootAttackCollider()
     {
+        MultiplayerTreeRootSync sync = GetComponentInParent<MultiplayerTreeRootSync>();
+        if (sync != null && !sync.Authority) return;
         if (attackCollider == null || rootAttack == null) return;
 
         rootAttack.EnableAttack();
         PlayEffect();
         attackCollider.enabled = true;
+        if (sync != null) sync.NotifyWindow(ramaIndex, true);
     }
 
     public void DisableRootAttackCollider()
     {
+        MultiplayerTreeRootSync sync = GetComponentInParent<MultiplayerTreeRootSync>();
+        if (sync != null && !sync.Authority) return;
         if (attackCollider == null || rootAttack == null) return;
 
         rootAttack.DisableAttack();
         attackCollider.enabled = false;
+        if (sync != null) sync.NotifyWindow(ramaIndex, false);
+    }
+
+    public void ApplyRemoteWindow(bool active)
+    {
+        if (attackCollider == null || rootAttack == null) return;
+        if (attackCollider.enabled == active) return;
+        if (active) rootAttack.EnableAttack(); else rootAttack.DisableAttack();
+        attackCollider.enabled = active;
     }
 
     public void BeginRootRetreat()

@@ -13,6 +13,7 @@ public class TreeRootController : MonoBehaviour
     [SerializeField] private Animator[] rootAnimators;
 
     private Transform player;
+    private MultiplayerTreeRootSync multiplayerSync;
 
     [Header("Modelos de rama")]
     [SerializeField] private Transform[] ramaModels;
@@ -76,12 +77,12 @@ public class TreeRootController : MonoBehaviour
         {
             // if (rootAgents[i] == null) continue;
 
-            if (rootAgents[i] == null)
+            if (rootAgents[i] != null)
             {
                 rootAgents[i].speed = moveSpeed;
                 rootAgents[i].updateRotation = false;
                 rootAgents[i].stoppingDistance = 0.5f;
-                rootAgents[i].isStopped = true;
+                if (rootAgents[i].isOnNavMesh) rootAgents[i].isStopped = true;
             }
 
             if (rootAgents[i] != null && ramaModels[i] != null)
@@ -96,6 +97,8 @@ public class TreeRootController : MonoBehaviour
 
     private void Start()
     {
+        multiplayerSync = GetComponent<MultiplayerTreeRootSync>();
+        if (multiplayerSync != null) return;
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
 
         if (playerObject != null) player = playerObject.transform;
@@ -103,13 +106,25 @@ public class TreeRootController : MonoBehaviour
 
     private void Update()
     {
-        if (!ramaActive || player == null) return;
+        if (!ramaActive) return;
+        if (multiplayerSync != null && !multiplayerSync.Authority) return;
+        Vector3 target;
+        if (multiplayerSync != null)
+        {
+            MultiplayerWorldSession world = MultiplayerWorldSession.Instance;
+            if (world == null || !world.Playing || !world.TryNearest(multiplayerSync.RoomId, transform.position, out target)) return;
+        }
+        else
+        {
+            if (player == null) return;
+            target = player.position;
+        }
 
-        for (int i = 0; i < rootAgents.Length; i++)
+        for (int i = 0; i < rootCount; i++)
         {
             if (isAttacking[i]) continue;
 
-            UpdateRootMovements(i);
+            UpdateRootMovements(i, target);
         }
     }
 
@@ -117,7 +132,7 @@ public class TreeRootController : MonoBehaviour
     {
         if (!ramaActive) return;
 
-        for (int i = 0; i < rootAgents.Length; i++)
+        for (int i = 0; i < rootCount; i++)
         {
             if (rootAgents[i] == null || ramaModels[i] == null) continue;
 
@@ -136,16 +151,16 @@ public class TreeRootController : MonoBehaviour
         }
     }
 
-    private void UpdateRootMovements(int index)
+    private void UpdateRootMovements(int index, Vector3 target)
     {
         NavMeshAgent agent = rootAgents[index];
 
         if (agent == null || !agent.isOnNavMesh) return;
 
-        agent.SetDestination(player.position);
+        agent.SetDestination(target);
 
         float distance = Vector3.Distance(
-            agent.transform.position, player.position
+            agent.transform.position, target
         );
 
         if (distance <= attackDistance)
@@ -208,7 +223,7 @@ public class TreeRootController : MonoBehaviour
     {
         ramaActive = active;
         
-        for (int i = 0; i < rootAgents.Length; i++)
+        for (int i = 0; i < rootCount; i++)
         {
             NavMeshAgent agent = rootAgents[i];
 
@@ -225,6 +240,24 @@ public class TreeRootController : MonoBehaviour
             }
             else agent.isStopped = false;
         }
+    }
+
+    public int RootCount => rootCount;
+    public Vector3 RootPosition(int index) => rootAgents[index].transform.position;
+    public float RootHeight(int index) => currentHeights[index];
+    public bool RootAttacking(int index) => isAttacking[index];
+    public void DisableClientAgents()
+    {
+        for (int i = 0; i < rootCount; i++)
+            if (rootAgents[i] != null) rootAgents[i].enabled = false;
+    }
+    public void ApplyRemoteRoot(int index, Vector3 position, float height, bool attacking)
+    {
+        if (!IsValidIndex(index) || rootAgents[index] == null) return;
+        rootAgents[index].transform.position = position;
+        currentHeights[index] = targetHeights[index] = height;
+        isAttacking[index] = attacking;
+        if (rootAnimators[index] != null) rootAnimators[index].SetBool("isAttacking", attacking);
     }
 
     private bool IsValidIndex(int index)

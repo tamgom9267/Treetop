@@ -72,6 +72,19 @@ public class GeneratedRoomController : MonoBehaviour
     {
         OpenDoor(enterDoor);
         CloseDoor(exitDoor);
+
+        if (isActive || isCompleted) return;
+
+        // El arbol permanece visible, pero sin movimiento ni combate hasta entrar.
+        foreach (GameObject enemy in enemies)
+        {
+            if (enemy == null || !enemy.TryGetComponent(out TreeRootController tree))
+                continue;
+
+            tree.SetRootActive(false);
+            foreach (EnemyCombat combat in enemy.GetComponentsInChildren<EnemyCombat>(true))
+                combat.SetCombatActive(false);
+        }
     }
 
     private void Update()
@@ -124,10 +137,18 @@ public class GeneratedRoomController : MonoBehaviour
         // Los jefes ya colocados en el cuarto despiertan al comenzar el combate.
         foreach (GameObject enemy in enemies)
         {
-            if (enemy != null && enemy.TryGetComponent(out SlimeBoss boss))
+            if (enemy == null) continue;
+
+            if (enemy.TryGetComponent(out SlimeBoss boss))
                 boss.ActivateSlime();
 
-            if(enemy.TryGetComponent(out TreeRootController tree)) tree.SetRootActive(true);
+            if (enemy.TryGetComponent(out TreeRootController tree))
+            {
+                foreach (EnemyCombat combat in enemy.GetComponentsInChildren<EnemyCombat>(true))
+                    combat.SetCombatActive(true);
+
+                tree.SetRootActive(true);
+            }
         }
     }
 

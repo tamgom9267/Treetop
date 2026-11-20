@@ -55,7 +55,12 @@ public abstract class MultiplayerRoomController : MonoBehaviour
     {
         ApplyDoors();
         foreach (MultiplayerEnemy enemy in enemies)
-            if (enemy != null) enemy.SetCombatActive(Stage == 1);
+        {
+            if (enemy == null) continue;
+            enemy.SetCombatActive(Stage == 1);
+            TreeRootController tree = enemy.GetComponentInParent<TreeRootController>();
+            if (tree != null) tree.SetRootActive(Stage == 1);
+        }
         if (rewardChest != null) rewardChest.SetActive(Stage == 2);
     }
     private void ApplyDoors()

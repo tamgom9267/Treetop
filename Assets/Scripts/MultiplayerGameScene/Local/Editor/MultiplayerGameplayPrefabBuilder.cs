@@ -52,6 +52,15 @@ public static class MultiplayerGameplayPrefabBuilder
         ValidatePrefabs();
         Debug.Log("FASE 4: 22 cuartos, 4 prefabs de enemigos, catalogo de loot y coordinador preparados. No se guardaron escenas.");
     }
+    [MenuItem("Tools/Multiplayer/Actualizar cuartos 7 y boss2")]
+    public static void RebuildTreeRooms()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Sal de Play para preparar los prefabs.");
+        foreach (string role in new[] { "Host", "Client" })
+            foreach (string id in new[] { "7", "boss2" })
+                BuildRoom(id, role == "Host", Root + "/" + role + "/Cuartos/" + id + ".prefab");
+        AssetDatabase.SaveAssets();
+    }
     private static void BuildRoom(string id, bool host, string destination)
     {
         GameObject root = PrefabUtility.LoadPrefabContents(Source + "/Cuartos/" + id + ".prefab");
@@ -70,24 +79,33 @@ public static class MultiplayerGameplayPrefabBuilder
                 foreach (GameObject obj in source.enemies)
                 {
                     if (obj == null) continue;
-                    var combat = obj.GetComponent<EnemyCombat>();
+                    var tree = obj.GetComponent<TreeRootController>();
+                    var combat = tree != null ? obj.GetComponentInChildren<EnemyCombat>(true) : obj.GetComponent<EnemyCombat>();
+                    GameObject bodyObject = combat != null ? combat.gameObject : obj;
                     var boss = obj.GetComponent<SlimeBoss>();
                     var movement = obj.GetComponent<SlimeBossMovementProcedural>();
-                    var enemy = obj.AddComponent<MultiplayerEnemy>();
+                    var enemy = bodyObject.AddComponent<MultiplayerEnemy>();
                     Copy(combat, enemy, "maxHealth", "contactDamage", "knockbackForce", "knockbackUpForce", "weaponKnockbackMultiplier", "rend", "flashColor", "flashDuration");
                     CopyEnemyEffects(combat, enemy);
                     var settings = new SerializedObject(enemy);
                     settings.FindProperty("authority").boolValue = host;
                     settings.FindProperty("startsActive").boolValue = false;
                     if (boss != null) settings.FindProperty("deathAnimationState").stringValue = "Base Layer.SlimeBossDeath";
+                    if (tree != null)
+                    {
+                        settings.FindProperty("anchored").boolValue = true;
+                        settings.FindProperty("destroyTarget").objectReferenceValue = obj;
+                        settings.FindProperty("deathAnimationState").stringValue = "Base Layer.ArbolMuerte";
+                        obj.AddComponent<MultiplayerTreeRootSync>();
+                    }
                     settings.ApplyModifiedPropertiesWithoutUndo();
                     if (host && movement != null) Copy(movement, obj.AddComponent<HostSlimeMovement>(), "minJumpCooldown", "maxJumpCooldown", "horizontalJumpForce", "verticalJumpForce", "turnSpeed", "navMeshCheckDistance");
                     if (boss != null) Object.DestroyImmediate(boss);
                     if (movement != null) Object.DestroyImmediate(movement);
                     if (combat != null) Object.DestroyImmediate(combat);
-                    obj.GetComponent<Rigidbody>().isKinematic = true;
-                    obj.GetComponent<Rigidbody>().useGravity = false;
-                    if (!host) obj.GetComponent<Animator>().updateMode = AnimatorUpdateMode.UnscaledTime;
+                    bodyObject.GetComponent<Rigidbody>().isKinematic = true;
+                    bodyObject.GetComponent<Rigidbody>().useGravity = false;
+                    if (!host) bodyObject.GetComponent<Animator>().updateMode = AnimatorUpdateMode.UnscaledTime;
                     placed.Add(enemy);
                 }
                 room.enemies = placed.ToArray();
@@ -328,7 +346,7 @@ public static class MultiplayerGameplayPrefabBuilder
             foreach (MultiplayerEnemy enemy in placed)
             {
                 if (enemy == null || !enemy.transform.IsChildOf(root.transform) || enemy.Authority != (role == "Host") ||
-                    (enemy.GetComponent<HostSlimeMovement>() != null) != (role == "Host") || enemy.GetComponent<SlimeBoss>() != null ||
+                    (enemy.GetComponent<HostSlimeMovement>() != null) != (role == "Host" && !enemy.Anchored) || enemy.GetComponent<SlimeBoss>() != null ||
                     enemy.GetComponent<EnemyCombat>() != null || enemy.GetComponent<SlimeBossMovementProcedural>() != null)
                     throw new InvalidOperationException("Enemigo colocado mal configurado en " + role + "/" + id);
                 var settings = new SerializedObject(enemy);

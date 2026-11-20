@@ -37,6 +37,7 @@ public class EnemyCombat : MonoBehaviour
 
     [Header("Estado")]
     [SerializeField] private bool startsActive = true;
+    [SerializeField] private bool ignoreDamageWhileInactive;
 
     [Header("Particulas de Golpe")]
     [SerializeField] private ParticleSystem hitEffectPrefab;
@@ -177,7 +178,7 @@ public class EnemyCombat : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (damage <= 0 || isDead) return;
+        if (damage <= 0 || isDead || (!isActive && ignoreDamageWhileInactive)) return;
 
         currentHealth = Mathf.Max(0, currentHealth - damage);
 
