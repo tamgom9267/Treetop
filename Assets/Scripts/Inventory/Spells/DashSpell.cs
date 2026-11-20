@@ -12,7 +12,7 @@ public class DashSpell : SpellObject
         {
             PlayerClass playerClass = player.GetComponent<PlayerController>().playerClass;
 
-            if(playerClass.MP - 5 < 0)
+            if(playerClass.MP <= 0)
             {
                 return;
             }
