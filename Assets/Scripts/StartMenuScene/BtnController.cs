@@ -12,4 +12,9 @@ public class BtnController : MonoBehaviour
     {
         Application.Quit();
     }
+
+    public void BtnAldea()
+    {
+        SceneManager.LoadScene("VillageMenuScene");
+    }
 }
