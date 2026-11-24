@@ -1527,7 +1527,7 @@ namespace Photon.Pun
         {
             if (!InRoom || !VerifyCanUseNetwork() || OfflineMode)
             {
-                if (LogLevel == PunLogLevel.Informational) /*Debug.Log("Can not SetMasterClient(). Not in room or in OfflineMode.")*/;
+                if (LogLevel == PunLogLevel.Informational) Debug.Log("Can not SetMasterClient(). Not in room or in OfflineMode.");
                 return false;
             }
 

@@ -25,11 +25,6 @@ public sealed class MultiplayerTreeRootSync : MonoBehaviour, IOnEventCallback
     private void OnEnable() { PhotonNetwork.AddCallbackTarget(this); }
     private void OnDisable() { PhotonNetwork.RemoveCallbackTarget(this); }
 
-    private void Start()
-    {
-        if (!Authority && controller != null) controller.DisableClientAgents();
-    }
-
     private void Update()
     {
         if (!Authority || enemy == null || !enemy.CombatActive || controller == null ||

@@ -145,7 +145,7 @@ public class SeedSelectionMenu : MonoBehaviour
     }
 
     private void OnDisable() { Close(); }
-    private void Error(string message) { if (errorText != null) errorText.text = message; else /*Debug.LogWarning(message, this)*/; }
+    private void Error(string message) { if (errorText != null) errorText.text = message; else Debug.LogWarning(message, this); }
     private void SetPanel(bool active)
     {
         if (seedPanel != null && !transform.IsChildOf(seedPanel.transform)) seedPanel.SetActive(active);

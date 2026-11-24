@@ -1500,7 +1500,7 @@ namespace Photon.Pun
             if (removeKeys.Count > 0)
             {
                 if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
-                    /*Debug.Log("New level loaded. Removed " + removeKeys.Count + " scene view IDs from last level.")*/;
+                    Debug.Log("New level loaded. Removed " + removeKeys.Count + " scene view IDs from last level.");
             }
         }
 
@@ -2179,7 +2179,7 @@ namespace Photon.Pun
             Hashtable setScene = new Hashtable();
             if (levelId is int) setScene[CurrentSceneProperty] = (int)levelId;
             else if (levelId is string) setScene[CurrentSceneProperty] = (string)levelId;
-            else /*Debug.LogError("Parameter levelId must be int or string!")*/;
+            else Debug.LogError("Parameter levelId must be int or string!");
 
             PhotonNetwork.CurrentRoom.SetCustomProperties(setScene);
             SendAllOutgoingCommands(); // send immediately! because: in most cases the client will begin to load and pause sending anything for a while
@@ -2396,11 +2396,11 @@ namespace Photon.Pun
                             else if (PhotonNetwork.LogLevel >= PunLogLevel.Informational)
                             {
                                 if (requestedView.OwnershipTransfer == OwnershipOption.Request)
-                                    /*Debug.Log("Failed incoming OwnershipTransfer attempt for '" + requestedView.name + "; " + requestedViewId +
-                                              " - photonView has OwnershipTransfer set to OwnershipOption.Request, but Player attempting to change owner is not the current owner/controller.")*/;
+                                    Debug.Log("Failed incoming OwnershipTransfer attempt for '" + requestedView.name + "; " + requestedViewId +
+                                              " - photonView has OwnershipTransfer set to OwnershipOption.Request, but Player attempting to change owner is not the current owner/controller.");
                                 else
-                                    /*Debug.Log("Failed incoming OwnershipTransfer attempt for '" + requestedView.name + "; " + requestedViewId +
-                                              " - photonView has OwnershipTransfer set to OwnershipOption.Fixed.")*/;
+                                    Debug.Log("Failed incoming OwnershipTransfer attempt for '" + requestedView.name + "; " + requestedViewId +
+                                              " - photonView has OwnershipTransfer set to OwnershipOption.Fixed.");
                             }
                         }
                         else if (PhotonNetwork.LogLevel >= PunLogLevel.ErrorsOnly)

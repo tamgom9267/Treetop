@@ -51,10 +51,7 @@ public class TreeRootAttack : MonoBehaviour
 
         playerClass.TakeDamage(damage);
 
-        // el objeto raiz de arbol para conservar
-        // el tag de physicalenemy y aplicar el knockback correcto
-        playerController.ReceiveHit(enemyRoot);
-        // esta mal este porque agarra el padre de todo, entocnes agarra el origen del prefab y no del enemigo
-        // playerController.ReceiveHit(transform.root.gameObject);
+        // El daño letal puede desactivar al jugador dentro de TakeDamage.
+        if (playerClass.health > 0) playerController.ReceiveHit(enemyRoot);
     }
 }

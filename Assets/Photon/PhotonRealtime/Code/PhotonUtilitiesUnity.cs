@@ -67,7 +67,7 @@ namespace Photon.Realtime
                 }
                 catch (Exception e)
                 {
-                    /*Debug.Log("Could not set Photon " + defineSymbol + " defines for current build target. Caught: " + e)*/;
+                    Debug.Log("Could not set Photon " + defineSymbol + " defines for current build target. Caught: " + e);
                 }
             }
         }

@@ -6,6 +6,7 @@ using Unity.AI.Navigation;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
@@ -25,7 +26,7 @@ public static class MultiplayerGameplayPrefabBuilder
         if (EditorApplication.isPlayingOrWillChangePlaymode) return;
         if (EditorApplication.isUpdating || EditorApplication.isCompiling) { EditorApplication.delayCall += BuildWhenIdle; return; }
         try { CreatePrefabs(); MultiplayerGameplayVerification.RunChecks(); }
-        catch (Exception error) { /*Debug.LogException(error)*/; }
+        catch (Exception error) { Debug.LogException(error); }
     }
     [MenuItem("Tools/Multiplayer/Crear prefabs de fase 4")]
     public static void CreatePrefabs()
@@ -116,6 +117,8 @@ public static class MultiplayerGameplayPrefabBuilder
             if (id == "0") root.AddComponent<MultiplayerStartingRoomSpawns>().FindLegacyPoints();
             if (!host)
             {
+                // El cliente usa los transforms de las raíces para reproducir la posición del host.
+                foreach (NavMeshAgent agent in root.GetComponentsInChildren<NavMeshAgent>(true)) agent.enabled = false;
                 foreach (NavMeshSurface surface in root.GetComponentsInChildren<NavMeshSurface>(true)) Object.DestroyImmediate(surface);
                 foreach (NavMeshLink link in root.GetComponentsInChildren<NavMeshLink>(true)) Object.DestroyImmediate(link);
                 foreach (NavMeshModifier modifier in root.GetComponentsInChildren<NavMeshModifier>(true)) Object.DestroyImmediate(modifier);
@@ -338,7 +341,15 @@ public static class MultiplayerGameplayPrefabBuilder
                 throw new InvalidOperationException("Controladores incorrectos en " + role + "/" + id);
             int original = source.GetComponentsInChildren<NavMeshSurface>(true).Length;
             int actual = root.GetComponentsInChildren<NavMeshSurface>(true).Length;
-            if (actual != (role == "Host" ? original : 0)) throw new InvalidOperationException("NavMesh incorrecto en " + role + "/" + id);
+            bool host = role == "Host";
+            if (actual != (host ? original : 0)) throw new InvalidOperationException("NavMesh incorrecto en " + role + "/" + id);
+            var sourceAgents = source.GetComponentsInChildren<NavMeshAgent>(true);
+            var agents = root.GetComponentsInChildren<NavMeshAgent>(true);
+            if (agents.Length != sourceAgents.Length)
+                throw new InvalidOperationException("Faltan referencias de navegación en " + role + "/" + id);
+            for (int i = 0; i < agents.Length; i++)
+                if (agents[i].enabled != (host && sourceAgents[i].enabled))
+                    throw new InvalidOperationException("Agente de navegación mal configurado en " + role + "/" + id + ": " + agents[i].name);
             if (root.GetComponent<MultiplayerRoomController>().spawners.Length != source.GetComponent<GeneratedRoomController>().spawners.Length)
                 throw new InvalidOperationException("Spawners diferentes en " + role + "/" + id);
             var placed = root.GetComponent<MultiplayerRoomController>().enemies;
@@ -359,6 +370,7 @@ public static class MultiplayerGameplayPrefabBuilder
                 if (animatorController == null || animatorController.layers.Length == 0 ||
                     !HasAnimationState(animatorController.layers[0].stateMachine, animatorController.layers[0].name, deathState))
                     throw new InvalidOperationException("Animacion de muerte inexistente en " + role + "/" + id);
+                if (!enemy.Anchored) ValidateTriggers(animatorController, role + "/" + id, "StartJump", "Land", "Activate");
             }
         }
         foreach (string role in new[] { "Host", "Client" }) for (int type = 1; type <= 2; type++)
@@ -377,11 +389,23 @@ public static class MultiplayerGameplayPrefabBuilder
                 throw new InvalidOperationException("Enemigo mal configurado: " + role + "/" + type);
             if (role == "Client" && (root.transform.Find("CombatVisual") != null || root.GetComponent<MeshRenderer>() == null))
                 throw new InvalidOperationException("Falta restaurar la malla del slime: Client/" + type);
+            if (!isGhost)
+            {
+                var controller = root.GetComponent<Animator>()?.runtimeAnimatorController as UnityEditor.Animations.AnimatorController;
+                ValidateTriggers(controller, role + "/Enemigo" + type, "StartJump", "Land");
+            }
         }
         var coordinator = AssetDatabase.LoadAssetAtPath<GameObject>(Root + "/Local/MultiplayerPlayers.prefab");
         if (coordinator.GetComponent<MultiplayerWorldSession>() == null || coordinator.GetComponent<MultiplayerLootSession>() == null ||
             !coordinator.GetComponent<MultiplayerInventoryAdapter>().Validate(out string error)) throw new InvalidOperationException("Coordinador incompleto.");
         ValidateLootCatalog(coordinator.GetComponent<MultiplayerLootSession>());
+    }
+    private static void ValidateTriggers(UnityEditor.Animations.AnimatorController controller, string prefab, params string[] required)
+    {
+        var parameters = controller != null ? controller.parameters : Array.Empty<AnimatorControllerParameter>();
+        foreach (string trigger in required)
+            if (!Array.Exists(parameters, parameter => parameter.name == trigger && parameter.type == AnimatorControllerParameterType.Trigger))
+                throw new InvalidOperationException("Falta el trigger " + trigger + " en " + prefab);
     }
     private static bool HasAnimationState(UnityEditor.Animations.AnimatorStateMachine machine, string path, int hash)
     {

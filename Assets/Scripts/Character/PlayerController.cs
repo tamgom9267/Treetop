@@ -93,15 +93,28 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject InventoryUI;
 
     public bool IsInventoryOpen => InventoryUI != null && InventoryUI.activeInHierarchy;
-    public bool IsExternalUIBlocked { get; private set; }
+    public bool IsExternalUIBlocked => externalUIBlocked || multiplayerInventoryBlocked;
+    private bool externalUIBlocked;
+    private bool multiplayerInventoryBlocked;
 
     // Bloquea las acciones de juego sin deshabilitar el Input System usado por los campos UI.
     public void SetExternalUIBlocked(bool blocked)
     {
-        IsExternalUIBlocked = blocked;
-        if (!blocked) return;
+        externalUIBlocked = blocked;
+        if (blocked) StopMovementForUI();
+    }
+
+    internal void SetMultiplayerInventoryBlocked(bool blocked)
+    {
+        if (multiplayerInventoryBlocked == blocked) return;
+        multiplayerInventoryBlocked = blocked;
+        if (blocked) StopMovementForUI();
+    }
+
+    private void StopMovementForUI()
+    {
         _moveDirection = Vector2.zero;
-        if (rb != null)
+        if (rb != null && !rb.isKinematic)
             rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
         if (playerAnimation != null) playerAnimation.SetFloat("Speed", 0f);
     }
@@ -144,7 +157,7 @@ public class PlayerController : MonoBehaviour
     {
         if (IsExternalUIBlocked)
         {
-            SetExternalUIBlocked(true);
+            StopMovementForUI();
             return;
         }
 
@@ -473,6 +486,8 @@ public class PlayerController : MonoBehaviour
 
     public void ReceiveHit(GameObject enemy)
     {
+        if (!isActiveAndEnabled || playerClass == null || playerClass.health <= 0) return;
+
         // Detener temporalmente la animación
         TriggerHitStop(receivedHitStopDuration);
 

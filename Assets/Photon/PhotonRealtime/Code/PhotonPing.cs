@@ -129,10 +129,9 @@ namespace Photon.Realtime
                 this.sock.Send(this.PingBytes);
                 this.PingBytes[this.PingBytes.Length - 1] = (byte)(this.PingId+1);  // this buffer is re-used for the result/receive. invalidate the result now.
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 this.sock = null;
-                /*System.Diagnostics.Debug.WriteLine(e.ToString())*/;
 
                 // bubble up
                 throw;

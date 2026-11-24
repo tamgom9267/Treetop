@@ -132,7 +132,7 @@ namespace Photon.Realtime
                     }
                     catch (Exception e)
                     {
-                        /*Debug.Log("Could not set Photon " + defineSymbol + " defines for build target: " + target + " group: " + group + " " + e)*/;
+                        Debug.Log("Could not set Photon " + defineSymbol + " defines for build target: " + target + " group: " + group + " " + e);
                     }
                 }
             }
@@ -196,7 +196,7 @@ namespace Photon.Realtime
                 }
                 catch (Exception e)
                 {
-                    /*Debug.LogErrorFormat("Could not set clean up PUN2's define symbols for build target: {0} group: {1}, {2}", target, group, e)*/;
+                    Debug.LogErrorFormat("Could not set clean up PUN2's define symbols for build target: {0} group: {1}, {2}", target, group, e);
                 }
             }
         }
@@ -262,7 +262,7 @@ namespace Photon.Realtime
                 }
                 catch (Exception ex)
                 {
-                    /*Debug.LogException(ex)*/;
+                    Debug.LogException(ex);
                     EditorApplication.update -= closureCallback;
                 }
             };

@@ -127,7 +127,7 @@ public sealed class MultiplayerLocalPlayerPublisher : MonoBehaviour
         if (!owner.TryGetType(weapon.weaponData, out string type))
         {
             if (warnedWeapons.Add(weapon.weaponData))
-                /*Debug.LogWarning("Multiplayer: registra el arma en el catalogo visual: " + weapon.weaponData.name, this)*/;
+                Debug.LogWarning("Multiplayer: registra el arma en el catalogo visual: " + weapon.weaponData.name, this);
             return default;
         }
         if (!itemIds.TryGetValue(item, out int id))

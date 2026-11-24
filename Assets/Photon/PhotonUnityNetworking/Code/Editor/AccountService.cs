@@ -184,7 +184,7 @@ namespace Photon.Realtime
             }
             catch (Exception ex) // probably JSON parsing exception, check if returned string is valid JSON
             {
-                /*Debug.LogException(ex)*/;
+                Debug.LogException(ex);
                 return null;
             }
         }

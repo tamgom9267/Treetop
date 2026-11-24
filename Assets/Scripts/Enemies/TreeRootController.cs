@@ -77,7 +77,7 @@ public class TreeRootController : MonoBehaviour
         {
             // if (rootAgents[i] == null) continue;
 
-            if (rootAgents[i] != null)
+            if (rootAgents[i] != null && rootAgents[i].isActiveAndEnabled)
             {
                 rootAgents[i].speed = moveSpeed;
                 rootAgents[i].updateRotation = false;
@@ -246,11 +246,6 @@ public class TreeRootController : MonoBehaviour
     public Vector3 RootPosition(int index) => rootAgents[index].transform.position;
     public float RootHeight(int index) => currentHeights[index];
     public bool RootAttacking(int index) => isAttacking[index];
-    public void DisableClientAgents()
-    {
-        for (int i = 0; i < rootCount; i++)
-            if (rootAgents[i] != null) rootAgents[i].enabled = false;
-    }
     public void ApplyRemoteRoot(int index, Vector3 position, float height, bool attacking)
     {
         if (!IsValidIndex(index) || rootAgents[index] == null) return;

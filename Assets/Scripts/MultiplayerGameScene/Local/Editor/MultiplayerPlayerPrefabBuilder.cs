@@ -35,7 +35,7 @@ public static class MultiplayerPlayerPrefabBuilder
         if (EditorApplication.isCompiling || EditorApplication.isUpdating)
         { EditorApplication.delayCall += CreateWhenIdle; return; }
         try { CreateMissingPrefabs(); }
-        catch (Exception exception) { /*Debug.LogException(exception)*/; }
+        catch (Exception exception) { Debug.LogException(exception); }
     }
 
     [MenuItem("Tools/Multiplayer/Crear prefabs de jugadores")]

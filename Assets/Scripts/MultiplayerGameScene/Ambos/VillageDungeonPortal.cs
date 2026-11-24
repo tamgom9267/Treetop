@@ -19,7 +19,7 @@ public class VillageDungeonPortal : MonoBehaviour
     private void Awake()
     {
         if (GetComponent<LoadProceduralGenScene>() != null)
-            /*Debug.LogError("Retira LoadProceduralGenScene del portal antes de probar VillageDungeonPortal.", this)*/;
+            Debug.LogError("Retira LoadProceduralGenScene del portal antes de probar VillageDungeonPortal.", this);
     }
 
     private void OnCollisionEnter(Collision collision) { Enter(collision.collider); }

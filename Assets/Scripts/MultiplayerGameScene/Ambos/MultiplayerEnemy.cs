@@ -7,6 +7,11 @@ using UnityEngine;
 // Salud e IA pertenecen al host; el movimiento puede delegarse durante un empuje.
 public sealed class MultiplayerEnemy : MonoBehaviour
 {
+    private static readonly int ActivateTrigger = Animator.StringToHash("Activate");
+    private static readonly int StartJumpTrigger = Animator.StringToHash("StartJump");
+    private static readonly int LandTrigger = Animator.StringToHash("Land");
+    private static readonly int DieTrigger = Animator.StringToHash("Die");
+
     [Header("Activacion y animacion")]
     [SerializeField] private bool startsActive = true;
     [SerializeField] private string deathAnimationState = "Base Layer.SlimeDeath";
@@ -27,6 +32,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
 
     private Rigidbody body;
     private Animator animator;
+    private readonly HashSet<int> animationTriggers = new HashSet<int>();
     private HostGhostMovement ghostMovement;
     private Renderer[] ghostRenderers;
     private Collider[] ghostColliders;
@@ -87,6 +93,12 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (componentsInitialized) return;
         componentsInitialized = true; combatActive = startsActive;
         body = GetComponent<Rigidbody>(); animator = GetComponent<Animator>(); Health = maxHealth;
+        if (animator != null && animator.runtimeAnimatorController != null)
+        {
+            foreach (AnimatorControllerParameter parameter in animator.parameters)
+                if (parameter.type == AnimatorControllerParameterType.Trigger)
+                    animationTriggers.Add(parameter.nameHash);
+        }
         if (isGhost)
         {
             ghostMovement = GetComponent<HostGhostMovement>();
@@ -126,7 +138,8 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (deathStarted || combatActive == active) return;
         combatActive = active;
         SetPhysics(SimulatesMotion);
-        if (active && !startsActive && !anchored && animator != null) animator.SetTrigger("Activate");
+        if (active && !startsActive && !anchored && animationTriggers.Contains(ActivateTrigger))
+            animator.SetTrigger(ActivateTrigger);
     }
     internal void SetGhostHidden(bool hidden)
     {
@@ -209,9 +222,14 @@ public sealed class MultiplayerEnemy : MonoBehaviour
     }
     private void ResumeAI(bool landed)
     {
-        if (landed && animator != null && !isGhost) animator.SetTrigger("Land");
+        if (landed) PlayLanding();
         var movement = GetComponent<HostSlimeMovement>();
         if (movement != null) movement.ResumeAfterKnockback();
+    }
+    private void PlayLanding()
+    {
+        if (!anchored && !isGhost && animationTriggers.Contains(LandTrigger))
+            animator.SetTrigger(LandTrigger);
     }
     private void ApplyImpulse(Vector3 origin)
     {
@@ -342,6 +360,7 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (state.motionVersion > motionVersion)
         {
             bool keepLocal = pendingAttack > 0 && state.motionActor == localActor && state.motionAttack == pendingAttack;
+            bool landed = knockbackActive && !state.knockbackActive && !localLanded;
             RetireCurrentControl();
             motionActor = state.motionActor; motionAttack = state.motionAttack; motionVersion = state.motionVersion;
             knockbackActive = state.knockbackActive; receivedSequence = 0; frames.Clear();
@@ -358,11 +377,12 @@ public sealed class MultiplayerEnemy : MonoBehaviour
                 localLanded = false; SetPhysics(SimulatesMotion);
                 if (SimulatesMotion)
                 {
-                    SetBody(latestMotion); StartGroundDetection(true);
+                    SetBody(latestMotion);
+                    if (knockbackActive) StartGroundDetection(true);
                 }
                 else StartCorrection();
             }
-            if (knockbackActive) PauseAI(); else ResumeAI(true);
+            if (knockbackActive) PauseAI(); else ResumeAI(landed);
             ApplyBufferedMotion();
         }
         // Una confirmacion anterior puede llegar despues de un snapshot que ya cambio de dueno.
@@ -449,10 +469,10 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         MultiplayerSlimeMotion final = CaptureMotion(landed); final.finished = true;
         localFinal = final;
         localLanded = true;
-        if (landed && animator != null) animator.SetTrigger("Land");
         if (authority) world.CompleteSlimeMotion(this, final, landed);
         else
         {
+            if (landed) PlayLanding();
             SetPhysics(false); world.PublishSlimeLanding(final);
         }
     }
@@ -522,7 +542,9 @@ public sealed class MultiplayerEnemy : MonoBehaviour
         if (!body.isKinematic) { body.linearVelocity = Vector3.zero; body.angularVelocity = Vector3.zero; }
         SetPhysics(false);
         if (animator == null) return;
-        animator.ResetTrigger("StartJump"); animator.ResetTrigger("Land"); animator.ResetTrigger("Die");
+        if (animationTriggers.Contains(StartJumpTrigger)) animator.ResetTrigger(StartJumpTrigger);
+        if (animationTriggers.Contains(LandTrigger)) animator.ResetTrigger(LandTrigger);
+        if (animationTriggers.Contains(DieTrigger)) animator.ResetTrigger(DieTrigger);
         animator.Play(DeathAnimation, 0, 0f); lastAnimation = DeathAnimation;
     }
     public void ApplyJumpForce()

@@ -17,7 +17,7 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
     private PlayerController player;
     private PlayerInventory inventory;
     private float previousHitDuration;
-    private bool bound, ownBlock, previousBlock;
+    private bool bound;
     private DragSnapshot stable;
     private sealed class DragSnapshot
     {
@@ -64,18 +64,17 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
                 position = rect.position, rotation = rect.localRotation, pivot = rect.pivot, colliderOffset = collider != null ? collider.offset : Vector2.zero };
         }
     }
-    private void Block()
-    {
-        if (!ownBlock) { previousBlock = player.IsExternalUIBlocked; ownBlock = true; }
-        player.SetExternalUIBlocked(true);
-    }
+    private void Block() => player.SetMultiplayerInventoryBlocked(true);
     private void Unblock()
-    { if (ownBlock && player != null) player.SetExternalUIBlocked(previousBlock); ownBlock = false; }
+    {
+        if (player != null) player.SetMultiplayerInventoryBlocked(false);
+    }
     private void Update()
     {
-        if (!bound || world == null) return;
+        if (!bound || world == null || player == null) return;
         if (world.Loot.Settling || world.Loot.ClaimPending) { Block(); return; }
-        if (!world.Playing || !player.enabled || player.IsExternalUIBlocked && !ownBlock) return;
+        Unblock();
+        if (!world.Playing || !player.isActiveAndEnabled || player.IsExternalUIBlocked) return;
         if (player.inventory.action.WasPressedThisFrame() && player.IsInventoryOpen) CancelDrag();
         CaptureStable();
         Chest nearbyChest = player.nearChest != null ? player.nearChest.GetComponent<Chest>() : null;

@@ -6,6 +6,7 @@ public class FollowPlayerNoRotation : MonoBehaviour
 {
     // Camara que queremos mover
     [SerializeField] private Camera cameraToFollow;
+    [SerializeField] private Transform audioListenerAnchor;
 
     // Personaje que la camara debe seguir
     [SerializeField] private Transform player;
@@ -31,15 +32,25 @@ public class FollowPlayerNoRotation : MonoBehaviour
     private void Start()
     {
         cameraToFollow.transform.rotation = Quaternion.Euler(cameraRotation);
+        UpdateListenerPose();
     }
 
     void LateUpdate()
     {
+        if (player == null || !player.gameObject.activeInHierarchy) return;
+
         // Calculamos la posicion donde deberia de estar la camara.
         Vector3 newPosition = player.position + offset;
 
         // Cambiamos la posicion de la camara
         cameraToFollow.transform.position = newPosition + shakeOffset;
+        UpdateListenerPose();
+    }
+
+    private void UpdateListenerPose()
+    {
+        if (audioListenerAnchor != null && player != null && player.gameObject.activeInHierarchy)
+            audioListenerAnchor.SetPositionAndRotation(player.position, player.rotation);
     }
 
     public void Shake()

@@ -32,7 +32,7 @@ public class FloorPortal : MonoBehaviour
             catch (Exception exception)
             {
                 activated = false;
-                /*Debug.LogError("No se pudo regresar a la aldea: " + exception.Message, this)*/;
+                Debug.LogError("No se pudo regresar a la aldea: " + exception.Message, this);
             }
             return;
         }

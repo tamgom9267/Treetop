@@ -622,7 +622,7 @@ namespace Photon.Realtime
             }
             catch (Exception e)
             {
-                /*System.Diagnostics.Debug.WriteLine($"RegionPingThreaded ResolveHost failed for {this.region}. Caught: {e}")*/;
+                System.Diagnostics.Debug.WriteLine($"RegionPingThreaded ResolveHost failed for {this.region}. Caught: {e}");
                 this.Aborted = true;
             }
 
@@ -642,7 +642,7 @@ namespace Photon.Realtime
                 }
                 catch (Exception e)
                 {
-                    /*System.Diagnostics.Debug.WriteLine("RegionPinger.RegionPingThreaded() caught exception for ping.StartPing(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message)*/;
+                    System.Diagnostics.Debug.WriteLine("RegionPinger.RegionPingThreaded() caught exception for ping.StartPing(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message);
                     break;
                 }
 
@@ -731,7 +731,7 @@ namespace Photon.Realtime
             }
             catch (Exception e)
             {
-                /*Debug.Log($"RegionPingCoroutine ResolveHost failed for {this.region}. Caught: {e}")*/;
+                System.Diagnostics.Debug.WriteLine($"RegionPingCoroutine ResolveHost failed for {this.region}. Caught: {e}");
                 this.Aborted = true;
             }
 
@@ -751,7 +751,7 @@ namespace Photon.Realtime
                 }
                 catch (Exception e)
                 {
-                    /*Debug.Log("RegionPinger.RegionPingCoroutine() caught exception for ping.StartPing(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message)*/;
+                    System.Diagnostics.Debug.WriteLine("RegionPinger.RegionPingCoroutine() caught exception for ping.StartPing(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message);
                     break;
                 }
 
@@ -868,7 +868,7 @@ namespace Photon.Realtime
             }
             catch (System.Exception e)
             {
-                /*System.Diagnostics.Debug.WriteLine("RegionPinger.ResolveHost() caught an exception for Dns.GetHostAddresses(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message)*/;
+                System.Diagnostics.Debug.WriteLine("RegionPinger.ResolveHost() caught an exception for Dns.GetHostAddresses(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message);
             }
 
             return ipv4Address;
