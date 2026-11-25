@@ -31,6 +31,11 @@ public class CursorObject : MonoBehaviour
         select.action.Enable();
     }
 
+    private void OnDisable()
+    {
+        isPressed = false;
+    }
+
     // Update is called once per frame
     void Update()
     {
