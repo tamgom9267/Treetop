@@ -46,8 +46,7 @@ public class CursorObject : MonoBehaviour
             isPressed = true;
             if (InventoryItemObj != null)
             {
-                InventoryItem.isMovingObject(InventoryItemObj.gameObject);
-                isMoving = true;
+                isMoving = InventoryItem.isMovingObject(InventoryItemObj);
             }
             else
             {
@@ -68,7 +67,11 @@ public class CursorObject : MonoBehaviour
             {
                 InventoryObject item = panel.itemObj.GetComponent<InventoryObject>();
 
-                if (item != null && Inventory.SelectedObject == item) Inventory.SelectedObject = null;
+                if (item != null)
+                {
+                    item.SetInventorySelectionVisual(false);
+                    if (Inventory.SelectedObject == item) Inventory.SelectedObject = null;
+                }
             }
         } 
         

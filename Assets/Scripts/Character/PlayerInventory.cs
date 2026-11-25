@@ -404,6 +404,13 @@ public class PlayerInventory : MonoBehaviour
                 PanelManager panel = child.GetComponent<PanelManager>();
                 if (panel != null && panel.WeaponID == itemID)
                 {
+                    if (SpriteObject == child.gameObject)
+                    {
+                        isMoving = false;
+                        SpriteObject = null;
+                        cursor.GetComponent<CursorObject>().ResetCursor();
+                    }
+
                     Destroy(child.gameObject);
                 }
             }
@@ -553,35 +560,29 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    public void isMovingObject(GameObject spritePanel)
+    public bool isMovingObject(GameObject spritePanel)
     {
-        if (isMoving == false)
+        PanelManager panel = spritePanel.GetComponent<PanelManager>();
+        InventoryObject item = panel.itemObj.GetComponent<InventoryObject>();
+
+        if (!isMoving)
         {
             isMoving = true;
             SpriteObject = spritePanel;
             PickUpWeapon();
+            item.SetInventorySelectionVisual(true);
+            return true;
         }
-        else
-        {
-            if(cursor.GetComponent<CursorObject>().InventoryZone == 1 && AddObject(spritePanel))
-            {
-                if (SpriteObject != null)
-                {
-                    SpriteObject = null;
-                }
-                isMoving = false;
-            }
-            else if (cursor.GetComponent<CursorObject>().InventoryZone == 0 && RemoveObject(spritePanel.GetComponent<PanelManager>().WeaponID))
-            {
-                if (SpriteObject != null)
-                {
-                    SpriteObject = null;
-                }
-                isMoving = false;
-                
-            }
-        }
-        
+
+        bool placed = cursor.GetComponent<CursorObject>().InventoryZone == 1
+            ? AddObject(spritePanel)
+            : RemoveObject(panel.WeaponID);
+        if (!placed) return true;
+
+        SpriteObject = null;
+        isMoving = false;
+        item.SetInventorySelectionVisual(false);
+        return false;
     }
 
     #endregion

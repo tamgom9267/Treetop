@@ -132,7 +132,9 @@ public sealed class MultiplayerInventoryAdapter : MonoBehaviour
 
         Sprite sprite = item.GetUISprite();
         if (sprite == null) sprite = icon;
-        image.GetComponent<Image>().sprite = sprite;
+        Image displayImage = image.GetComponent<Image>();
+        displayImage.sprite = sprite;
+        item.SetDisplayImage(displayImage);
 
         inventory.gameObject.SetActive(true); CaptureStable(); return true;
     }

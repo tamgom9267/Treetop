@@ -36,7 +36,6 @@ public class InventoryObject : MonoBehaviour
             if (selected == value) return;
 
             selected = value;
-            UpdateSelectionVisual();
             
             OnSelectionChanged?.Invoke(selected);
         }
@@ -57,15 +56,14 @@ public class InventoryObject : MonoBehaviour
         if (itemImage != null)
         {
             originalColor = itemImage.color;
-            UpdateSelectionVisual();
         }
     }
 
-    private void UpdateSelectionVisual()
+    public void SetInventorySelectionVisual(bool selectedForMove)
     {
         if (itemImage == null) return;
 
-        itemImage.color = selected ? selectedColor : originalColor;
+        itemImage.color = selectedForMove ? selectedColor : originalColor;
     }
 
     public virtual Sprite GetUISprite()
