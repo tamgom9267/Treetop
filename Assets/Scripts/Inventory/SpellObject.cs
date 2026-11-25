@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using System;
 
 public abstract class SpellObject : InventoryObject
 {
@@ -22,7 +23,33 @@ public abstract class SpellObject : InventoryObject
 
     public AudioClip Sound;
 
+    private GameObject interactCanvas;
+
     public abstract void SpellEffect();
+    
+    // cooldown lo quiero hacer observer para sacarlo del Update del HUD :P
+    public event Action<bool> OnCooldownChanged;
+
+    public bool IsOnCooldown { get; protected set; } = false;
+
+    protected void SetCooldown(bool value)
+    {
+        if (IsOnCooldown == value)
+            return;
+
+        IsOnCooldown = value;
+        OnCooldownChanged?.Invoke(IsOnCooldown);
+    }
+
+    private void OnEnable()
+    {
+        OnSelectionChanged += HandleSelectionChanged;
+    }
+
+    private void OnDisable()
+    {
+        OnSelectionChanged -= HandleSelectionChanged;
+    }
 
     protected bool CanCast()
     {
@@ -56,8 +83,10 @@ public abstract class SpellObject : InventoryObject
         return spellData.UIsprite;
     }
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
+
         Name = spellData.Name;
         health = spellData.health;
         MP = spellData.MP;
@@ -70,12 +99,24 @@ public abstract class SpellObject : InventoryObject
         getRealList(spellData.requiredCells);
     }
 
-    void Update()
+    private void Start()
     {
-        if(transform.childCount > 0)
-        {
-            transform.GetChild(0).gameObject.SetActive(isSelected);
-        }
+        if (transform.childCount > 0) interactCanvas = transform.GetChild(0).gameObject;
+
+        HandleSelectionChanged(isSelected);
     }
+
+    private void HandleSelectionChanged(bool selected)
+    {
+        if (interactCanvas != null) interactCanvas.SetActive(selected);
+    }
+
+    // void Update()
+    // {
+    //     if(transform.childCount > 0)
+    //     {
+    //         transform.GetChild(0).gameObject.SetActive(isSelected);
+    //     }
+    // }
 
 }

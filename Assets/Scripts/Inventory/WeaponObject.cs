@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -50,10 +51,38 @@ public class WeaponObject : InventoryObject
         player.Inventory.SelectedObject = this;
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    
-    void Awake()
+    private GameObject interactCanvas;
+
+    private void OnEnable()
     {
+        OnSelectionChanged += HandleSelectionChanged;
+    }
+    
+    private void OnDisable()
+    {
+        OnSelectionChanged -= HandleSelectionChanged;
+    }
+
+    private void Start()
+    {
+        if (transform.childCount > 0) interactCanvas = transform.GetChild(0).gameObject;
+
+        HandleSelectionChanged(isSelected);
+    }
+
+    private void HandleSelectionChanged(bool selected)
+    {
+        if (interactCanvas == null)
+        return;
+
+        interactCanvas.SetActive(selected && !inHand);
+    }
+
+    
+    protected override void Awake()
+    {
+        base.Awake();
+
         Name = weaponData.Name;
         health = weaponData.health;
         MP = weaponData.MP;
@@ -68,23 +97,25 @@ public class WeaponObject : InventoryObject
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        if(isSelected == true)
-        {
-            GameObject InteractCanva = transform.GetChild(0).gameObject;
-            if(inHand == false)
-            {
-                InteractCanva.SetActive(true);
-            }
+    // void Update()
+    // {
+    //     if(isSelected == true)
+    //     {
+    //         GameObject InteractCanva = transform.GetChild(0).gameObject;
+    //         if(inHand == false)
+    //         {
+    //             InteractCanva.SetActive(true);
+    //         }
             
-        }
-        else
-        {
-            GameObject InteractCanva = transform.GetChild(0).gameObject;
-            InteractCanva.SetActive(false);
-        }
-    }
+    //     }
+    //     else
+    //     {
+    //         GameObject InteractCanva = transform.GetChild(0).gameObject;
+    //         InteractCanva.SetActive(false);
+    //     }
+
+        
+    // }
 
     public void EnableTrail()
     {

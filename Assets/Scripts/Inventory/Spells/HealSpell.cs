@@ -3,24 +3,22 @@ using UnityEngine;
 
 public class HealSpell : SpellObject
 {
-    bool onCooldown = false;
-
     public override void SpellEffect()
     {
         if (!CanCast()) return;
-        if(onCooldown == false)
+        if(!IsOnCooldown)
         {
             PlayerClass playerClass = player.GetComponent<PlayerController>().playerClass;
 
-            if(playerClass.MP -10 < 0 || playerClass.maxHealth == playerClass.health)
+            if(playerClass.MP -MP < 0 || playerClass.maxHealth == playerClass.health)
             {
                 return;
             }
 
             playerClass.GetComponent<AudioSource>().PlayOneShot(Sound, 0.2f);
-            playerClass.SpendMP(10);
+            playerClass.SpendMP(MP);
             playerClass.Heal(20);
-            onCooldown = true;
+            SetCooldown(true);
             player.StartCoroutine(EndEffect());
         }
     }
@@ -28,6 +26,6 @@ public class HealSpell : SpellObject
     public override IEnumerator EndEffect(float num = 5)
     {
         yield return new WaitForSeconds(num);
-        onCooldown = false;
+        SetCooldown(false);
     }
 }

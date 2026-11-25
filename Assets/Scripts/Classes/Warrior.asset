@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Warrior
   m_EditorClassIdentifier: Assembly-CSharp::classStats
   health: 100
-  MP: 20
+  MP: 60
   defense: 10
   WD: 3
   PD: 2

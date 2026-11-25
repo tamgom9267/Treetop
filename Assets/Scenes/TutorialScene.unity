@@ -5321,6 +5321,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FollowPlayerNoRotation
   cameraToFollow: {fileID: 330585545}
+  audioListenerAnchor: {fileID: 0}
   player: {fileID: 707366301}
   offset: {x: 0, y: 10, z: -8}
   cameraRotation: {x: 45, y: 0, z: 0}
@@ -44231,6 +44232,10 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 707366305}
+    - target: {fileID: 1455885289304584805, guid: b90d22db1d25b2092bf6253974dc310c, type: 3}
+      propertyPath: playerClass
+      value: 
+      objectReference: {fileID: 707366304}
     - target: {fileID: 6705876818345292063, guid: b90d22db1d25b2092bf6253974dc310c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -63215,6 +63220,7 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 0
+  ignoreDamageWhileInactive: 0
   hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
   deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
 --- !u!33 &3469287836679994221
@@ -63370,6 +63376,7 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 0
+  ignoreDamageWhileInactive: 0
   hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
   deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
 --- !u!33 &3469287837315990319
@@ -63420,6 +63427,7 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 1
+  ignoreDamageWhileInactive: 0
   hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
   deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
 --- !u!33 &3469287837520323133
@@ -63486,6 +63494,7 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 0
+  ignoreDamageWhileInactive: 0
   hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
   deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
 --- !u!33 &3469287838068554643
@@ -63568,6 +63577,7 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 0
+  ignoreDamageWhileInactive: 0
   hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
   deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
 --- !u!1 &3471701395223937985
@@ -88634,6 +88644,7 @@ MonoBehaviour:
   flashDuration: 0.1
   hitStopDuration: 0.08
   startsActive: 0
+  ignoreDamageWhileInactive: 0
   hitEffectPrefab: {fileID: 4169060289881727177, guid: 416be249cc4daf6df92310eda09ff5b7, type: 3}
   deathEffectPrefab: {fileID: 392493001736636100, guid: f843709ba372254adaf13cd27079f84b, type: 3}
 --- !u!23 &6995960347033874681

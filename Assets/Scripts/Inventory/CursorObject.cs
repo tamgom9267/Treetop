@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -58,9 +60,22 @@ public class CursorObject : MonoBehaviour
 
     public void ResetCursor()
     {
+        if (InventoryItemObj  != null)
+        {
+            PanelManager panel = InventoryItemObj.GetComponent<PanelManager>();
+
+            if (panel != null && panel.itemObj != null)
+            {
+                InventoryObject item = panel.itemObj.GetComponent<InventoryObject>();
+
+                if (item != null && Inventory.SelectedObject == item) Inventory.SelectedObject = null;
+            }
+        } 
+        
         InventoryItem = null;
         InventoryItemObj = null;
         isMoving = false;
+        
         updateSize();
         gameObject.GetComponent<Image>().color = Color.green;
     }
@@ -125,34 +140,70 @@ public class CursorObject : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.gameObject.CompareTag("Item") && isMoving == false)
-        {
-            updateSize(other.gameObject);
-            InventoryItem = Inventory.GetComponent<PlayerInventory>();
-            InventoryItemObj = other.gameObject;
-            Inventory.SnapCursorToItem(other.gameObject);
-        }
+        // no cambiar de seleccion mientras se mueve
+        if (isMoving) return;
+        PanelManager panel = other.GetComponent<PanelManager>();
+        if (panel == null) panel = other.GetComponentInParent<PanelManager>();
+        if (panel == null || panel.itemObj == null) return;
+
+        InventoryObject item = panel.itemObj.GetComponent<InventoryObject>();
+        if (item == null) return;
+
+        // Conservar las referencias que utiliza el sistema del cursor.
+        InventoryItem = Inventory;
+        InventoryItemObj = panel.gameObject;
+
+        // Mantener el comportamiento del cursor.
+        updateSize(panel.gameObject);
+        Inventory.SnapCursorToItem(panel.gameObject);
+
+        // Actualizar la selección y disparar el Observer.
+        Inventory.SelectedObject = item;
+
+        // Debug.Log("Objeto seleccionado: " + item.Name);
+
+        // if(other.gameObject.CompareTag("Item") && isMoving == false)
+        // {
+        //     updateSize(other.gameObject);
+        //     InventoryItem = Inventory.GetComponent<PlayerInventory>();
+        //     InventoryItemObj = other.gameObject;
+        //     Inventory.SnapCursorToItem(other.gameObject);
+        // }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if(isRotating == true)
-        {
-            return;
-        }
+        if (isMoving || isRotating) return;
 
-        if(isMoving == false || (InventoryItemObj != null && other == InventoryItemObj.GetComponent<Collider2D>()))
-        {
-            GetComponent<RectTransform>().sizeDelta = CopyCurrentsize;
-            GetComponent<BoxCollider2D>().size = CopyColliderSize;
-            GetComponent<BoxCollider2D>().offset = CopyColliderOffset;
+        PanelManager panel = other.GetComponent<PanelManager>();
+        if (panel == null) panel = other.GetComponentInParent<PanelManager>();
+        if (panel == null || panel.itemObj == null) return;
 
-            InventoryItem = null;
+        InventoryObject item = panel.gameObject.GetComponent<InventoryObject>();
+        if (item == null) return;
+
+        // solo se quita la seleccion si todavia es el mismo objeto seleccionado
+        if (Inventory.SelectedObject == item) Inventory.SelectedObject = null;
+
+        if (InventoryItemObj == panel.gameObject)
+        {
             InventoryItemObj = null;
-            isMoving = false;
+            InventoryItem = null;
             updateSize();
-            gameObject.GetComponent<Image>().color = Color.green;
         }
+
+        // if(isMoving == false || (InventoryItemObj != null && other == InventoryItemObj.GetComponent<Collider2D>()))
+        // {
+        //     GetComponent<RectTransform>().sizeDelta = CopyCurrentsize;
+        //     GetComponent<BoxCollider2D>().size = CopyColliderSize;
+        //     GetComponent<BoxCollider2D>().offset = CopyColliderOffset;
+
+        //     InventoryItem = null;
+        //     InventoryItemObj = null;
+        //     isMoving = false;
+        //     updateSize();
+        //     gameObject.GetComponent<Image>().color = Color.green;
+        // }
     }
 
 }

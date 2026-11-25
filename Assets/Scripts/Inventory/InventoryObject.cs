@@ -1,6 +1,7 @@
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UI;
+using System;
 
 public class InventoryObject : MonoBehaviour
 {
@@ -16,7 +17,56 @@ public class InventoryObject : MonoBehaviour
 
     public List<List<int>> requieredCells = new List<List<int>>();
 
-    public bool isSelected = false;
+    [Header("Feedback de selección")]
+    [SerializeField] private Image itemImage;
+    [SerializeField] private Color selectedColor = Color.gray;
+
+    private Color originalColor;
+
+    public event Action<bool> OnSelectionChanged;
+
+    private bool selected;
+
+
+    public bool isSelected
+    {
+        get => selected;
+        set 
+        {
+            if (selected == value) return;
+
+            selected = value;
+            UpdateSelectionVisual();
+            
+            OnSelectionChanged?.Invoke(selected);
+        }
+    }
+
+    // public bool isSelected = false;
+
+    protected virtual void Awake()
+    {
+        if (itemImage == null) itemImage = GetComponent<Image>();
+        if (itemImage != null) originalColor = itemImage.color;
+    }
+    
+    public void SetDisplayImage(Image image)
+    {
+        itemImage = image;
+
+        if (itemImage != null)
+        {
+            originalColor = itemImage.color;
+            UpdateSelectionVisual();
+        }
+    }
+
+    private void UpdateSelectionVisual()
+    {
+        if (itemImage == null) return;
+
+        itemImage.color = selected ? selectedColor : originalColor;
+    }
 
     public virtual Sprite GetUISprite()
     {
@@ -29,17 +79,5 @@ public class InventoryObject : MonoBehaviour
         {
             requieredCells.Add(new List<int> {cells[i],cells[i+1]});
         }
-    }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

@@ -20,7 +20,7 @@ MonoBehaviour:
   AttackSound: {fileID: 8300000, guid: 5be049805fc87b741ad37f5b391a14de, type: 3}
   requiredCells: 0100000000000000
   health: 0
-  MP: 0
+  MP: 10
   defense: 0
   WD: 0
   PD: 0

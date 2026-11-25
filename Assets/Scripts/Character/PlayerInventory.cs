@@ -44,7 +44,27 @@ public class PlayerInventory : MonoBehaviour
     public int column = 4;
 
     //Para cuando Recogas un objeto
-    public InventoryObject SelectedObject;
+    [SerializeField] private InventoryObject selectedObject;
+
+    public InventoryObject SelectedObject
+    {
+        get => selectedObject;
+
+        set
+        {
+            if (selectedObject == value) return;
+
+            // Deseleccionar el objecto anterior
+            if (selectedObject != null) selectedObject.isSelected = false;
+
+            // asignar nuevo objecto
+            selectedObject = value;
+
+            // seleccionar otro objeto
+            if (selectedObject != null) selectedObject.isSelected = true;
+        }
+    }
+
     public int lootWeight = 8;
     public List<List<int>> lootgrid = new List<List<int>>();
     public List<GameObject> Loot = new List<GameObject>();
@@ -337,6 +357,8 @@ public class PlayerInventory : MonoBehaviour
         }
 
         InvObj.GetComponent<Image>().sprite = worldObject.GetComponent<InventoryObject>().GetUISprite();
+
+        worldObject.GetComponent<InventoryObject>().SetDisplayImage(InvObj.GetComponent<Image>());
     }
 
     

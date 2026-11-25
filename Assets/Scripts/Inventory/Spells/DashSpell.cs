@@ -4,25 +4,24 @@ using UnityEngine;
 
 public class DashSpell : SpellObject
 {
-    bool onCooldown = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void SpellEffect()
     {
         if (!CanCast()) return;
-        if (onCooldown == false)
+        if (!IsOnCooldown)
         {
             PlayerClass playerClass = player.GetComponent<PlayerController>().playerClass;
 
-            if(playerClass.MP < 5)
+            if(playerClass.MP < MP)
             {
                 return;
             }
 
             playerClass.GetComponent<AudioSource>().PlayOneShot(Sound, 0.2f);
             playerClass.speed += 10;
-            onCooldown = true;
+            SetCooldown(true);
 
-            playerClass.SpendMP(5);
+            playerClass.SpendMP(MP);
             player.StartCoroutine(EndEffect(3));   
         }
         
@@ -34,7 +33,7 @@ public class DashSpell : SpellObject
         yield return new WaitForSeconds(num);
         PlayerClass playerClass = player.GetComponent<PlayerController>().playerClass;
         playerClass.speed -= 10;
-        onCooldown = false;
+        SetCooldown(false);
         
     }
 }
