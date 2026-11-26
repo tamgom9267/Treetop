@@ -1117,6 +1117,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Heal
       objectReference: {fileID: 0}
+    - target: {fileID: 7539547155309952578, guid: e797e4bb67949514e994b86dfeac5cba, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2359,6 +2363,10 @@ PrefabInstance:
     - target: {fileID: 8117721023256671360, guid: b7578f6edf9a35b42a11cda900d1bc54, type: 3}
       propertyPath: m_Name
       value: Dash
+      objectReference: {fileID: 0}
+    - target: {fileID: 8117721023256671360, guid: b7578f6edf9a35b42a11cda900d1bc54, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8929548368856706618, guid: b7578f6edf9a35b42a11cda900d1bc54, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5609,6 +5617,10 @@ PrefabInstance:
     - target: {fileID: 4547242166365193442, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
       propertyPath: m_Name
       value: Bola de Fuego
+      objectReference: {fileID: 0}
+    - target: {fileID: 4547242166365193442, guid: 9954f0147af6c024c9b903c88e7271ef, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13267,6 +13279,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: espadaLanza
       objectReference: {fileID: 0}
+    - target: {fileID: 2540236224194365382, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6957035691118666429, guid: 328f488063926bb418e6c1e932e5c0d6, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.421
@@ -13674,7 +13690,7 @@ Transform:
   m_GameObject: {fileID: 137415525515194019}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -13.245773, y: 0.32499748, z: -11.732754}
+  m_LocalPosition: {x: -0.08, y: 0.32499748, z: -11.73}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -14564,6 +14580,10 @@ PrefabInstance:
     - target: {fileID: 7291598591648831995, guid: bfc14715b5f84c543b2fcd104e715983, type: 3}
       propertyPath: m_Name
       value: EspadaAfilada
+      objectReference: {fileID: 0}
+    - target: {fileID: 7291598591648831995, guid: bfc14715b5f84c543b2fcd104e715983, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7932637713482276523, guid: bfc14715b5f84c543b2fcd104e715983, type: 3}
       propertyPath: m_LocalPosition.x
@@ -17469,6 +17489,10 @@ PrefabInstance:
     - target: {fileID: 2038680570063503422, guid: 5ed751d2c05f647468915e065607f6c1, type: 3}
       propertyPath: m_Name
       value: Baston
+      objectReference: {fileID: 0}
+    - target: {fileID: 2038680570063503422, guid: 5ed751d2c05f647468915e065607f6c1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7295382141211567449, guid: 5ed751d2c05f647468915e065607f6c1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -20727,6 +20751,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Martillo
       objectReference: {fileID: 0}
+    - target: {fileID: 6373350743961968574, guid: 078aeb1923f78314aa96b85a621a2a4d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -21242,6 +21270,10 @@ PrefabInstance:
     - target: {fileID: 1410989081947598978, guid: 9f5ffcd9ba372a649948bbe5bb76cabc, type: 3}
       propertyPath: m_Name
       value: Lanza
+      objectReference: {fileID: 0}
+    - target: {fileID: 1410989081947598978, guid: 9f5ffcd9ba372a649948bbe5bb76cabc, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4975992705386195111, guid: 9f5ffcd9ba372a649948bbe5bb76cabc, type: 3}
       propertyPath: m_LocalPosition.x
